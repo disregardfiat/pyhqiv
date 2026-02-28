@@ -31,9 +31,12 @@ pip install pyhqiv
 From source:
 
 ```bash
-git clone https://github.com/disregardfiat/hqvmpy.git && cd hqvmpy
+git clone https://github.com/disregardfiat/pyhqiv.git && cd pyhqiv
 pip install -e .
 ```
+
+Also on [TestPyPI](https://test.pypi.org/project/pyhqiv/) for pre-release testing:  
+`pip install --index-url https://test.pypi.org/simple/ pyhqiv`
 
 Optional extras (PDB loading, JAX, QuTiP, visualization):
 
