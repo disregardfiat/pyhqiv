@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyhqiv"
+version = "0.1.0"
+description = "Horizon-Quantized Informational Vacuum (HQIV) framework — discrete null lattice, phase-horizon Maxwell, octonion algebra, and protein-scale field simulation"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [
+    { name = "HQIV Team" }
+]
+keywords = ["HQIV", "cosmology", "quantum Maxwell", "octonion", "discrete lattice", "phase-horizon"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "numpy>=1.20",
+    "scipy>=1.7",
+]
+
+[project.optional-dependencies]
+ase = ["ase>=3.22"]
+mda = ["MDAnalysis>=2.0"]
+qutip = ["qutip>=4.7"]
+jax = ["jax>=0.4", "jaxlib>=0.4"]
+pyvista = ["pyvista>=0.38"]
+all = ["pyhqiv[ase,mda,qutip,jax,pyvista]"]
+
+[project.urls]
+Documentation = "https://github.com/disregardfiat/hqiv"
+Repository = "https://github.com/disregardfiat/hqiv"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]
