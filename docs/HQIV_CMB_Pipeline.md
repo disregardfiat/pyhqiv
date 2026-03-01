@@ -103,16 +103,19 @@ Implemented in **main** (today):
 - [x] **Background** — `HQIVCosmology.evolve_to_cmb` (scalar: Ω_k, lapse, ages); no map.
 - [x] **Linear perturbations** — `HQIVPerturbations.cosmological_perturbation`, `linear_response`.
 
-Planned in **optional cosmology module** (`pyhqiv.cosmology_full`, Healpy):
+Implemented in **optional cosmology module** (`pyhqiv.cosmology_full`):
 
-- [ ] **Background at z_rec** — Use `HQIVCosmology` + lattice to define T_rec, a_rec, φ(τ_rec).
-- [ ] **Primordial spectrum** — Scale-invariant from combinatorial invariant.
-- [ ] **HQIV Boltzmann equations** — δ' and θ' with f(φ); photon hierarchy with lapse.
-- [ ] **Perturbation evolution z_rec → z = 0** — Integrate δ, θ, δT/T, polarization with f(φ(τ)) and δE(m).
-- [ ] **Line-of-sight integration** — δT/T(ℓ, m) and E/B; **ISW/Rees–Sciama** (galaxy accelerated motion).
-- [ ] **σ₈** — Amplitude at 8 h⁻¹ Mpc from HQIV growth.
-- [ ] **C_ℓ** — Multipole power spectrum (TT, EE, TE, BB) and chart.
-- [ ] **Map generation** — HEALPix full-sky T, Q, U; secondaries (lensing, ISW, Rees–Sciama).
+- [x] **universe_evolver** — z_grid, a_grid, D(z), f(z) from lattice + perturbations.
+- [x] **σ₈** — `sigma8(z)` from HQIV growth D(z) and P(k) with top-hat filter at 8 h⁻¹ Mpc.
+- [x] **C_ℓ** — `c_ell_spectrum('TT'|'EE'|'TE'|'BB')` phenomenological template (μK²).
+- [x] **Line-of-sight ISW/Rees–Sciama** — `line_of_sight_isw_rees_sciama(ell)` ΔC_ℓ from D(z), f(z).
+- [x] **Full-sky Healpy map** — `full_sky_healpy_map(n_side)` when healpy installed (T or Q,U).
+- [x] **hqiv_cmb** — `hqiv_cmb()` returns C_ℓ, σ₈, optional T_map.
+
+Still planned (heavy):
+
+- [ ] **Boltzmann hierarchy** — Full δ' and θ' with f(φ); photon hierarchy with lapse.
+- [ ] **Lensing convergence** — κ map from φ-corrected LSS.
 
 ---
 

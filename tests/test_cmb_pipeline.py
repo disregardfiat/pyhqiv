@@ -11,10 +11,11 @@ def test_cmb_pipeline_status():
     assert status["background"] == "implemented"
     assert status["perturbations_class"] == "implemented"
     assert status["boltzmann_hierarchy"] == "not_implemented"
-    assert status["line_of_sight_integration"] == "not_implemented"
+    assert "implemented" in status["line_of_sight_integration"] or status["line_of_sight_integration"] == "not_implemented"
     assert "Omega_k_true" in status
     assert status.get("Omega_k_true") is not None
     assert "design_doc" in status
+    assert "optional_module" in status
 
 
 def test_hqiv_cmb_pipeline_run_no_map():

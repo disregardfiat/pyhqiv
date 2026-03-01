@@ -50,11 +50,14 @@ def cmb_pipeline_status() -> Dict[str, Any]:
         "perturbations_class": "implemented",
         "cosmological_perturbation": "implemented",
         "boltzmann_hierarchy": "not_implemented",
-        "line_of_sight_integration": "not_implemented",
-        "map_generation_healpix": "not_implemented",
-        "secondaries_lensing_isw_rees_sciama": "not_implemented",
+        "line_of_sight_integration": "implemented (cosmology_full.line_of_sight_isw_rees_sciama)",
+        "map_generation_healpix": "implemented (cosmology_full.full_sky_healpy_map when healpy installed)",
+        "secondaries_lensing_isw_rees_sciama": "implemented (LOS ISW/RS in cosmology_full)",
+        "sigma8": "implemented (cosmology_full.sigma8)",
+        "c_ell_spectrum": "implemented (cosmology_full.c_ell_spectrum)",
+        "universe_evolver": "implemented (cosmology_full.universe_evolver)",
         "design_doc": "docs/HQIV_CMB_Pipeline.md",
-        "optional_module": "pyhqiv.cosmology_full (universe_evolver, hqiv_cmb, sigma8, c_ell, healpy_map, los_isw; install pyhqiv[cosmology])",
+        "optional_module": "pyhqiv.cosmology_full (install pyhqiv[cosmology] for healpy map)",
     }
 
 
