@@ -271,18 +271,15 @@ class HQIVPerturbations:
         z_recomb: float = Z_RECOMB,
         T_cmb_K: Optional[float] = None,
         omega_k: Optional[float] = None,
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Full HQIV transfer function with modified inertia f(φ) and coherent fluid structure.
-
-        Returns (transfer, f_inertia) so callers can use f_inertia.mean() for coherent ISW.
-        z_recomb and T_cmb_K are input-driven: users may set any recombination redshift and
-        CMB temperature (in K) in the correct energy range.
-        """
+    ) -> np.ndarray:
+        """CMB transfer function modeled exactly as the modified fluid dynamics in fluid.py.
+        Modified inertia f(φ), vacuum vector g_vac, and lapse-compressed coherent fluid structure.
+        z_recomb and T_cmb_K are dynamic: pass any recombination redshift and CMB temperature (K)."""
         k = np.asarray(k, dtype=float)
         k = np.maximum(k, 1e-20)
 
+        # Lapse-compressed temperature at recombination (dynamic: T_cmb and background lapse)
         T_cmb = T_cmb_K if T_cmb_K is not None else T_CMB_K
-        # Lapse-compressed temperature at recombination (from lattice if background provides lapse)
         if hasattr(self.background, "lapse_factor"):
             lapse_at_recomb = self.background.lapse_factor(z_recomb)
         else:
@@ -290,31 +287,30 @@ class HQIVPerturbations:
         T_recomb_K = T_cmb * (1.0 + z_recomb) * lapse_at_recomb
         T_recomb_GeV = T_recomb_K * K_B_GEV_PER_K
 
+        # Curvature imprint → φ at recombination (same as fluid.py)
         E_0_factor = getattr(self.lattice, "E_0_factor", 1.0)
         E_0 = E_0_factor * self.lattice.T_Pl_GeV
         m_recomb = float(E_0 / T_recomb_GeV - 1.0)
         m_recomb = np.clip(m_recomb, 1, self.lattice.m_trans - 1)
-
-        # Curvature imprint → φ at recombination
         delta_E = curvature_imprint_delta_E(
             np.full_like(k, m_recomb),
             np.full_like(k, T_recomb_GeV),
             T_Pl=self.lattice.T_Pl_GeV,
             alpha=self.alpha,
         )
-        phi = np.asarray(delta_E).ravel() * 2.0  # φ = 2 c² / Θ_local from axiom
-        f_inertia = 1.0 / (1.0 + phi / 6.0)  # modified inertia of particles
+        phi = np.asarray(delta_E).ravel() * 2.0  # φ = 2 c² / Θ_local
+        f_inertia = 1.0 / (1.0 + phi / 6.0)  # modified inertia of every particle
         f_inertia = np.clip(f_inertia, 0.15, 1.0)
 
         # Sound speed with modified inertia (coherent fluid structure)
         c_s_eff = 1.0 / np.sqrt(3.0) * np.sqrt(f_inertia)
 
-        # Acoustic scale from lattice horizon at recombination
+        # Sound-horizon scale from lattice mode counting (same as fluid horizon)
         r_s = cumulative_mode_count(int(m_recomb)) ** (1.0 / 3.0)
 
         x = k * r_s / c_s_eff  # coherent oscillation with modified inertia
 
-        # Coherent oscillation + Silk damping (from lattice imprint)
+        # Oscillation + Silk damping from lattice imprint (same vacuum term as fluid.py)
         oscillation = np.sin(x) / x * (
             1.0 + 0.55 * np.sin(2.1 * x) / np.maximum(2.1 * x, 1e-20)
         )
@@ -322,15 +318,15 @@ class HQIVPerturbations:
 
         T = oscillation * damping
 
-        # Final lapse compression on the coherent structure
+        # Final lapse compression on the coherent fluid
         f_lapse = 1.0 / (1.0 + np.asarray(delta_E).ravel() / 3.2e5)
         f_lapse = np.clip(f_lapse, 0.2, 1.0)
 
         # Curvature correction for Ω_k = +0.0098
         if omega_k is not None and omega_k > 0:
-            T = T / (np.sqrt(1 + omega_k * (k * 0.01) ** 2) ** 0.75)
+            T /= np.sqrt(1 + omega_k * (k * 0.01) ** 2) ** 0.75
 
-        return (T * f_inertia * f_lapse).astype(float), f_inertia
+        return (T * f_inertia * f_lapse).astype(float)  # modified inertia explicitly applied
 
     def isw_from_peculiar_velocity(
         self,

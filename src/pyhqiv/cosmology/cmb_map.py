@@ -63,7 +63,7 @@ class HQIVCMBMap:
 
         k = np.logspace(-5, 0, n_k)
         Pk_prim = self.lattice.primordial_power_from_invariant(k)
-        delta_T_transfer, _ = self.pert.cosmological_transfer(
+        delta_T_transfer = self.pert.cosmological_transfer(
             k, z_recomb=z_recomb, omega_k=omega_k
         )
 

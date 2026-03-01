@@ -59,12 +59,12 @@ class HQIVCMBMap:
         k = np.logspace(-5, 0, 800)
         Pk_prim = self.lattice.primordial_power_from_invariant(k)
 
-        # 3. Lapse + curvature-aware transfer (returns transfer, f_inertia for coherent ISW)
-        delta_T_transfer, f_inertia_recomb = self.pert.cosmological_transfer(
+        # 3. Lapse + curvature-aware transfer (fluid.py-style: f(φ), coherent fluid)
+        delta_T_transfer = self.pert.cosmological_transfer(
             k, z_recomb=Z_RECOMB, omega_k=self.cosmo.Ok0
         )
 
-        # 4. Full-sky projection with galaxy accelerated motion (ISW); ISW uses same modified inertia
+        # 4. Full-sky projection with galaxy accelerated motion (ISW)
         npix = hp.nside2npix(self.nside)
         delta_T = np.zeros(npix, dtype=float)
         for ipix in range(npix):
@@ -74,7 +74,7 @@ class HQIVCMBMap:
             )
             isw = self.pert.isw_from_peculiar_velocity(
                 theta, phi, omega_k=self.cosmo.Ok0
-            ) * float(np.mean(f_inertia_recomb))
+            )
             delta_T[ipix] = (
                 np.sum(delta_T_transfer * los * self.cosmo.lapse_factor(z=0)) + isw
             )
