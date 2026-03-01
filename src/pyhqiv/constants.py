@@ -62,6 +62,11 @@ T_CMB_MUK: Final[float] = T_CMB_K * 1e6  # μK
 # --- Recombination redshift (standard cosmology reference; used for z_rec in transfer) ---
 Z_RECOMB: Final[float] = 1090.0
 
+# --- Comoving sound horizon at recombination [Mpc] ---
+# Paper: acoustic scale set by horizon at recombination; CLASS-HQIV thermo gives rs_rec ~ 218 Mpc.
+# Used so transfer argument k·r_s is dimensionless when k is in 1/Mpc (peak position ℓ_A ≈ π χ_rec / r_s).
+R_S_REC_MPC: Final[float] = 218.0
+
 # --- Molecular / protein (Å units) ---
 HBAR_C_EV_ANG: Final[float] = 1973.27  # eV·Å
 A_LOC_ANG: Final[float] = 1.0

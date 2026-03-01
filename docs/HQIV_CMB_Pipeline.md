@@ -11,8 +11,30 @@
 | Cosmology wrapper | ✅ 90% | `HQIVCosmology` with Ok0, lapse_factor, curved_line_of_sight |
 | Observable projector + map | ✅ 100% | `hqiv_cmb.py` + `universe_evolver.py` |
 | σ₈ calculation | ✅ 100% | `growth_to_sigma8(omega_k) * sqrt(mean(Pk_prim))` in pipeline |
-| Multipole chart (C_ℓ) | ✅ 100% | From anafast(projected map); `plot_multipole(result)` |
+| Multipole chart (C_ℓ) | ✅ 100% | From **harmonic integral** C_ℓ = ∫ (dk/k) P(k) T(k)² j_ℓ(k χ)²; `plot_multipole(result)` |
 | Galaxy accelerated motion (ISW) | ✅ 100% | `isw_from_peculiar_velocity(theta, phi)` in pixel loop |
+
+### Why CLASS-HQIV gets peaks and we didn’t (fixed)
+
+In **CLASS-HQIV** (Repos/HQIV), C_ℓ is computed in **harmonic space**: the transfer Δ_Tℓ(k) comes from the full line-of-sight integral with **spherical Bessel j_ℓ(k χ)**. So each multipole ℓ gets structure from j_ℓ(k χ_rec), which produces acoustic peaks.
+
+In the **previous pyhqiv** pipeline we built the map with **j0(k χ)** only (isotropic LOS weight). That makes the map the same in every direction, so `anafast` returns almost no ℓ-structure and **no peaks**. The fix is to compute **C_ℓ directly** from the same formula as CLASS:  
+C_ℓ = (4π) ∫ (dk/k) P(k) T(k)² j_ℓ(k χ_rec)²  
+(in μK² with T_CMB_MUK²). The pipeline now uses `_cl_from_harmonic_integral()` and builds the map from C_ℓ via `synfast`, so peaks appear.
+
+### Where the pyhqiv pipeline differs from CLASS-HQIV (peak shape / position)
+
+| Aspect | CLASS-HQIV (Repos/HQIV) | pyhqiv (this repo) |
+|--------|-------------------------|---------------------|
+| **Background** | Integrates HQVM 3H²−γH = 8πG_eff ρ → H(a), τ(a), conformal time in **one** timeline (~52 Gyr). Thermodynamics gives z_rec, visibility, **r_s in Mpc** (~218). | Scalar `evolve_to_cmb()` + FLRW-style `comoving_distance(z)` with Ω_m, Ω_k. **No** thermodynamics module; no r_s in Mpc from visibility. |
+| **Sound horizon r_s** | **rs_rec in Mpc** from thermo (e.g. ~218 Mpc). Transfer and C_ℓ use k in 1/Mpc, so k·r_s and k·χ_rec are both dimensionless. | **r_s = cumulative_mode_count(m_recomb)^(1/3)** in **lattice units** (dimensionless). Same k (1/Mpc) is used in transfer as in C_ℓ. So in the transfer, **x = k·r_s has units 1/Mpc** — wrong. Peak scale in T(k) does not match χ_rec; first acoustic peak position ℓ_A ≈ π χ_rec / r_s is wrong. |
+| **Transfer** | Full **Boltzmann hierarchy** Θ_ℓ(τ,k) and **line-of-sight** integral: Δ_Tℓ(k) = ∫ dτ S(τ,k) j_ℓ(k(τ0−τ)). Source S from thermo + potentials. | **Analytic** T(k): oscillation sin(k·r_s)/(k·r_s) + damping + f_inertia, f_lapse. **No** time integral; no visibility; r_s not in Mpc (see above). |
+| **Primordial** | **A_s = 2.1e-9**, n_s = 0.96, pivot k. | **primordial_power_from_invariant(k)** from combinatorial invariant; no A_s; amplitude differs. |
+| **C_ℓ formula** | Full integral over k with **Δ_Tℓ(k)** from LOS. | C_ℓ = (4π) ∫ (dk/k) P(k) T(k)² j_ℓ(k χ_rec)². Same **structure**, but T(k) and P(k) differ; **r_s / χ_rec scale** wrong → peak positions and shape off. |
+| **Peak position** | ℓ_A ≈ π χ_rec / r_s (both in Mpc) tuned via γ, ω_b, h, α (peak_alignment_scan). | χ_rec in Mpc, r_s in lattice units → **ℓ_A wrong** unless r_s is converted to Mpc (e.g. calibrate r_s_Mpc = 218 at fiducial). |
+| **Boost / dipole** | No explicit “boost scale” in CLASS output; observer motion and ISW in the perturbation/LOS. | **ISW** from `isw_from_peculiar_velocity` added to map; **boost_scale** (default 0.1) for galactic/solar system–like dipole so gradient isn’t extreme. |
+
+**Summary:** The main differences that **change peak shape/position** are: (1) **r_s in Mpc** — we need the sound horizon in Mpc (e.g. from thermo or a calibration to CLASS r_s) so that the transfer argument k·r_s is dimensionless and the first peak in T(k) sits at the right k; (2) **full transfer** — we use an analytic T(k) instead of the integrated LOS source; (3) **primordial amplitude** — A_s vs invariant; (4) **boost** — we add a separate dipole term with boost_scale.
 
 ---
 

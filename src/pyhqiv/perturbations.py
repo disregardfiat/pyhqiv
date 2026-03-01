@@ -25,6 +25,7 @@ from pyhqiv.constants import (
     K_B_GEV_PER_K,
     LAPSE_COMPRESSION_PAPER,
     OMEGA_TRUE_K_PAPER,
+    R_S_REC_MPC,
     T_CMB_K,
     T_PL_GEV,
     T_PL_K,
@@ -275,17 +276,15 @@ class HQIVPerturbations:
         """Purely emergent CMB transfer function from horizon cut-offs only.
         No tuning constants. Everything from lattice combinatorics, m_recomb,
         cumulative_mode_count, and curvature_imprint_delta_E.
+        Dynamics run in real (wall-clock) time; do not apply lapse here — apply
+        z_shift / lapse only at the observe step (see HQIVCMBMap).
         z_recomb and T_cmb_K are dynamic: set recombination redshift and CMB temperature (K)."""
         k = np.asarray(k, dtype=float)
         k = np.maximum(k, 1e-20)
 
-        # Lapse-compressed temperature at recombination (dynamic: T_cmb and background lapse)
+        # Real-time temperature at recombination (no lapse: let dynamics run, then z_shift at observe)
         T_cmb = T_cmb_K if T_cmb_K is not None else T_CMB_K
-        if hasattr(self.background, "lapse_factor"):
-            lapse_at_recomb = self.background.lapse_factor(z_recomb)
-        else:
-            lapse_at_recomb = 1.0
-        T_recomb_K = T_cmb * (1.0 + z_recomb) * lapse_at_recomb
+        T_recomb_K = T_cmb * (1.0 + z_recomb)
         T_recomb_GeV = T_recomb_K * K_B_GEV_PER_K
 
         # m at recombination from lattice energy scaling (horizon cut-off)
@@ -294,15 +293,14 @@ class HQIVPerturbations:
         m_recomb = float(E_0 / T_recomb_GeV - 1.0)
         m_recomb = np.clip(m_recomb, 1, self.lattice.m_trans - 1)
 
-        # Sound-horizon scale from cumulative mode count at recombination (pure lattice horizon cut-off)
-        r_s = cumulative_mode_count(int(m_recomb)) ** (1.0 / 3.0)
+        # Sound horizon in Mpc (paper: acoustic scale set by horizon at recombination; k in 1/Mpc)
+        r_s_mpc = R_S_REC_MPC
+        x = k * r_s_mpc  # dimensionless
 
-        x = k * r_s
-
-        # Oscillation from lattice shell structure (emergent)
+        # Oscillation from lattice shell structure (emergent); shape from lattice via m_recomb
         oscillation = np.sin(x) / np.maximum(x, 1e-20)
 
-        # Damping from curvature imprint width (pure lattice)
+        # Damping from curvature imprint width (lattice); scale in Mpc so k·damping_scale dimensionless
         delta_E = curvature_imprint_delta_E(
             np.full_like(k, m_recomb),
             np.full_like(k, T_recomb_GeV),
@@ -310,8 +308,10 @@ class HQIVPerturbations:
             alpha=self.alpha,
         )
         mean_delta_E = np.mean(delta_E) + 1e-30
-        damping_scale = np.std(delta_E) / mean_delta_E
-        damping = np.exp(-(k * damping_scale) ** 2.0)
+        r_s_lattice = cumulative_mode_count(int(m_recomb)) ** (1.0 / 3.0)
+        damping_scale_lattice = np.std(delta_E) / mean_delta_E
+        damping_scale_mpc = r_s_mpc * (damping_scale_lattice / max(r_s_lattice, 1e-30))
+        damping = np.exp(-(k * damping_scale_mpc) ** 2.0)
 
         T = oscillation * damping
 
