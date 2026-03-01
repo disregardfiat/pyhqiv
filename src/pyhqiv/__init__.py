@@ -86,6 +86,8 @@ from pyhqiv.thermo import (
     TESTABLE_PREDICTIONS,
     plot_phase_diagram_standard_vs_hqiv,
 )
+from pyhqiv.perturbations import HQIVPerturbations, PerturbationMode
+from pyhqiv.cmb_pipeline import HQIVCMBPipeline, cmb_pipeline_status
 from pyhqiv.ase_interface import (
     HQIVCalculator,
     hqiv_energy_at_positions,
@@ -158,6 +160,10 @@ __all__ = [
     "z_expansion_from_scale_factor",
     "HQIVOrbit",
     "parker_perihelion_lapse",
+    "HQIVPerturbations",
+    "PerturbationMode",
+    "HQIVCMBPipeline",
+    "cmb_pipeline_status",
     "HQIVThermoSystem",
     "HQIVEquationOfState",
     "HQIVIdealGas",

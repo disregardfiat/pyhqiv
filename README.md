@@ -185,6 +185,7 @@ V_shift = hqiv_potential_shift(phi_avg=1e-10, dot_delta_theta_avg=1e-18)
 | `src/pyhqiv/fields.py` | Phase-horizon FDTD / spectral Maxwell (γ(φ/c²)(˙δθ′/c) terms) |
 | `src/pyhqiv/fluid.py` | Modified Navier–Stokes: f_inertia, g_vac, ν_eddy (laminar → standard NS) |
 | `src/pyhqiv/thermo.py` | First-principles thermodynamics: phase diagrams, EOS, critical points (no DAC/reference data) |
+| `src/pyhqiv/perturbations.py` | Unified linear perturbations with lapse/φ: stellar oscillations, fluid stability, phonons, cosmology |
 | `src/pyhqiv/waveguide.py` | HQIV waveguide: k_c²(ω,β,m), constant-φ circle, taper, hyperbolic, mode solver |
 | `src/pyhqiv/molecular.py` | PROtien: Θ(Z, coord), bond_length_from_theta, damping_force_magnitude |
 | `src/pyhqiv/crystal.py` | HQIVCrystal: PBC, supercell, bloch_sum, reciprocal_vectors; high_symmetry_k_path; hqiv_potential_shift |
@@ -215,7 +216,17 @@ pip install -e ".[all]"
 pytest tests/ -v
 ```
 
-The test `tests/test_paper_numbers.py` checks Ω_true_k, γ, combinatorial invariant, lapse factor, and lattice δE(m) / mode counts to 6 decimal places.
+With coverage (optional):
+
+```bash
+pip install pytest-cov
+pytest tests/ -v --cov=pyhqiv --cov-report=term-missing --cov-report=html
+# open htmlcov/index.html
+```
+
+CI runs pytest with `--cov=pyhqiv --cov-report=term-missing --cov-report=html` and uploads the HTML report as an artifact (7-day retention). Config: `.coveragerc`. To add a coverage badge, integrate [Codecov](https://codecov.io) or [Coveralls](https://coveralls.io) and add their badge to this README.
+
+The test `tests/test_paper_numbers.py` checks Ω_true_k, γ, combinatorial invariant, lapse factor, and lattice δE(m) / mode counts to 6 decimal places. Additional tests cover ASE calculator (energy/forces/stress), crystal (PBC, k-path), fluid, semiconductors (band_gap, DOS, effective_mass, dielectric), defects, export, and thermo (EOS, phase diagram, hqiv_answer_thermo).
 
 ## Reproducibility
 
@@ -241,6 +252,22 @@ From the single axiom **E_tot = m c² + ħ c/Δx** with **Δx ≤ Θ_local(ρ, T
 - **TESTABLE_PREDICTIONS**, **plot_phase_diagram_standard_vs_hqiv** — Falsifiable predictions and side-by-side standard vs HQIV plots.
 
 Enables the full "space model": solar core, rocket propellants, high-z stellar evolution from one equation → entire phase diagram.
+
+## Advanced modeling (perturbations)
+
+Unified linear perturbations with full HQIV lapse/φ corrections — stellar oscillations (Kepler/TESS), fluid instabilities, phonon spectra, cosmological density perturbations:
+
+```python
+from pyhqiv import HQIVPerturbations, HQIVSolarCore
+
+background = HQIVSolarCore()  # or HQIVSystem, future HQIVStar/HQIVNeutronStar
+pert = HQIVPerturbations(background=background)
+modes = pert.stellar_oscillations(l=1, n_max=5)
+print([m.period for m in modes])  # periods with lapse-compressed frequencies
+print(pert.summary())
+```
+
+**CMB pipeline (roadmap):** Full universe evolution from recombination (z ≈ 1100) to now and synthetic CMB map (lapse-compressed perturbations, no Boltzmann hierarchy) is designed in `docs/HQIV_CMB_Pipeline.md`. Entry point: `HQIVCMBPipeline`, status: `cmb_pipeline_status()`. Includes peculiar velocities, ISW/Rees–Sciama, and φ-corrected lensing for Planck-comparable power spectra and testable low-ℓ deviations.
 
 ## Materials / semiconductors
 

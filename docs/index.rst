@@ -13,6 +13,12 @@ Installation
 
 Optional extras: ``pip install pyhqiv[ase,mda,qutip,jax,pyvista]`` or ``pyhqiv[all]``.
 
+Design and pipeline docs
+------------------------
+
+* **HQIV Integrated Space Model** — ``docs/HQIV_Integrated_Space_Model.md`` (solar core, redshift, orbits).
+* **HQIV CMB Pipeline** — ``docs/HQIV_CMB_Pipeline.md`` (universe evolution to synthetic CMB map, perturbations, secondaries).
+
 API Reference
 -------------
 

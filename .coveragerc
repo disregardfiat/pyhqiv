@@ -1,0 +1,25 @@
+# Coverage.py config: pytest --cov=pyhqiv
+# See https://coverage.readthedocs.io/
+
+[run]
+source = src/pyhqiv
+branch = false
+omit =
+    */tests/*
+    */__main__.py
+    */_version.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if TYPE_CHECKING:
+    if __name__ == .__main__.:
+    @abstractmethod
+show_missing = true
+skip_covered = false
+precision = 2
+
+[html]
+directory = htmlcov

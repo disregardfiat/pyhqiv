@@ -88,7 +88,8 @@ def test_omega_k_jax_matches_numpy():
     pytest.importorskip("jax")
     omega_np = omega_k_from_shell_integral(m_trans=200, use_jax=False)
     omega_jax = omega_k_from_shell_integral(m_trans=200, use_jax=True)
-    assert abs(omega_np - omega_jax) < 1e-10
+    # JAX may use float32; relax tolerance
+    assert abs(omega_np - omega_jax) < 1e-6
 
 
 def test_curvature_imprint_no_nan_extreme_T():
