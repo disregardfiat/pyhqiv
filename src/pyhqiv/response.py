@@ -5,11 +5,11 @@ and f(a, φ) inertia. Non-local conductivity from horizon monogamy (γ ≈ 0.40)
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 
-from pyhqiv.constants import C_SI, GAMMA
+from pyhqiv.constants import GAMMA
 
 
 def compute_conductivity(

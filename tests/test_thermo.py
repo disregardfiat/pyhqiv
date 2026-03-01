@@ -1,26 +1,25 @@
 """Tests for thermo: HQIVThermoSystem, compute_free_energy, EOS, PhaseDiagram, hqiv_answer_thermo."""
 
 import numpy as np
-import pytest
 
+from pyhqiv.constants import ALPHA, GAMMA
 from pyhqiv.thermo import (
-    theta_local_from_density,
-    phi_from_rho_T,
-    shell_fraction_energy_shift,
-    lapse_compression_thermo,
-    HQIVThermoSystem,
-    compute_free_energy,
+    TESTABLE_PREDICTIONS,
+    HQIVHydrogen,
     HQIVIdealGas,
     HQIVRealGas,
-    HQIVHydrogen,
+    HQIVThermoSystem,
     PhaseDiagramGenerator,
+    compute_free_energy,
     hqiv_answer_thermo,
-    TESTABLE_PREDICTIONS,
-    thermo_fluid_lapse,
-    thermo_crystal_phi,
+    lapse_compression_thermo,
+    phi_from_rho_T,
+    shell_fraction_energy_shift,
     thermo_ase_phase_stability,
+    thermo_crystal_phi,
+    thermo_fluid_lapse,
+    theta_local_from_density,
 )
-from pyhqiv.constants import GAMMA, ALPHA
 
 
 def test_theta_local_from_density():

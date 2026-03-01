@@ -36,9 +36,7 @@ class NullLatticeProtocol(Protocol):
         """New modes per shell (vectorized over m)."""
         ...
 
-    def omega_k_true(
-        self, E_0_factor: float = 1.0, use_jax: bool = False
-    ) -> float:
+    def omega_k_true(self, E_0_factor: float = 1.0, use_jax: bool = False) -> float:
         """Ω_k^true from shell integral."""
         ...
 
@@ -94,9 +92,7 @@ class NullLatticeBase(ABC):
         ...
 
     @abstractmethod
-    def omega_k_true(
-        self, E_0_factor: float = 1.0, use_jax: bool = False
-    ) -> float:
+    def omega_k_true(self, E_0_factor: float = 1.0, use_jax: bool = False) -> float:
         """Ω_k^true from shell integral."""
         ...
 
@@ -138,9 +134,7 @@ class PhaseLiftProtocol(Protocol):
 
     gamma: float
 
-    def delta_theta_prime(
-        self, E_prime: Union[float, np.ndarray]
-    ) -> Union[float, np.ndarray]:
+    def delta_theta_prime(self, E_prime: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """δθ′(E′) = arctan(E′)×(π/2)."""
         ...
 
@@ -182,9 +176,7 @@ class PhaseLiftBase(ABC):
         self.c_si = c_si
 
     @abstractmethod
-    def delta_theta_prime(
-        self, E_prime: Union[float, np.ndarray]
-    ) -> Union[float, np.ndarray]:
+    def delta_theta_prime(self, E_prime: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """δθ′(E′) (e.g. arctan(E′)×(π/2))."""
         ...
 
@@ -204,7 +196,7 @@ class PhaseLiftBase(ABC):
         delta_theta_dot: Union[float, np.ndarray],
     ) -> Union[float, np.ndarray]:
         """Lapse factor from γ(φ/c²)(˙δθ′/c). Default implementation."""
-        phi_over_c2 = np.asarray(phi_local, dtype=float) / (self.c_si ** 2)
+        phi_over_c2 = np.asarray(phi_local, dtype=float) / (self.c_si**2)
         dtdc = np.asarray(delta_theta_dot, dtype=float) / self.c_si
         return 1.0 + self.gamma * phi_over_c2 * dtdc
 

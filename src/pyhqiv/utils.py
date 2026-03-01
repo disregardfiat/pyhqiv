@@ -40,7 +40,7 @@ def local_theta_from_distance(r: np.ndarray, scale: float = 1.0) -> np.ndarray:
 
 def phi_from_theta_local(theta_local: np.ndarray, c: float = 1.0) -> np.ndarray:
     """φ(x) = 2c²/Θ_local(x). c in natural units can be 1."""
-    return 2.0 * (c ** 2) / np.maximum(np.asarray(theta_local), 1e-30)
+    return 2.0 * (c**2) / np.maximum(np.asarray(theta_local), 1e-30)
 
 
 def set_seed(seed: Optional[int] = 42) -> None:
@@ -84,7 +84,7 @@ def theta_local(
     """
     z = max(1, int(z_shell))
     coord = max(1, int(coordination))
-    norm = (6.0 ** alpha) * (2.0 ** (1.0 / 3.0))
+    norm = (6.0**alpha) * (2.0 ** (1.0 / 3.0))
     return theta_ref_ang * norm * (z ** (-alpha)) / (coord ** (1.0 / 3.0))
 
 
@@ -170,8 +170,9 @@ def damping_force_magnitude(
     """
     if gamma is None:
         from pyhqiv.constants import GAMMA
+
         gamma = GAMMA
     phi = np.asarray(phi, dtype=float)
     grad_phi = np.asarray(grad_phi, dtype=float)
     denom = np.maximum(a_loc + phi / 6.0, 1e-30)
-    return gamma * phi * np.abs(grad_phi) / (denom ** 2)
+    return gamma * phi * np.abs(grad_phi) / (denom**2)

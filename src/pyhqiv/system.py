@@ -37,7 +37,7 @@ def _coulomb_field(
         r = grid - positions[i]
         d = np.linalg.norm(r, axis=1, keepdims=True)
         d = np.maximum(d, 1e-12)
-        E += charges[i] * r / (d ** 3)
+        E += charges[i] * r / (d**3)
 
     if epsilon_eff is not None:
         eps = np.asarray(epsilon_eff).reshape(-1, 1)
@@ -60,7 +60,7 @@ def _phase_corrected_epsilon(
     phi_sum = np.zeros(grid.shape[0], dtype=float)
     for at in atoms:
         phi_sum += at.phi_local(grid)
-    phi_over_c2 = phi_sum / (C_SI ** 2)
+    phi_over_c2 = phi_sum / (C_SI**2)
     dtdc = np.arctan(E_prime) * (np.pi / 2.0) / C_SI
     # Constitutive: ε_eff ∝ 1 + γ φ/c² (˙δθ′/c) for phase-horizon correction
     return 1.0 + gamma * phi_over_c2 * dtdc
@@ -97,7 +97,7 @@ class HQIVSystem:
         charges: Optional[List[float]] = None,
         species: Optional[List[str]] = None,
         gamma: float = GAMMA,
-    ) -> "HQIVSystem":
+    ) -> HQIVSystem:
         """Build HQIVSystem from list of positions and optional charges/species."""
         positions = np.asarray(positions)
         if positions.ndim == 1:
@@ -107,10 +107,7 @@ class HQIVSystem:
             charges = [0.0] * M
         if species is None:
             species = ["X"] * M
-        atoms = [
-            HQIVAtom(positions[i], charge=charges[i], species=species[i])
-            for i in range(M)
-        ]
+        atoms = [HQIVAtom(positions[i], charge=charges[i], species=species[i]) for i in range(M)]
         return cls(atoms, gamma=gamma)
 
     @classmethod
@@ -118,7 +115,7 @@ class HQIVSystem:
         cls,
         path: Union[str, Path],
         gamma: float = GAMMA,
-    ) -> "HQIVSystem":
+    ) -> HQIVSystem:
         """
         Load atoms from PDB file. Requires optional dependency ase or MDAnalysis.
         Falls back to empty system with warning if neither available.
@@ -129,6 +126,7 @@ class HQIVSystem:
 
         try:
             import ase.io
+
             atoms_ase = ase.io.read(str(path))
             positions = atoms_ase.get_positions()
             symbols = atoms_ase.get_chemical_symbols()
@@ -141,6 +139,7 @@ class HQIVSystem:
 
         try:
             import MDAnalysis as mda
+
             u = mda.Universe(str(path))
             positions = u.atoms.positions
             names = u.atoms.names
@@ -151,7 +150,9 @@ class HQIVSystem:
         except ImportError:
             pass
 
-        raise ImportError("Install ase or MDAnalysis to use from_pdb: pip install pyhqiv[ase] or pyhqiv[mda]")
+        raise ImportError(
+            "Install ase or MDAnalysis to use from_pdb: pip install pyhqiv[ase] or pyhqiv[mda]"
+        )
 
     def compute_fields(
         self,

@@ -1,11 +1,9 @@
 """Tests for HQIVSystem and HQIVAtom."""
 
 import numpy as np
-import pytest
 
 from pyhqiv.atom import HQIVAtom
 from pyhqiv.system import HQIVSystem
-from pyhqiv.constants import GAMMA
 
 
 def test_atom_phi_local():

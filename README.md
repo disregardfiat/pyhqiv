@@ -284,7 +284,7 @@ print([m.period for m in modes])  # periods with lapse-compressed frequencies
 print(pert.summary())
 ```
 
-**CMB pipeline:** Full universe evolution to a synthetic CMB map is in `docs/HQIV_CMB_Pipeline.md`. Use **HQIVUniverseEvolver** (`pyhqiv.cosmology`) with `run_from_T_Pl_to_now()` for a full-sky map (µK) and σ₈; it delegates to the optional module `pyhqiv.cosmology_full`. **Caveat:** the current map and σ₈ are **phenomenological** (C_ℓ template + synfast, growth-based σ₈); the first-principles chain (primordial seeding → forward evolution → LOS projection → anafast) is not yet implemented. See `cmb_pipeline_status()` and doc §0.1 for the gap.
+**CMB pipeline:** Full universe evolution to a synthetic CMB map is in `docs/HQIV_CMB_Pipeline.md`. Use **HQIVUniverseEvolver** (`pyhqiv.cosmology`) with `run_from_T_Pl_to_now()` for a full-sky map (µK) and σ₈; it delegates to the optional module `pyhqiv.cosmology_full`. **Seed from bulk (paper-authoritative):** Until baryogenesis is complete, the pipeline should be seeded by HQIV `horizon_modes/python/bulk.py`. Call `get_bulk_seed()` (when the HQIV repo is available) and pass it as `bulk_seed` to the evolver or `hqiv_cmb`; then Ω_k, H₀, and η come from bulk. **Caveat:** the current map and σ₈ are **phenomenological** (C_ℓ template + synfast, growth-based σ₈); the first-principles chain (primordial seeding → forward evolution → LOS projection → anafast) is not yet implemented. See `cmb_pipeline_status()` and doc §0.1 for the gap.
 
 ## Materials / semiconductors
 

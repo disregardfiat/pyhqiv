@@ -12,7 +12,7 @@ VESTA or OVITO; optional HQIV correction multiplies the density by a factor
 
 from __future__ import annotations
 
-from typing import Optional, Tuple, Union
+from typing import Optional
 
 import numpy as np
 

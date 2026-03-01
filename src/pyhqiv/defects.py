@@ -5,7 +5,7 @@ charged-defect supercell helpers.
 
 from __future__ import annotations
 
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -120,7 +120,7 @@ def charged_defect_supercell(
     else:
         pos_frac = pos
     ch = np.asarray(charges, dtype=float).ravel()
-    n_cell = len(ch)
+    _ = len(ch)  # number of cells (for future use)
     n1, n2, n3 = supercell_shape
     positions_list: List[np.ndarray] = []
     charges_list: List[float] = []

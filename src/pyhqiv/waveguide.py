@@ -44,7 +44,7 @@ def kc_squared_hqiv(
     Paper: (∇⊥² + k_c²) E_t = 0. Non-Hermitian when m≠0 → complex, leaky, or phase-locked modes.
     """
     k0_sq = (omega / c) ** 2
-    base = k0_sq - beta ** 2
+    base = k0_sq - beta**2
     d = np.asarray(dot_delta_theta, dtype=complex)
     return base + 2j * m_phase * omega * d + (m_phase * d) ** 2
 
@@ -58,7 +58,7 @@ def waveguide_radius_constant_phi(
 
     Only shape with uniform Θ_local (distance to wall) in the cross-section.
     """
-    return 2.0 * (c ** 2) / max(phi_target, 1e-30)
+    return 2.0 * (c**2) / max(phi_target, 1e-30)
 
 
 def waveguide_te11_cutoff_beta(
@@ -73,7 +73,12 @@ def waveguide_te11_cutoff_beta(
     shifted by HQIV phase terms. β² = ω²/c² - (1.841/a)² + 2imωδ̇θ′ + m²(δ̇θ′)².
     """
     kc_te11 = 1.841 / max(a, 1e-30)
-    kc_sq = (omega / c) ** 2 - kc_te11 ** 2 + 2j * m_phase * omega * dot_delta_theta + (m_phase * dot_delta_theta) ** 2
+    kc_sq = (
+        (omega / c) ** 2
+        - kc_te11**2
+        + 2j * m_phase * omega * dot_delta_theta
+        + (m_phase * dot_delta_theta) ** 2
+    )
     return np.sqrt(kc_sq + 0j)
 
 
@@ -178,8 +183,13 @@ def _laplacian_2d_dirichlet(
     L = np.zeros((n_total, n_total))
     for i, flat_i in enumerate(idx):
         iy, ix = np.unravel_index(flat_i, (n_y, n_x))
-        L[i, i] = 2.0 / (dx ** 2) + 2.0 / (dy ** 2)
-        for di, dj, coef in [(-1, 0, -1.0 / (dx ** 2)), (1, 0, -1.0 / (dx ** 2)), (0, -1, -1.0 / (dy ** 2)), (0, 1, -1.0 / (dy ** 2))]:
+        L[i, i] = 2.0 / (dx**2) + 2.0 / (dy**2)
+        for di, dj, coef in [
+            (-1, 0, -1.0 / (dx**2)),
+            (1, 0, -1.0 / (dx**2)),
+            (0, -1, -1.0 / (dy**2)),
+            (0, 1, -1.0 / (dy**2)),
+        ]:
             ny, nx = iy + dj, ix + di
             if 0 <= ny < n_y and 0 <= nx < n_x:
                 j = inv_idx[ny * n_x + nx]
@@ -209,7 +219,7 @@ def hqiv_waveguide_mode_solver(
     """
     try:
         from scipy.sparse import csr_matrix
-        from scipy.sparse.linalg import eigsh, eigs
+        from scipy.sparse.linalg import eigsh
     except ImportError:
         raise ImportError("scipy required for hqiv_waveguide_mode_solver")
 
@@ -230,7 +240,7 @@ def hqiv_waveguide_mode_solver(
         Theta_grid = np.asarray(Theta_grid)
         interior_mask = Theta_grid > 0.01 * (Theta_grid.max() + 1e-30)
 
-    phi_grid = 2.0 * (c ** 2) / np.maximum(Theta_grid, 1e-30)
+    phi_grid = 2.0 * (c**2) / np.maximum(Theta_grid, 1e-30)
     dot_dtheta = dot_delta_theta_from_phi(phi_grid, gamma=gamma, c=c)
     kc2_grid = kc_squared_hqiv(omega, beta_target, m_phase, dot_dtheta, c=c)
 

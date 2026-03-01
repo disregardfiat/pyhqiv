@@ -121,7 +121,7 @@ def eddy_viscosity(
     Theta = np.asarray(Theta_local, dtype=float)
     dot = np.asarray(dot_delta_theta, dtype=float)
     lc = np.asarray(l_coh, dtype=float)
-    return gamma * Theta * np.abs(dot) * (lc ** 2) * coherence_factor
+    return gamma * Theta * np.abs(dot) * (lc**2) * coherence_factor
 
 
 def modified_momentum_rhs(

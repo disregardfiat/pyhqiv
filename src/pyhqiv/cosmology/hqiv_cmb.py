@@ -17,6 +17,7 @@ def run_hqiv_cmb_to_map(
     max_ell: int = 1500,
     include_polarization: bool = True,
     cosmology: Optional[HQIVCosmology] = None,
+    bulk_seed: Optional[Any] = None,
     include_isw_rees_sciama: bool = True,
     frame_velocity_km_s: Optional[float] = None,
     frame_gal_l_deg: float = 264.0,
@@ -26,8 +27,8 @@ def run_hqiv_cmb_to_map(
     """
     Run HQIV CMB pipeline: C_ℓ → full-sky map in μK.
 
-    Delegates to cosmology_full.hqiv_cmb. Multipoles out to max_ell (≥1500).
-    Set frame_velocity_km_s to add kinematic dipole and generate low-ℓ region.
+    When bulk_seed is provided (from pyhqiv.bulk_seed.get_bulk_seed()), the pipeline
+    uses HQIV bulk.py output as the authoritative seed until baryogenesis complete.
     """
     from pyhqiv import cosmology_full
 
@@ -36,6 +37,7 @@ def run_hqiv_cmb_to_map(
         max_ell=max(max_ell, 1500),
         include_polarization=include_polarization,
         cosmology=cosmology,
+        bulk_seed=bulk_seed,
         frame_velocity_km_s=frame_velocity_km_s,
         frame_gal_l_deg=frame_gal_l_deg,
         frame_gal_b_deg=frame_gal_b_deg,

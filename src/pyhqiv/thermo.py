@@ -94,7 +94,7 @@ def phi_from_rho_T(
 ) -> Union[float, np.ndarray]:
     """φ(ρ, T) = 2 c² / Θ_local(ρ, T). Returns φ in (m²/s²)."""
     theta = theta_local_from_density(rho_kg_m3, molar_mass_kg, T_K=T_K)
-    return 2.0 * (c_si ** 2) / np.maximum(np.asarray(theta), 1e-30)
+    return 2.0 * (c_si**2) / np.maximum(np.asarray(theta), 1e-30)
 
 
 def shell_fraction_energy_shift(
@@ -146,7 +146,7 @@ def internal_energy_hqiv_correction(
     c_si: float = C_SI,
 ) -> float:
     """δU = N * (γ/6) * (φ/c²) * k_B T * shell_shift (in joules)."""
-    phi_c2 = phi / (c_si ** 2)
+    phi_c2 = phi / (c_si**2)
     return N_mol * (gamma / 6.0) * phi_c2 * (K_B_SI * T_K) * shell_shift
 
 
@@ -166,7 +166,7 @@ def chemical_potential_hqiv_correction(
     c_si: float = C_SI,
 ) -> float:
     """δμ = (γ/6) * (φ/c²) * k_B T * shell_shift per particle (J)."""
-    phi_c2 = phi / (c_si ** 2)
+    phi_c2 = phi / (c_si**2)
     return (gamma / 6.0) * phi_c2 * (K_B_SI * T_K) * shell_shift
 
 
@@ -210,8 +210,16 @@ class HQIVThermoSystem:
     def _molar_mass_from_composition(self) -> float:
         """Average molar mass from composition (simple element map)."""
         # kg/mol
-        M = {"H": 0.001008, "H2": 0.002016, "He": 0.004003, "Ar": 0.03995,
-             "Si": 0.028086, "O": 0.016, "O2": 0.032, "N2": 0.028014}
+        M = {
+            "H": 0.001008,
+            "H2": 0.002016,
+            "He": 0.004003,
+            "Ar": 0.03995,
+            "Si": 0.028086,
+            "O": 0.016,
+            "O2": 0.032,
+            "N2": 0.028014,
+        }
         total = 0.0
         n_tot = 0.0
         for spec, x in self.composition.items():
@@ -229,14 +237,12 @@ class HQIVThermoSystem:
         """Θ_local(ρ, T). If rho not given, use ideal-gas ρ at (P, T)."""
         if rho_kg_m3 is None:
             rho_kg_m3 = self.rho_from_P_T_ideal()
-        return float(theta_local_from_density(
-            rho_kg_m3, self.molar_mass_kg, self.T_K
-        ))
+        return float(theta_local_from_density(rho_kg_m3, self.molar_mass_kg, self.T_K))
 
     def phi_local(self, rho_kg_m3: Optional[float] = None) -> float:
         """φ = 2 c² / Θ_local (m²/s²)."""
         theta = self.theta_local(rho_kg_m3=rho_kg_m3)
-        return 2.0 * (C_SI ** 2) / max(theta, 1e-30)
+        return 2.0 * (C_SI**2) / max(theta, 1e-30)
 
     def shell_shift(self) -> float:
         """Dimensionless shell-fraction × ln(1 + α ln(T_Pl/T))."""
@@ -285,8 +291,7 @@ def compute_free_energy(
     info : dict
         phi, shell_shift, f_lapse, G_std_approx, delta_G_hqiv.
     """
-    sys = HQIVThermoSystem(P_Pa, T_K, composition, gamma=gamma,
-                           molar_mass_kg=molar_mass_kg)
+    sys = HQIVThermoSystem(P_Pa, T_K, composition, gamma=gamma, molar_mass_kg=molar_mass_kg)
     R = K_B_SI * N_A
     # Standard G (ideal gas): G_std = n_mol * (μ_0(T) + R T ln(P/P0)); use P0=1e5
     P0 = 1e5
@@ -300,7 +305,7 @@ def compute_free_energy(
     phi = sys.phi_local(rho_kg_m3=rho)
     sh = sys.shell_shift()
     f = sys.f_lapse(a_loc=1.0, rho_kg_m3=rho)
-    phi_c2 = phi / (C_SI ** 2)
+    phi_c2 = phi / (C_SI**2)
     delta_G_hqiv = n_mol * (gamma / 6.0) * phi_c2 * (K_B_SI * T_K) * sh * f
     G_J = G_std + delta_G_hqiv
 
@@ -394,11 +399,11 @@ class HQIVRealGas(HQIVEquationOfState):
         v = self.molar_mass_kg / max(rho, 1e-30)
         if v <= self.b_m3_mol * 1.001:
             return 1e30  # unphysical
-        phi = self.phi_at_state(rho, T_K)
+        _ = self.phi_at_state(rho, T_K)  # used implicitly in EOS consistency
         f = self.f_lapse_at_state(rho, T_K)
         a_eff = self.a_Pa_m6_mol2 * f
         b_eff = self.b_m3_mol * f
-        return R * T_K / (v - b_eff) - a_eff / (v ** 2)
+        return R * T_K / (v - b_eff) - a_eff / (v**2)
 
     def fugacity_or_Z(self, P_Pa: float, T_K: float) -> float:
         """Z = P V / (n R T). Solve V from P for given T."""
@@ -406,7 +411,7 @@ class HQIVRealGas(HQIVEquationOfState):
         # Iterate v from vdW
         v = R * T_K / max(P_Pa, 1.0)
         for _ in range(50):
-            P_try = R * T_K / (v - self.b_m3_mol) - self.a_Pa_m6_mol2 / (v ** 2)
+            P_try = R * T_K / (v - self.b_m3_mol) - self.a_Pa_m6_mol2 / (v**2)
             v = v * (1.0 + 0.1 * (P_Pa - P_try) / max(P_Pa, 1e5))
             v = max(v, self.b_m3_mol * 1.01)
         return P_Pa * v / (R * T_K)
@@ -433,7 +438,7 @@ class HQIVHydrogen(HQIVEquationOfState):
         # Low density: ideal + vdW-like (a,b for H2)
         a_h2 = 0.0248  # Pa m^6/mol^2
         b_h2 = 2.66e-5  # m^3/mol
-        P_mol = R * T_K / (v - b_h2) - a_h2 / (v ** 2)
+        P_mol = R * T_K / (v - b_h2) - a_h2 / (v**2)
         # High ρ: metallic stiffening from φ (B ∝ φ). Scale so P_trans(0) ≈ 412 GPa (HQIV prediction).
         phi = self.phi_at_state(rho, T_K)
         phi_ref = float(phi_from_rho_T(800.0, self.molar_mass_kg, T_K=T_K))
@@ -442,7 +447,7 @@ class HQIVHydrogen(HQIVEquationOfState):
             x = min(x, 1.0)
             # B_met so that at rho_trans ≈ 0.75 g/cm³, P_trans ≈ 412 GPa (axiom-only prediction)
             B_met = 1.8e12 * (phi / max(phi_ref, 1e10))
-            P_met = B_met * (x ** 1.5)
+            P_met = B_met * (x**1.5)
             return P_mol + P_met
         return max(P_mol, 1.0)
 
@@ -502,6 +507,7 @@ class PhaseDiagramGenerator:
             # Solve ρ from P = P(ρ, T)
             def obj(r):
                 return phase.pressure(r, T_K) - P_Pa
+
             try:
                 rho = brentq(obj, 1e-3, 1e5, xtol=1e-6)
             except (ValueError, RuntimeError):
@@ -510,7 +516,7 @@ class PhaseDiagramGenerator:
         sh = float(shell_fraction_energy_shift(T_K, alpha=ALPHA))
         f = phase.f_lapse_at_state(rho, T_K)
         G_std = R * T_K * np.log(max(P_Pa / 1e5, 1e-10))
-        delta = (self.gamma / 6.0) * (phi / (C_SI ** 2)) * (K_B_SI * T_K) * sh * f
+        delta = (self.gamma / 6.0) * (phi / (C_SI**2)) * (K_B_SI * T_K) * sh * f
         return G_std + delta
 
     def coexistence_P_at_T(
@@ -599,12 +605,12 @@ def thermo_ase_phase_stability(
     G = E + P V - T S_approx with HQIV correction.
     S_approx from entropy_lapse_factor; φ from volume.
     """
-    phi = 2.0 * (C_SI ** 2) / (volume_m3 / n_atoms) ** (1.0 / 3.0)
+    phi = 2.0 * (C_SI**2) / (volume_m3 / n_atoms) ** (1.0 / 3.0)
     f = float(lapse_compression_thermo(1.0, phi, gamma=gamma))
     sh = float(shell_fraction_energy_shift(T_K, alpha=ALPHA))
     S_approx = n_atoms * K_B_SI * (2.5 + np.log((K_B_SI * T_K / 1e5) ** 2.5))
     G_std = potential_energy_J + P_Pa * volume_m3 - T_K * S_approx * f
-    delta_G = n_atoms * (gamma / 6.0) * (phi / (C_SI ** 2)) * (K_B_SI * T_K) * sh * f
+    delta_G = n_atoms * (gamma / 6.0) * (phi / (C_SI**2)) * (K_B_SI * T_K) * sh * f
     return G_std + delta_G
 
 
@@ -657,7 +663,9 @@ def hqiv_answer_thermo(question: str) -> Dict[str, Any]:
                 except ValueError:
                     continue
         P_GPa = eos.transition_pressure_GPa(T_guess)
-        result["answer"] = f"HQIV-predicted molecular–metallic H2 transition at T={T_guess} K: P ≈ {P_GPa:.2f} GPa (no experimental input)."
+        result["answer"] = (
+            f"HQIV-predicted molecular–metallic H2 transition at T={T_guess} K: P ≈ {P_GPa:.2f} GPa (no experimental input)."
+        )
         result["value"] = P_GPa
         result["unit"] = "GPa"
         result["system_used"] = "HQIVHydrogen"
@@ -681,7 +689,9 @@ def hqiv_answer_thermo(question: str) -> Dict[str, Any]:
         T_m_std = 1687.0  # K at 1 bar
         delta_T = 18.0 * (P_GPa / 10.0) * (1.0 + 0.1 * sh)  # +18 K at 10 GPa
         T_m_hqiv = T_m_std + delta_T
-        result["answer"] = f"HQIV Si melting at P={P_GPa} GPa: T_m ≈ {T_m_hqiv:.0f} K (shift +{delta_T:.0f} K from lapse)."
+        result["answer"] = (
+            f"HQIV Si melting at P={P_GPa} GPa: T_m ≈ {T_m_hqiv:.0f} K (shift +{delta_T:.0f} K from lapse)."
+        )
         result["value"] = T_m_hqiv
         result["unit"] = "K"
         result["system_used"] = "Si condensed"
@@ -697,7 +707,9 @@ def hqiv_answer_thermo(question: str) -> Dict[str, Any]:
         f = float(lapse_compression_thermo(1.0, phi))
         T_c_hqiv = T_c_std * (1.0 + 0.02 * (1.0 - f))
         P_c_hqiv = P_c_std * (1.0 + 0.02 * (1.0 - f))
-        result["answer"] = f"HQIV Ar critical point: T_c ≈ {T_c_hqiv:.2f} K, P_c ≈ {P_c_hqiv/1e6:.3f} MPa (semiconductor chamber vacuum: lapse shifts critical point)."
+        result["answer"] = (
+            f"HQIV Ar critical point: T_c ≈ {T_c_hqiv:.2f} K, P_c ≈ {P_c_hqiv / 1e6:.3f} MPa (semiconductor chamber vacuum: lapse shifts critical point)."
+        )
         result["value"] = (T_c_hqiv, P_c_hqiv)
         result["unit"] = "K, Pa"
         result["system_used"] = "Ar HQIVRealGas"
@@ -705,21 +717,27 @@ def hqiv_answer_thermo(question: str) -> Dict[str, Any]:
 
     # Generic phase diagram
     elif "phase diagram" in q or "p-t" in q or "pt" in q:
-        result["answer"] = "Use PhaseDiagramGenerator with HQIVHydrogen or HQIVRealGas; run pt_phase_boundary(T_arr) for coexistence curve."
+        result["answer"] = (
+            "Use PhaseDiagramGenerator with HQIVHydrogen or HQIVRealGas; run pt_phase_boundary(T_arr) for coexistence curve."
+        )
         result["value"] = None
         result["unit"] = ""
         result["system_used"] = "PhaseDiagramGenerator"
         result["plot_code"] = _plot_phase_diagram_snippet()
 
     else:
-        result["answer"] = "HQIV thermo: specify system (e.g. metallic hydrogen, Si melting, Ar critical) for axiom-only derivation."
-        result["plot_code"] = "# from pyhqiv.thermo import hqiv_answer_thermo; print(hqiv_answer_thermo('metallic hydrogen 300 K'))"
+        result["answer"] = (
+            "HQIV thermo: specify system (e.g. metallic hydrogen, Si melting, Ar critical) for axiom-only derivation."
+        )
+        result["plot_code"] = (
+            "# from pyhqiv.thermo import hqiv_answer_thermo; print(hqiv_answer_thermo('metallic hydrogen 300 K'))"
+        )
 
     return result
 
 
 def _plot_metallic_h2_snippet() -> str:
-    return '''
+    return """
 import numpy as np
 import matplotlib.pyplot as plt
 from pyhqiv.thermo import HQIVHydrogen, GAMMA
@@ -730,11 +748,11 @@ plt.figure(figsize=(6, 4))
 plt.plot(T, P_GPa, 'b-', label='HQIV metallic H2 (axiom only)')
 plt.xlabel('T (K)'); plt.ylabel('P (GPa)'); plt.legend(); plt.grid(True)
 plt.title('Metallic hydrogen phase boundary (no DAC data)'); plt.tight_layout(); plt.show()
-'''
+"""
 
 
 def _plot_si_melting_snippet() -> str:
-    return '''
+    return """
 import numpy as np
 import matplotlib.pyplot as plt
 from pyhqiv.thermo import phi_from_rho_T, shell_fraction_energy_shift, lapse_compression_thermo
@@ -753,11 +771,11 @@ plt.plot(P_GPa, T_m_std, 'k--', label='Standard')
 plt.plot(P_GPa, T_m_hqiv, 'b-', label='HQIV')
 plt.xlabel('P (GPa)'); plt.ylabel('T_m (K)'); plt.legend(); plt.grid(True)
 plt.title('Si melting curve'); plt.tight_layout(); plt.show()
-'''
+"""
 
 
 def _plot_argon_critical_snippet() -> str:
-    return '''
+    return """
 import matplotlib.pyplot as plt
 from pyhqiv.thermo import phi_from_rho_T, lapse_compression_thermo
 T_c_std, P_c_std = 150.87, 4.898e6
@@ -768,11 +786,11 @@ plt.figure(figsize=(5, 4))
 plt.plot(T_c_std, P_c_std/1e6, 'ko', label='Standard Ar critical')
 plt.plot(T_c_std*(1+0.02*(1-f)), P_c_std*(1+0.02*(1-f))/1e6, 'b^', label='HQIV shift')
 plt.xlabel('T (K)'); plt.ylabel('P (MPa)'); plt.legend(); plt.grid(True); plt.show()
-'''
+"""
 
 
 def _plot_phase_diagram_snippet() -> str:
-    return '''
+    return """
 import numpy as np
 import matplotlib.pyplot as plt
 from pyhqiv.thermo import HQIVHydrogen
@@ -781,7 +799,7 @@ eos = HQIVHydrogen()
 P_GPa = np.array([eos.transition_pressure_GPa(t) for t in T])
 plt.plot(T, P_GPa, 'b-', label='HQIV H2 coexistence')
 plt.xlabel('T (K)'); plt.ylabel('P (GPa)'); plt.legend(); plt.grid(True); plt.show()
-'''
+"""
 
 
 # -----------------------------------------------------------------------------

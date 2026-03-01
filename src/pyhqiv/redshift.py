@@ -11,7 +11,7 @@ from typing import Optional, Union
 
 import numpy as np
 
-from pyhqiv.constants import C_SI, LAPSE_COMPRESSION_PAPER
+from pyhqiv.constants import LAPSE_COMPRESSION_PAPER
 from pyhqiv.fluid import f_inertia
 from pyhqiv.lattice import DiscreteNullLattice
 from pyhqiv.phase import HQIVPhaseLift

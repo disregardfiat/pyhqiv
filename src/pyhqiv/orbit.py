@@ -7,14 +7,13 @@ Integrates with REBOUND/Gala-style stepping: at each step compute φ(r), f(r), a
 
 from __future__ import annotations
 
-from typing import Callable, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
 from pyhqiv.constants import C_SI, GAMMA
 from pyhqiv.fluid import f_inertia
 from pyhqiv.utils import phi_from_theta_local
-
 
 # SI constants for orbits
 G_SI: float = 6.67430e-11  # m³/(kg·s²)
@@ -80,7 +79,7 @@ class HQIVOrbit:
     def a_grav_mag(self, r_vec: np.ndarray) -> np.ndarray:
         """Newtonian |a| = G M / r² (m/s²)."""
         r = np.linalg.norm(r_vec, axis=-1)
-        return self.G * self.M_central / np.maximum(r ** 2, 1e-30)
+        return self.G * self.M_central / np.maximum(r**2, 1e-30)
 
     def lapse_f(self, r_vec: np.ndarray) -> np.ndarray:
         """f(a_loc, φ) at position r_vec; a_loc = G M/r²."""
@@ -109,7 +108,7 @@ class HQIVOrbit:
         r = np.linalg.norm(r_vec, axis=-1, keepdims=True)
         r = np.maximum(r, 1e-30)
         r_hat = r_vec / r
-        a_newt = -self.G * self.M_central / (r ** 2) * r_hat
+        a_newt = -self.G * self.M_central / (r**2) * r_hat
         if not scale_force_by_1_over_f:
             return a_newt
         f = self.lapse_f(r_vec)
@@ -178,5 +177,5 @@ def parker_perihelion_lapse(R_perihelion_au: float = 0.05) -> float:
     """Lapse factor f at Parker Solar Probe perihelion (au). φ and f at that r."""
     r_m = R_perihelion_au * AU_M
     phi = float(phi_from_r(r_m))
-    a_loc = G_SI * M_SUN_KG / (r_m ** 2)
+    a_loc = G_SI * M_SUN_KG / (r_m**2)
     return float(f_inertia(a_loc, phi))

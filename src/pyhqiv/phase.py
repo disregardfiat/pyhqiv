@@ -6,7 +6,7 @@ and modified Maxwell lift terms (γ(φ/c²)(˙δθ′/c)). Paper Sec. 2 & 5.
 from __future__ import annotations
 
 import math
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import numpy as np
 
@@ -85,7 +85,7 @@ class HQIVPhaseLift:
         delta_theta_dot: Union[float, np.ndarray],
     ) -> Union[float, np.ndarray]:
         """Lapse factor from γ(φ/c²)(˙δθ′/c). phi_local in (m/s²) or natural; delta_theta_dot in 1/s."""
-        phi_over_c2 = np.asarray(phi_local, dtype=float) / (self.c_si ** 2)
+        phi_over_c2 = np.asarray(phi_local, dtype=float) / (self.c_si**2)
         dtdc = np.asarray(delta_theta_dot, dtype=float) / self.c_si
         return adm_lapse_compression_factor(phi_over_c2, dtdc, gamma=self.gamma)
 

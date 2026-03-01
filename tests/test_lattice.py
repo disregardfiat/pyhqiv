@@ -3,13 +3,13 @@
 import numpy as np
 import pytest
 
+from pyhqiv.constants import ALPHA, T_PL_GEV
 from pyhqiv.lattice import (
     DiscreteNullLattice,
-    discrete_mode_count,
     curvature_imprint_delta_E,
+    discrete_mode_count,
     omega_k_from_shell_integral,
 )
-from pyhqiv.constants import M_TRANS, T_PL_GEV, ALPHA, COMBINATORIAL_INVARIANT
 
 
 def test_lattice_omega_k_reproducible():

@@ -1,15 +1,14 @@
 """Tests for modified Navier-Stokes (HQIV fluid): f_inertia, g_vac, ν_eddy."""
 
 import numpy as np
-import pytest
 
+from pyhqiv.constants import GAMMA
 from pyhqiv.fluid import (
     eddy_viscosity,
     f_inertia,
     g_vac_vector,
     modified_momentum_rhs,
 )
-from pyhqiv.constants import GAMMA
 
 
 def test_f_inertia_laminar_limit():
@@ -69,7 +68,7 @@ def test_eddy_viscosity():
         coherence_factor=0.5,
         gamma=0.4,
     )
-    expected = 0.4 * 1.0 * 1e-18 * (1e-3 ** 2) * 0.5
+    expected = 0.4 * 1.0 * 1e-18 * (1e-3**2) * 0.5
     assert abs(nu - expected) < 1e-30
     assert nu >= 0
 

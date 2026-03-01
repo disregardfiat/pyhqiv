@@ -52,15 +52,11 @@ class HQIVCosmology:
         Returns Omega_true_k, age_wall_Gyr, age_apparent_Gyr, lapse_compression,
         T_CMB_K, m_trans, gamma.
         """
-        return self._lattice.evolve_to_cmb(
-            T0_K=T0_K, E_0_factor=E_0_factor, use_jax=use_jax
-        )
+        return self._lattice.evolve_to_cmb(T0_K=T0_K, E_0_factor=E_0_factor, use_jax=use_jax)
 
     def omega_k_true(self, E_0_factor: float = 1.0, use_jax: bool = False) -> float:
         """True curvature from shell integral (paper ≈ +0.0098)."""
-        return self._lattice.omega_k_true(
-            E_0_factor=E_0_factor, use_jax=use_jax
-        )
+        return self._lattice.omega_k_true(E_0_factor=E_0_factor, use_jax=use_jax)
 
     def get_delta_E_grid(self, E_0_factor: float = 1.0) -> np.ndarray:
         """Curvature imprint δE(m) for m = 0, ..., m_trans-1."""

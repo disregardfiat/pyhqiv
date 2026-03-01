@@ -61,9 +61,7 @@ def test_c_ell_spectrum_ee_te_bb():
 def test_line_of_sight_isw_rees_sciama():
     """line_of_sight_isw_rees_sciama returns ΔC_ℓ same shape as ell."""
     ell = np.array([2.0, 10.0, 100.0, 500.0])
-    delta_cl = cosmology_full.line_of_sight_isw_rees_sciama(
-        ell, z_range=(0.0, 10.0), n_z=30
-    )
+    delta_cl = cosmology_full.line_of_sight_isw_rees_sciama(ell, z_range=(0.0, 10.0), n_z=30)
     assert delta_cl.shape == ell.shape
     assert np.all(delta_cl >= 0)
     assert np.all(np.isfinite(delta_cl))
@@ -109,6 +107,7 @@ def test_full_sky_healpy_map_import():
 def test_cmb_pipeline_status_mentions_optional_module():
     """cmb_pipeline_status includes optional_module key."""
     from pyhqiv.cmb_pipeline import cmb_pipeline_status
+
     status = cmb_pipeline_status()
     assert "optional_module" in status
     assert "cosmology_full" in status["optional_module"]
@@ -128,8 +127,20 @@ def test_hqiv_universe_evolver_run_from_T_Pl_to_now():
     # T_map_muK may be None if healpy not installed
     if result["T_map_muK"] is not None:
         import healpy as hp
+
         assert len(result["T_map_muK"]) == hp.nside2npix(evolver.nside)
         assert np.all(np.isfinite(result["T_map_muK"]))
+
+
+def test_bulk_seed_used_when_provided():
+    """When bulk_seed dict is provided, universe_evolver and sigma8 use its Omega_k and H0."""
+    from pyhqiv import cosmology_full
+
+    seed = {"Omega_true_k": 0.012, "H0_km_s_Mpc": 68.0, "lapse_compression": 3.9}
+    ev = cosmology_full.universe_evolver(z_start=10.0, z_end=0.0, n_steps=10, bulk_seed=seed)
+    assert ev["Omega_k_true"] == 0.012
+    s8 = cosmology_full.sigma8(0.0, bulk_seed=seed)
+    assert np.isfinite(s8) and s8 > 0
 
 
 def test_add_kinematic_dipole():
@@ -139,6 +150,7 @@ def test_add_kinematic_dipole():
     except ImportError:
         pytest.skip("healpy not installed")
     from pyhqiv import cosmology_full
+
     n_side = 16
     npix = hp.nside2npix(n_side)
     zero_map = np.zeros(npix)

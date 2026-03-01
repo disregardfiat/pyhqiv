@@ -66,7 +66,17 @@ target-version = "py39"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
-ignore = ["E501"]
+ignore = [
+    "E501",   # line length (handled by formatter or separately)
+    "N802",   # function name lowercase (e.g. get_delta_E_grid, run_from_T_Pl_to_now are API)
+    "N803",   # argument name lowercase (e.g. T0_K, E_0_factor, T_cmb_k are physics)
+    "N806",   # variable lowercase (G, M, L, Y, Delta are standard physics/math symbols)
+    "UP035",  # typing.Tuple/List/Dict deprecated (use tuple/list/dict in 3.9+)
+    "UP006",  # use list/tuple/dict for annotations
+    "UP007",  # use X | Y for Union
+    "UP045",  # use X | None for Optional
+    "N813",   # camelcase import as lowercase (e.g. MDAnalysis as mda)
+]
 
 [tool.mypy]
 python_version = "3.9"

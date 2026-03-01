@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 
 import numpy as np
 
-from pyhqiv.constants import C_SI, GAMMA
+from pyhqiv.constants import GAMMA
 
 
 def _curl_E(E: np.ndarray, dx: float) -> np.ndarray:

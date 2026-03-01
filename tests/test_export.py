@@ -2,16 +2,16 @@
 
 import os
 import tempfile
+
 import numpy as np
 import pytest
 
+from pyhqiv.crystal import hqiv_potential_shift
 from pyhqiv.export import (
-    export_charge_density_vesta,
     export_charge_density_ovito,
+    export_charge_density_vesta,
     pyscf_hqiv_shift,
 )
-from pyhqiv.crystal import hqiv_potential_shift
-from pyhqiv.constants import GAMMA
 
 
 def test_export_charge_density_vesta_shape():

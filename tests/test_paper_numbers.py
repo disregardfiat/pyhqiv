@@ -3,30 +3,29 @@ Tests that reproduce the paper's exact numerical predictions to 6 decimals.
 Paper: Ettinger, February 22, 2026.
 """
 
-import pytest
 import numpy as np
 
+from pyhqiv.algebra import OctonionHQIVAlgebra
 from pyhqiv.constants import (
-    GAMMA,
-    ALPHA,
-    T_LOCK_GEV,
-    T_CMB_K,
-    T_PL_GEV,
-    M_TRANS,
-    COMBINATORIAL_INVARIANT,
-    OMEGA_TRUE_K_PAPER,
-    LAPSE_COMPRESSION_PAPER,
-    AGE_WALL_GYR_PAPER,
     AGE_APPARENT_GYR_PAPER,
+    AGE_WALL_GYR_PAPER,
+    ALPHA,
+    COMBINATORIAL_INVARIANT,
+    GAMMA,
+    LAPSE_COMPRESSION_PAPER,
+    M_TRANS,
+    OMEGA_TRUE_K_PAPER,
+    T_CMB_K,
+    T_LOCK_GEV,
+    T_PL_GEV,
 )
 from pyhqiv.lattice import (
     DiscreteNullLattice,
-    discrete_mode_count,
     cumulative_mode_count,
     curvature_imprint_delta_E,
+    discrete_mode_count,
     omega_k_from_shell_integral,
 )
-from pyhqiv.algebra import OctonionHQIVAlgebra
 
 
 def test_gamma_value():
@@ -56,7 +55,7 @@ def test_m_trans():
 
 def test_combinatorial_invariant():
     """6^7 √3 ≈ 4.849×10^5."""
-    expected = (6 ** 7) * np.sqrt(3)
+    expected = (6**7) * np.sqrt(3)
     assert abs(COMBINATORIAL_INVARIANT - expected) < 1e-3
     assert abs(COMBINATORIAL_INVARIANT - 4.849e5) < 5e3  # order of magnitude
 

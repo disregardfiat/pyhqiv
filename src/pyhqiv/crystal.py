@@ -189,7 +189,7 @@ def high_symmetry_k_path(
                 raise ValueError(f"Unknown special point: {label}")
             pts_frac.append((label, np.array(special_points[label], dtype=float)))
     else:
-        pts_frac = [(str(l), np.asarray(k, dtype=float)) for l, k in path]
+        pts_frac = [(str(label), np.asarray(k, dtype=float)) for label, k in path]
 
     if len(pts_frac) < 2:
         raise ValueError("Path must have at least 2 points")

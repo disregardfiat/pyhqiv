@@ -40,6 +40,7 @@ class HQIVUniverseEvolver:
         nside: int = 256,
         cosmology: Optional[HQIVCosmology] = None,
         max_ell: int = 1500,
+        bulk_seed: Optional[Any] = None,
         frame_velocity_km_s: Optional[float] = None,
         frame_gal_l_deg: float = 264.0,
         frame_gal_b_deg: float = 48.0,
@@ -47,6 +48,7 @@ class HQIVUniverseEvolver:
         self.nside = nside
         self.cosmology = cosmology or HQIVCosmology()
         self.max_ell = max(max_ell, 1500)
+        self.bulk_seed = bulk_seed
         self.frame_velocity_km_s = frame_velocity_km_s
         self.frame_gal_l_deg = frame_gal_l_deg
         self.frame_gal_b_deg = frame_gal_b_deg
@@ -66,6 +68,7 @@ class HQIVUniverseEvolver:
             max_ell=self.max_ell,
             include_polarization=True,
             cosmology=self.cosmology,
+            bulk_seed=self.bulk_seed,
             frame_velocity_km_s=self.frame_velocity_km_s,
             frame_gal_l_deg=self.frame_gal_l_deg,
             frame_gal_b_deg=self.frame_gal_b_deg,

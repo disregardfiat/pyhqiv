@@ -3,9 +3,9 @@
 import numpy as np
 import pytest
 
+from pyhqiv.constants import ALPHA, C_SI, GAMMA
 from pyhqiv.perturbations import HQIVPerturbations, PerturbationMode
 from pyhqiv.system import HQIVSystem
-from pyhqiv.constants import GAMMA, ALPHA, C_SI
 
 
 def test_perturbation_mode():
@@ -109,7 +109,7 @@ def test_phi_and_f_lapse_consistent():
     pert = HQIVPerturbations(HQIVSystem.from_atoms([(0, 0, 0)]))
     phi = pert._phi(1.0)
     phi = np.atleast_1d(phi).flat[0]
-    f = pert._f_lapse(phi, a_loc=C_SI ** 2)
+    f = pert._f_lapse(phi, a_loc=C_SI**2)
     f = np.atleast_1d(f).flat[0]
-    expected = (C_SI ** 2) / ((C_SI ** 2) + phi / 6.0)
+    expected = (C_SI**2) / ((C_SI**2) + phi / 6.0)
     assert abs(f - expected) < 0.01

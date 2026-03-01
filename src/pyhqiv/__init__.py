@@ -22,83 +22,81 @@ If you use this package in research, please cite:
 https://doi.org/10.5281/zenodo.18794889
 """
 
-from pyhqiv.constants import (
-    A_LOC_ANG,
-    GAMMA,
-    ALPHA,
-    HBAR_C_EV_ANG,
-    T_PL_GEV,
-    T_LOCK_GEV,
-    T_CMB_K,
-    M_TRANS,
-    COMBINATORIAL_INVARIANT,
-    OMEGA_TRUE_K_PAPER,
-    LAPSE_COMPRESSION_PAPER,
-    AGE_WALL_GYR_PAPER,
-    AGE_APPARENT_GYR_PAPER,
-)
+from pyhqiv import defects, molecular, semiconductors, waveguide
 from pyhqiv.algebra import OctonionHQIVAlgebra
-from pyhqiv.lattice import DiscreteNullLattice
-from pyhqiv.cosmology import HQIVCosmology, HQIVUniverseEvolver
-from pyhqiv.phase import HQIVPhaseLift
-from pyhqiv.atom import HQIVAtom
-from pyhqiv.system import HQIVSystem
-from pyhqiv.fields import PhaseHorizonFDTD
-from pyhqiv.fluid import eddy_viscosity, f_inertia, g_vac_vector, modified_momentum_rhs
-from pyhqiv import molecular
-from pyhqiv import waveguide
-from pyhqiv.crystal import HQIVCrystal, hqiv_potential_shift, high_symmetry_k_path
-from pyhqiv import semiconductors
-from pyhqiv.semiconductors import (
-    compute_band_gap,
-    dos,
-    effective_mass,
-    compute_conductivity_tensor,
-    dielectric_function_epsilon,
-)
-from pyhqiv import defects
-from pyhqiv.defects import formation_energy, charged_defect_supercell
-from pyhqiv.export import (
-    export_charge_density_vesta,
-    export_charge_density_ovito,
-    pyscf_hqiv_shift,
-)
-from pyhqiv.response import compute_conductivity, response_tensor_diagonal
-from pyhqiv.solar_core import HQIVSolarCore, phi_solar_radial_profile
-from pyhqiv.redshift import HQIVRedshift, z_total_apparent, z_expansion_from_scale_factor
-from pyhqiv.orbit import HQIVOrbit, parker_perihelion_lapse
-from pyhqiv.thermo import (
-    HQIVThermoSystem,
-    HQIVEquationOfState,
-    HQIVIdealGas,
-    HQIVRealGas,
-    HQIVHydrogen,
-    PhaseDiagramGenerator,
-    compute_free_energy,
-    hqiv_answer_thermo,
-    phi_from_rho_T,
-    theta_local_from_density,
-    shell_fraction_energy_shift,
-    lapse_compression_thermo,
-    thermo_fluid_lapse,
-    thermo_crystal_phi,
-    thermo_ase_phase_stability,
-    TESTABLE_PREDICTIONS,
-    plot_phase_diagram_standard_vs_hqiv,
-)
-from pyhqiv.perturbations import HQIVPerturbations, PerturbationMode
-from pyhqiv.cmb_pipeline import HQIVCMBPipeline, cmb_pipeline_status
 from pyhqiv.ase_interface import (
     HQIVCalculator,
     hqiv_energy_at_positions,
     hqiv_forces_analytic,
     hqiv_stress_virial,
 )
+from pyhqiv.atom import HQIVAtom
+from pyhqiv.bulk_seed import BULK_SEED_AVAILABLE, get_bulk_seed
+from pyhqiv.cmb_pipeline import HQIVCMBPipeline, cmb_pipeline_status
+from pyhqiv.constants import (
+    A_LOC_ANG,
+    AGE_APPARENT_GYR_PAPER,
+    AGE_WALL_GYR_PAPER,
+    ALPHA,
+    COMBINATORIAL_INVARIANT,
+    GAMMA,
+    HBAR_C_EV_ANG,
+    LAPSE_COMPRESSION_PAPER,
+    M_TRANS,
+    OMEGA_TRUE_K_PAPER,
+    T_CMB_K,
+    T_LOCK_GEV,
+    T_PL_GEV,
+)
+from pyhqiv.cosmology import HQIVCosmology, HQIVUniverseEvolver
+from pyhqiv.crystal import HQIVCrystal, high_symmetry_k_path, hqiv_potential_shift
+from pyhqiv.defects import charged_defect_supercell, formation_energy
+from pyhqiv.export import (
+    export_charge_density_ovito,
+    export_charge_density_vesta,
+    pyscf_hqiv_shift,
+)
+from pyhqiv.fields import PhaseHorizonFDTD
+from pyhqiv.fluid import eddy_viscosity, f_inertia, g_vac_vector, modified_momentum_rhs
+from pyhqiv.lattice import DiscreteNullLattice
+from pyhqiv.orbit import HQIVOrbit, parker_perihelion_lapse
+from pyhqiv.perturbations import HQIVPerturbations, PerturbationMode
+from pyhqiv.phase import HQIVPhaseLift
 from pyhqiv.protocols import (
-    NullLatticeProtocol,
     NullLatticeBase,
-    PhaseLiftProtocol,
+    NullLatticeProtocol,
     PhaseLiftBase,
+    PhaseLiftProtocol,
+)
+from pyhqiv.redshift import HQIVRedshift, z_expansion_from_scale_factor, z_total_apparent
+from pyhqiv.response import compute_conductivity, response_tensor_diagonal
+from pyhqiv.semiconductors import (
+    compute_band_gap,
+    compute_conductivity_tensor,
+    dielectric_function_epsilon,
+    dos,
+    effective_mass,
+)
+from pyhqiv.solar_core import HQIVSolarCore, phi_solar_radial_profile
+from pyhqiv.system import HQIVSystem
+from pyhqiv.thermo import (
+    TESTABLE_PREDICTIONS,
+    HQIVEquationOfState,
+    HQIVHydrogen,
+    HQIVIdealGas,
+    HQIVRealGas,
+    HQIVThermoSystem,
+    PhaseDiagramGenerator,
+    compute_free_energy,
+    hqiv_answer_thermo,
+    lapse_compression_thermo,
+    phi_from_rho_T,
+    plot_phase_diagram_standard_vs_hqiv,
+    shell_fraction_energy_shift,
+    thermo_ase_phase_stability,
+    thermo_crystal_phi,
+    thermo_fluid_lapse,
+    theta_local_from_density,
 )
 
 __all__ = [
@@ -120,6 +118,8 @@ __all__ = [
     "DiscreteNullLattice",
     "HQIVCosmology",
     "HQIVUniverseEvolver",
+    "get_bulk_seed",
+    "BULK_SEED_AVAILABLE",
     "HQIVPhaseLift",
     "HQIVAtom",
     "HQIVSystem",

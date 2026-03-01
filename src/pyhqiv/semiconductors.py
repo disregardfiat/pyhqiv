@@ -107,7 +107,9 @@ def dos(
         w = np.ones_like(ev) / ev.size
     rho = np.zeros_like(grid, dtype=float)
     for i, e in enumerate(grid):
-        rho[i] = np.sum(w * np.exp(-0.5 * ((ev - e) / max(sigma, 1e-30)) ** 2)) / (np.sqrt(2 * np.pi) * sigma)
+        rho[i] = np.sum(w * np.exp(-0.5 * ((ev - e) / max(sigma, 1e-30)) ** 2)) / (
+            np.sqrt(2 * np.pi) * sigma
+        )
     return rho
 
 
@@ -172,7 +174,7 @@ def effective_mass(
 
     e_plus = e_at(k_plus)
     e_minus = e_at(k_minus)
-    d2edk2 = (e_plus - 2 * e0 + e_minus) / (dk ** 2)
+    d2edk2 = (e_plus - 2 * e0 + e_minus) / (dk**2)
     if abs(d2edk2) < 1e-20:
         return np.nan
     m_star = HBAR2_OVER_2ME_EV_ANG2 / d2edk2

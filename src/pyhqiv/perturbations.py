@@ -45,9 +45,7 @@ class PerturbationMode:
 
 def _default_radius(background: Any) -> float:
     """Radius in m from background (R_star, radius, or default)."""
-    return getattr(background, "R_star", None) or getattr(
-        background, "radius", 1e9
-    )
+    return getattr(background, "R_star", None) or getattr(background, "radius", 1e9)
 
 
 def _default_density(
@@ -66,9 +64,7 @@ def _default_density(
         return rho_solar_polytrope(r, R_sun=R, rho_c=rho_c)
     except (ImportError, AttributeError):
         pass
-    return np.full_like(np.atleast_1d(r), 1e3, dtype=float).reshape(
-        np.shape(r)
-    )
+    return np.full_like(np.atleast_1d(r), 1e3, dtype=float).reshape(np.shape(r))
 
 
 class HQIVPerturbations:
@@ -97,7 +93,7 @@ class HQIVPerturbations:
         if hasattr(self.background, "phi"):
             r = np.atleast_1d(r_or_rho)
             phi_val = self.background.phi(r)
-            return 2.0 * (C_SI ** 2) / np.maximum(np.asarray(phi_val), 1e-30)
+            return 2.0 * (C_SI**2) / np.maximum(np.asarray(phi_val), 1e-30)
         # Fallback: Θ ∝ 1/√ρ scale (characteristic length)
         rho = np.asarray(r_or_rho, dtype=float)
         rho = np.maximum(rho, 1e-30)
@@ -112,7 +108,7 @@ class HQIVPerturbations:
             r = np.atleast_1d(r_or_rho)
             return self.background.phi(r)
         theta = self._theta_local(r_or_rho)
-        return 2.0 * (C_SI ** 2) / np.maximum(np.asarray(theta), 1e-30)
+        return 2.0 * (C_SI**2) / np.maximum(np.asarray(theta), 1e-30)
 
     def _f_lapse(
         self,
@@ -126,7 +122,7 @@ class HQIVPerturbations:
 
     def stellar_oscillations(
         self,
-        l: int = 1,
+        l: int = 1,  # noqa: E741  # angular quantum number (standard symbol)
         n_max: int = 10,
         r_points: int = 100,
     ) -> List[PerturbationMode]:
@@ -138,7 +134,7 @@ class HQIVPerturbations:
         """
         R = _default_radius(self.background)
         r = np.linspace(1e3, R, r_points)
-        rho = _default_density(self.background, r)
+        _ = _default_density(self.background, r)  # density profile (for future use)
         phi = self._phi(r)
         a_ref = 9e16  # c² in m²/s²
         f_lapse = self._f_lapse(phi, a_loc=a_ref)
@@ -156,10 +152,10 @@ class HQIVPerturbations:
         diag = (N2 + L2) * f_lapse
         diag = np.maximum(diag, 1e-20)
         # Off-diagonal coupling (second derivative)
-        off = 1.0 / (dr ** 2) * np.ones(r_points - 1)
+        off = 1.0 / (dr**2) * np.ones(r_points - 1)
         mat = np.diag(diag) + np.diag(off, 1) + np.diag(off, -1)
-        mat[0, 0] += 1.0 / (dr ** 2)
-        mat[-1, -1] += 1.0 / (dr ** 2)
+        mat[0, 0] += 1.0 / (dr**2)
+        mat[-1, -1] += 1.0 / (dr**2)
         try:
             from scipy.linalg import eigh
 
@@ -174,9 +170,7 @@ class HQIVPerturbations:
         for n in range(min(n_max, len(omegas))):
             omega_n = complex(omegas[n] * f_mean, -1e-6 * f_mean)
             vec = eigvecs[:, n] if eigvecs.shape[1] > n else np.zeros(r_points)
-            modes.append(
-                PerturbationMode(omega_n, vec, mode_type=f"l={l} n={n}")
-            )
+            modes.append(PerturbationMode(omega_n, vec, mode_type=f"l={l} n={n}"))
         return modes
 
     # ====================== FLUID / PLASMA STABILITY ======================
@@ -193,7 +187,7 @@ class HQIVPerturbations:
         """
         k = np.asarray(wavenumber, dtype=float)
         if phi_ref is None:
-            phi_ref = 2.0 * (C_SI ** 2) / 1e-15
+            phi_ref = 2.0 * (C_SI**2) / 1e-15
         a_loc = 9e16
         f = float(a_loc / (a_loc + phi_ref / 6.0))
         # Toy growth rate: σ ∝ k with lapse suppression
@@ -217,7 +211,7 @@ class HQIVPerturbations:
         if q.ndim == 1:
             q = q.reshape(-1, 1)
         q_norm = np.linalg.norm(q, axis=-1)
-        phi_ref = 2.0 * (C_SI ** 2) / 1e-10
+        phi_ref = 2.0 * (C_SI**2) / 1e-10
         f = float(self._f_lapse(phi_ref))
         return omega_scale * np.sqrt(np.maximum(q_norm, 1e-20)) * f
 
@@ -276,9 +270,7 @@ class HQIVPerturbations:
         lapse = float(lapse.flat[0]) if lapse.size else 1.0
         m_arr = np.array([m_shell], dtype=float)
         T_arr = 1.22e19 * 1.16e13 / (m_shell + 1.0)
-        delta_E = curvature_imprint_delta_E(
-            m_arr, np.array([T_arr]), alpha=self.alpha
-        )
+        delta_E = curvature_imprint_delta_E(m_arr, np.array([T_arr]), alpha=self.alpha)
         imprint = float(delta_E.flat[0]) / 1e6
         # Response ∝ lapse × (1 + imprint) for density/velocity/field
         amp = lapse * (1.0 + np.clip(imprint, 0, 10))

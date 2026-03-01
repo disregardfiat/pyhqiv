@@ -15,7 +15,7 @@ Requires the optional dependency: pip install pyhqiv[ase]
 
 from __future__ import annotations
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional
 
 import numpy as np
 
@@ -84,7 +84,7 @@ def hqiv_forces_analytic(
             r_norm = np.linalg.norm(r)
             r_norm = max(r_norm, 1e-12)
             # F_i += 2 * c² * (x_i - x_j) / r_ij^3  (contribution from pair i,j)
-            forces[i] += (2.0 * (c_si ** 2) * energy_scale) * r / (r_norm ** 3)
+            forces[i] += (2.0 * (c_si**2) * energy_scale) * r / (r_norm**3)
     return forces
 
 
@@ -105,14 +105,21 @@ def hqiv_stress_virial(
     virial = np.einsum("ia,ib->ab", positions, forces)
     stress_3x3 = -virial / volume
     # Voigt order: xx, yy, zz, yz, xz, xy
-    return np.array([
-        stress_3x3[0, 0], stress_3x3[1, 1], stress_3x3[2, 2],
-        stress_3x3[1, 2], stress_3x3[0, 2], stress_3x3[0, 1],
-    ])
+    return np.array(
+        [
+            stress_3x3[0, 0],
+            stress_3x3[1, 1],
+            stress_3x3[2, 2],
+            stress_3x3[1, 2],
+            stress_3x3[0, 2],
+            stress_3x3[0, 1],
+        ]
+    )
 
 
 try:
-    from ase.calculators.calculator import Calculator as _ASECalculator, all_changes
+    from ase.calculators.calculator import Calculator as _ASECalculator
+    from ase.calculators.calculator import all_changes
 except ImportError:
     _ASECalculator = None  # type: ignore
     all_changes = None
@@ -159,9 +166,7 @@ def _hqiv_calc_calculate(
                 pos, charges, gamma=self.gamma, energy_scale=self.energy_scale
             )
         vol = atoms.get_volume()
-        self.results["stress"] = hqiv_stress_virial(
-            pos, self.results["forces"], vol
-        )
+        self.results["stress"] = hqiv_stress_virial(pos, self.results["forces"], vol)
 
 
 def _atoms_to_system(self: Any, atoms: Any) -> HQIVSystem:
@@ -217,4 +222,6 @@ else:
         implemented_properties = ["energy", "forces", "stress"]
 
         def __init__(self, *args: Any, **kwargs: Any) -> None:
-            raise ImportError("ASE is required for HQIVCalculator. Install with: pip install pyhqiv[ase]")
+            raise ImportError(
+                "ASE is required for HQIVCalculator. Install with: pip install pyhqiv[ase]"
+            )

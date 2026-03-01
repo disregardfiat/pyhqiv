@@ -18,7 +18,6 @@ from pyhqiv.constants import C_SI, GAMMA
 from pyhqiv.fluid import f_inertia
 from pyhqiv.utils import phi_from_theta_local
 
-
 # --- Standard solar model fiducials (SI where noted) ---
 R_SUN_M: float = 6.9634e8  # m
 M_SUN_KG: float = 1.9884e30  # kg
@@ -32,7 +31,7 @@ AGE_SOLAR_APPARENT_GYR: float = 4.57  # apparent age (local chronometers)
 
 def schwarzschild_radius_sun_m() -> float:
     """Schwarzschild radius of the Sun, in metres."""
-    return 2.0 * G_SI * M_SUN_KG / (C_SI ** 2)
+    return 2.0 * G_SI * M_SUN_KG / (C_SI**2)
 
 
 def theta_local_solar(
@@ -53,7 +52,7 @@ def theta_local_solar(
     if use_enclosed_mass and M_enclosed_callback is not None:
         M_r = np.asarray(M_enclosed_callback(r))
         # Θ ~ characteristic length from gravity: (G M/c²) or (G M/c² * r)^{1/2}
-        rs_local = 2.0 * G_SI * np.maximum(M_r, 1e-30) / (C_SI ** 2)
+        rs_local = 2.0 * G_SI * np.maximum(M_r, 1e-30) / (C_SI**2)
         theta = np.maximum(np.sqrt(rs_local * np.abs(r) + 1e-30), r_core * 0.01)
         return theta
     # Default: linear + core floor
@@ -76,7 +75,7 @@ def rho_solar_polytrope(
     x = np.minimum(np.abs(r) / np.maximum(r_core, 1e-30), 20.0)
     # Gaussian-like core, taper to surface
     r_frac = np.abs(r) / np.maximum(R_sun, 1e-30)
-    rho = rho_c * np.exp(-x ** 2) * np.maximum(1.0 - r_frac ** 2, 0.0) ** 0.5
+    rho = rho_c * np.exp(-(x**2)) * np.maximum(1.0 - r_frac**2, 0.0) ** 0.5
     return np.maximum(rho, 1e-30)
 
 
@@ -130,7 +129,7 @@ class HQIVSolarCore:
         """
         phi = self.phi(r)
         if a_loc is None:
-            a_loc = float(G_SI * self.M_star / (self.R_star ** 2))
+            a_loc = float(G_SI * self.M_star / (self.R_star**2))
         return f_inertia(np.asarray(a_loc), phi)
 
     def fusion_rate_correction(self, r: Union[float, np.ndarray]) -> np.ndarray:

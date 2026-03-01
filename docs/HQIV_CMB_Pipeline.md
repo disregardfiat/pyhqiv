@@ -11,8 +11,11 @@
 | `DiscreteNullLattice.evolve_to_cmb` (scalar) | `universe_evolver`, `hqiv_cmb` |
 | `HQIVCosmology`, Ω_k, lapse, ages | Full-sky Healpy map generator |
 | `HQIVPerturbations` (linear response, cosmological_perturbation) | C_ℓ multipole power spectrum / chart |
+| **Bulk seed** (paper-authoritative) | `pyhqiv.bulk_seed.get_bulk_seed()` → HQIV `horizon_modes/python/bulk.py` |
 | `cmb_pipeline_status`, `HQIVCMBPipeline` (stub) | σ₈ calculation |
 | — | Line-of-sight ISW/Rees–Sciama (galaxy accelerated motion) |
+
+**Authoritative seed until baryogenesis complete:** The paper and HQIV repo use `horizon_modes/python/bulk.py` (baryogenesis → lock-in → modified Friedmann to T_cmb) as the single source of truth. That bulk output should **seed** the → CMB pipeline. In pyhqiv, call `get_bulk_seed()` when the HQIV repo is available; pass the result as `bulk_seed` to `HQIVUniverseEvolver`, `hqiv_cmb`, `universe_evolver`, and `sigma8`. Then Ω_k, H₀, η, and the lattice table come from bulk; the rest (growth, C_ℓ, map) uses that seed. Without bulk_seed, the pipeline falls back to the in-package lattice (evolve_to_cmb).
 
 Perturbations stay in the main codebase; the full “run the universe to now” map (seeding from lattice, evolving perturbations, LOS projection, Healpy map + C_ℓ + σ₈) is in the optional cosmology module so the core package stays lean.
 

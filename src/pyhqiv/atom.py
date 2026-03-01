@@ -5,7 +5,7 @@ delta_theta_prime(), modified field contribution. Paper: φ = 2c²/Θ_local.
 
 from __future__ import annotations
 
-from typing import Optional, Tuple, Union
+from typing import Tuple, Union
 
 import numpy as np
 
@@ -60,7 +60,7 @@ class HQIVAtom:
         Returns array same shape as phi_local(x) for use in constitutive relations.
         """
         phi = self.phi_local(x)
-        phi_over_c2 = phi / (self.c_si ** 2)
+        phi_over_c2 = phi / (self.c_si**2)
         # Homogeneous ˙δθ′ ≈ H; use E′ to set scale: ˙δθ′/c ∝ arctan(E′)
         dtdc = np.arctan(E_prime) * (np.pi / 2.0) / self.c_si
         return gamma * phi_over_c2 * dtdc

@@ -1,16 +1,15 @@
 """Tests for HQIVPhaseLift and δθ′, ˙δθ′, lapse."""
 
 import numpy as np
-import pytest
 
+from pyhqiv.constants import GAMMA, LAPSE_COMPRESSION_PAPER
 from pyhqiv.phase import (
-    delta_theta_prime,
-    delta_theta_prime_dot_homogeneous,
+    HQIVPhaseLift,
     adm_lapse_compression_factor,
     apparent_age_from_wall_clock,
-    HQIVPhaseLift,
+    delta_theta_prime,
+    delta_theta_prime_dot_homogeneous,
 )
-from pyhqiv.constants import GAMMA, LAPSE_COMPRESSION_PAPER
 
 
 def test_delta_theta_prime_zero():

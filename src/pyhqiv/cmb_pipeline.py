@@ -23,8 +23,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-import numpy as np
-
 from pyhqiv.cosmology import HQIVCosmology
 from pyhqiv.perturbations import HQIVPerturbations
 
@@ -95,9 +93,7 @@ class HQIVCMBPipeline:
     def perturbations(self) -> HQIVPerturbations:
         """Lazy-build perturbation solver around cosmology background."""
         if self._pert is None:
-            self._pert = HQIVPerturbations(
-                self.cosmology, gamma=self.gamma, alpha=self.alpha
-            )
+            self._pert = HQIVPerturbations(self.cosmology, gamma=self.gamma, alpha=self.alpha)
         return self._pert
 
     def run(
@@ -114,9 +110,7 @@ class HQIVCMBPipeline:
         """
         result = self.cosmology.evolve_to_cmb()
         # Cosmological perturbation at a representative k, z
-        delta_growth, f = self.perturbations.cosmological_perturbation(
-            k=0.01, z=0.0
-        )
+        delta_growth, f = self.perturbations.cosmological_perturbation(k=0.01, z=0.0)
         out = {
             "Omega_k_true": result["Omega_true_k"],
             "lapse_compression": result["lapse_compression"],

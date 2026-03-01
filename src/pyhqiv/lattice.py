@@ -10,16 +10,16 @@ from typing import Dict, Optional
 import numpy as np
 
 from pyhqiv.constants import (
+    AGE_APPARENT_GYR_PAPER,
+    AGE_WALL_GYR_PAPER,
     ALPHA,
     COMBINATORIAL_INVARIANT,
+    GAMMA,
+    LAPSE_COMPRESSION_PAPER,
     M_TRANS,
     OMEGA_TRUE_K_PAPER,
     T_CMB_K,
     T_PL_GEV,
-    GAMMA,
-    AGE_WALL_GYR_PAPER,
-    AGE_APPARENT_GYR_PAPER,
-    LAPSE_COMPRESSION_PAPER,
 )
 
 
@@ -88,9 +88,7 @@ def omega_k_from_shell_integral(
 
             m_ref = jnp.arange(0, int(reference_m_trans), dtype=jnp.float64)
             T_ref = E_0 / (m_ref + 1.0)
-            ln_t_ref = 1.0 + alpha * jnp.log(
-                jnp.maximum(T_Pl / jnp.maximum(T_ref, 1e-300), 1.0)
-            )
+            ln_t_ref = 1.0 + alpha * jnp.log(jnp.maximum(T_Pl / jnp.maximum(T_ref, 1e-300), 1.0))
             delta_E_ref = (1.0 / (m_ref + 1.0)) * ln_t_ref * COMBINATORIAL_INVARIANT
             integral_ref = float(jnp.sum(delta_E_ref))
             if integral_ref <= 0:
@@ -154,9 +152,7 @@ class DiscreteNullLattice:
         m_int = np.clip(np.round(m).astype(int), 0, max(0, self.m_trans - 1))
         return 8.0 * (m_int + 2) * (m_int + 1) / 2.0
 
-    def omega_k_true(
-        self, E_0_factor: float = 1.0, use_jax: bool = False
-    ) -> float:
+    def omega_k_true(self, E_0_factor: float = 1.0, use_jax: bool = False) -> float:
         """Ω_k^true from shell integral 0..m_trans (paper ≈ +0.0098)."""
         return omega_k_from_shell_integral(
             m_trans=self.m_trans,

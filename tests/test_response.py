@@ -1,10 +1,6 @@
 """Tests for conductivity / response API."""
 
-import numpy as np
-import pytest
-
 from pyhqiv.response import compute_conductivity, response_tensor_diagonal
-from pyhqiv.constants import GAMMA
 
 
 def test_compute_conductivity_no_phi():

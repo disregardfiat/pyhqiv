@@ -1,10 +1,9 @@
 """Tests for HQIVCrystal (PBC, bloch_sum) and band-gap / potential shift."""
 
 import numpy as np
-import pytest
 
-from pyhqiv.crystal import HQIVCrystal, hqiv_potential_shift, high_symmetry_k_path
 from pyhqiv.atom import HQIVAtom
+from pyhqiv.crystal import HQIVCrystal, high_symmetry_k_path, hqiv_potential_shift
 
 
 def test_hqiv_crystal_lattice_vectors():

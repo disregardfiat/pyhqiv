@@ -16,7 +16,7 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
-from pyhqiv.constants import ALPHA, COMBINATORIAL_INVARIANT, GAMMA
+from pyhqiv.constants import ALPHA, GAMMA
 from pyhqiv.cosmology import HQIVCosmology
 from pyhqiv.lattice import curvature_imprint_delta_E
 from pyhqiv.perturbations import HQIVPerturbations
@@ -57,13 +57,35 @@ def _get_cosmology(cosmology: Optional[Any]) -> HQIVCosmology:
     return HQIVCosmology(gamma=GAMMA, alpha=ALPHA)
 
 
+def _get_background(
+    bulk_seed: Optional[Any],
+    cosmology: Optional[Any],
+) -> dict:
+    """
+    Background (Ω_k, H₀, lapse) for CMB pipeline.
+    When bulk_seed is provided (from HQIV bulk.py), use it as authoritative until baryogenesis complete.
+    Otherwise use lattice evolve_to_cmb() and default H₀.
+    """
+    if bulk_seed is not None and isinstance(bulk_seed, dict):
+        return {
+            "Omega_true_k": bulk_seed.get("Omega_true_k", bulk_seed.get("omega_k_true")),
+            "H0_km_s_Mpc": bulk_seed.get("H0_km_s_Mpc", H0_KM_S_MPC),
+            "lapse_compression": bulk_seed.get("lapse_compression", 3.96),
+        }
+    cosmo = _get_cosmology(cosmology)
+    result = cosmo.evolve_to_cmb()
+    return {
+        "Omega_true_k": result["Omega_true_k"],
+        "H0_km_s_Mpc": H0_KM_S_MPC,
+        "lapse_compression": result["lapse_compression"],
+    }
+
+
 def _lapse_f_from_lattice(k: float, z: float) -> float:
     """Lapse factor f(z) from curvature imprint at effective shell m ∝ k."""
     m = np.clip(int(k * 50), 0, 499)
     T = 2.725 * (1.0 + z)
-    delta_E = curvature_imprint_delta_E(
-        np.array([m]), np.array([T]), alpha=ALPHA
-    )
+    delta_E = curvature_imprint_delta_E(np.array([m]), np.array([T]), alpha=ALPHA)
     f = 1.0 / (1.0 + float(np.asarray(delta_E).flat[0]) / 1e6)
     return float(np.clip(f, 0.1, 1.0))
 
@@ -103,7 +125,7 @@ def _transfer_simple(k_mpc: np.ndarray, k_eq: float = 0.01) -> np.ndarray:
 def _tophat_filter(k_mpc: np.ndarray, R_mpc: float) -> np.ndarray:
     """Top-hat filter W(kR) = 3*(sin(kR)-kR*cos(kR))/(kR)^3."""
     x = np.maximum(k_mpc * R_mpc, 1e-20)
-    return 3.0 * (np.sin(x) - x * np.cos(x)) / (x ** 3)
+    return 3.0 * (np.sin(x) - x * np.cos(x)) / (x**3)
 
 
 def sigma8(
@@ -111,15 +133,19 @@ def sigma8(
     cosmology: Optional[Any] = None,
     sigma8_z0_ref: float = 0.810,
     n_z: int = 100,
+    bulk_seed: Optional[Any] = None,
     **kwargs: Any,
 ) -> float:
     """
     Amplitude of matter fluctuations at R = 8 h⁻¹ Mpc.
 
     σ₈ from HQIV growth factor D(z) with f(φ) and curvature imprint.
-    P(k) = A_s (k/k_pivot)^(n_s-1) T²(k) D²(z); normalize so σ8(z=0) = sigma8_z0_ref.
+    When bulk_seed is provided, H₀ from bulk is used for R = 8 h⁻¹ Mpc.
     """
     cosmo = _get_cosmology(cosmology)
+    bg = _get_background(bulk_seed, cosmology)
+    H0_km_s_Mpc = bg["H0_km_s_Mpc"]
+    R8_MPC_local = 8.0 / (H0_km_s_Mpc / 100.0)
     z_arr = np.linspace(0.0, max(z, 0.01), max(n_z, 2))
     D = _growth_factor_hqiv(z_arr, cosmo)
     # D(z) at requested z (interpolate)
@@ -135,19 +161,19 @@ def sigma8(
     n_k = 400
     k_mpc = np.logspace(np.log10(k_min), np.log10(k_max), n_k)
     T_k = _transfer_simple(k_mpc)
-    W = _tophat_filter(k_mpc, R8_MPC)
+    W = _tophat_filter(k_mpc, R8_MPC_local)
     # Normalize A_s so that at z=0, σ8 = sigma8_z0_ref
     D0 = _growth_factor_hqiv(np.array([0.0]), cosmo)[0]
-    P0 = (k_mpc / K_PIVOT) ** (N_S - 1.0) * (T_k ** 2) * (D0 ** 2)
-    integrand0 = P0 * (W ** 2) * (k_mpc ** 2)
-    sigma_sq_0 = _trapz(integrand0, k_mpc) / (2.0 * np.pi ** 2)
+    P0 = (k_mpc / K_PIVOT) ** (N_S - 1.0) * (T_k**2) * (D0**2)
+    integrand0 = P0 * (W**2) * (k_mpc**2)
+    sigma_sq_0 = _trapz(integrand0, k_mpc) / (2.0 * np.pi**2)
     if sigma_sq_0 <= 0:
         return 0.0
-    A_s_norm = (sigma8_z0_ref ** 2) / sigma_sq_0
+    A_s_norm = (sigma8_z0_ref**2) / sigma_sq_0
 
-    P_z = A_s_norm * (k_mpc / K_PIVOT) ** (N_S - 1.0) * (T_k ** 2) * (D_z ** 2)
-    integrand = P_z * (W ** 2) * (k_mpc ** 2)
-    sigma_sq = _trapz(integrand, k_mpc) / (2.0 * np.pi ** 2)
+    P_z = A_s_norm * (k_mpc / K_PIVOT) ** (N_S - 1.0) * (T_k**2) * (D_z**2)
+    integrand = P_z * (W**2) * (k_mpc**2)
+    sigma_sq = _trapz(integrand, k_mpc) / (2.0 * np.pi**2)
     return float(np.sqrt(max(sigma_sq, 0.0)))
 
 
@@ -156,15 +182,18 @@ def universe_evolver(
     z_end: float = 0.0,
     n_steps: int = 500,
     cosmology: Optional[Any] = None,
+    bulk_seed: Optional[Any] = None,
     **kwargs: Any,
 ) -> Dict[str, Any]:
     """
     Evolve universe from z_start (e.g. recombination) to z_end (now).
 
-    Seeds from lattice; growth D(z) and lapse f(z) from HQIV perturbations.
+    When bulk_seed is provided (from HQIV bulk.py), background Ω_k and lapse use that
+    as the authoritative seed until baryogenesis complete. Otherwise seeds from lattice.
     Returns z_grid, a_grid, D(z), f(z) for use in LOS and C_ℓ.
     """
     cosmo = _get_cosmology(cosmology)
+    bg = _get_background(bulk_seed, cosmology)
     z_grid = np.linspace(z_end, z_start, n_steps)
     a_grid = 1.0 / (1.0 + z_grid)
     D = _growth_factor_hqiv(z_grid, cosmo)
@@ -174,14 +203,13 @@ def universe_evolver(
     for i, z in enumerate(z_grid):
         _, f_grid[i] = pert.cosmological_perturbation(0.1, z)
 
-    result = cosmo.evolve_to_cmb()
     return {
         "z": z_grid,
         "a": a_grid,
         "D": D,
         "f_lapse": f_grid,
-        "Omega_k_true": result["Omega_true_k"],
-        "lapse_compression": result["lapse_compression"],
+        "Omega_k_true": bg["Omega_true_k"],
+        "lapse_compression": bg["lapse_compression"],
         "z_start": z_start,
         "z_end": z_end,
     }
@@ -205,7 +233,7 @@ def c_ell_spectrum(
     # C_ℓ^TT ∝ 1/(ell(ell+1)) * (1 + first peak); amplitude in μK²
     sw = 1.0 / (ell * (ell + 1))
     first_peak_ell = 220.0
-    peak = 1.0 + 2.5 * np.exp(-((ell - first_peak_ell) ** 2) / (2.0 * 80.0 ** 2))
+    peak = 1.0 + 2.5 * np.exp(-((ell - first_peak_ell) ** 2) / (2.0 * 80.0**2))
     C_tt = amplitude * sw * peak
     C_tt = np.maximum(C_tt, 1e-10)
 
@@ -225,18 +253,22 @@ def line_of_sight_isw_rees_sciama(
     z_range: Tuple[float, float] = (0.0, 1100.0),
     n_z: int = 200,
     cosmology: Optional[Any] = None,
+    bulk_seed: Optional[Any] = None,
     amplitude: float = 1.0,
     **kwargs: Any,
 ) -> np.ndarray:
     """
     Line-of-sight: ISW + Rees–Sciama contribution to C_ℓ (additive ΔC_ℓ).
 
-    Uses HQIV growth D(z) and f(φ). Phenomenological amplitude; full version
-    integrates (d(Φ D)/dτ)² × visibility along LOS.
+    Uses HQIV growth D(z) and f(φ). When bulk_seed is provided, background uses bulk.
     """
     cosmo = _get_cosmology(cosmology)
     ev = universe_evolver(
-        z_start=z_range[1], z_end=z_range[0], n_steps=n_z, cosmology=cosmo
+        z_start=z_range[1],
+        z_end=z_range[0],
+        n_steps=n_z,
+        cosmology=cosmo,
+        bulk_seed=bulk_seed,
     )
     ell = np.asarray(ell, dtype=float)
     ell = np.maximum(ell, 2.0)
@@ -287,6 +319,7 @@ def full_sky_healpy_map(
     map_type: str = "T",
     include_isw_rees_sciama: bool = True,
     cosmology: Optional[Any] = None,
+    bulk_seed: Optional[Any] = None,
     max_ell: int = 1500,
     frame_velocity_km_s: Optional[float] = None,
     frame_gal_l_deg: float = 264.0,
@@ -311,7 +344,7 @@ def full_sky_healpy_map(
     max_ell = max(int(max_ell), 1500)
     ell_tt, c_tt = c_ell_spectrum("TT", max_ell=max_ell, cosmology=cosmology)
     if include_isw_rees_sciama:
-        delta_cl = line_of_sight_isw_rees_sciama(ell_tt, cosmology=cosmology)
+        delta_cl = line_of_sight_isw_rees_sciama(ell_tt, cosmology=cosmology, bulk_seed=bulk_seed)
         c_tt = c_tt + delta_cl
 
     # Build C_ℓ array for healpy (indexed by ell from 0 to max_ell)
@@ -323,8 +356,11 @@ def full_sky_healpy_map(
         t_map = hp.synfast(cl_arr, n_side, verbose=False)
         if frame_velocity_km_s is not None and frame_velocity_km_s != 0:
             t_map = add_kinematic_dipole(
-                t_map, n_side, frame_velocity_km_s,
-                gal_l_deg=frame_gal_l_deg, gal_b_deg=frame_gal_b_deg,
+                t_map,
+                n_side,
+                frame_velocity_km_s,
+                gal_l_deg=frame_gal_l_deg,
+                gal_b_deg=frame_gal_b_deg,
             )
         return t_map
     if map_type.upper() in ("QU", "Q", "U"):
@@ -335,13 +371,14 @@ def full_sky_healpy_map(
         cl_ee[2:] = c_ee[: n_ell - 2]
         cl_bb[2:] = c_bb[: n_ell - 2]
         te, eb, tb = np.zeros(n_ell), np.zeros(n_ell), np.zeros(n_ell)
-        t_map, q_map, u_map = hp.synfast(
-            [cl_arr, cl_ee, cl_bb, te, eb, tb], n_side, verbose=False
-        )
+        t_map, q_map, u_map = hp.synfast([cl_arr, cl_ee, cl_bb, te, eb, tb], n_side, verbose=False)
         if frame_velocity_km_s is not None and frame_velocity_km_s != 0:
             t_map = add_kinematic_dipole(
-                t_map, n_side, frame_velocity_km_s,
-                gal_l_deg=frame_gal_l_deg, gal_b_deg=frame_gal_b_deg,
+                t_map,
+                n_side,
+                frame_velocity_km_s,
+                gal_l_deg=frame_gal_l_deg,
+                gal_b_deg=frame_gal_b_deg,
             )
         if map_type.upper() == "QU":
             return t_map, q_map, u_map
@@ -351,8 +388,11 @@ def full_sky_healpy_map(
     t_map = hp.synfast(cl_arr, n_side, verbose=False)
     if frame_velocity_km_s is not None and frame_velocity_km_s != 0:
         t_map = add_kinematic_dipole(
-            t_map, n_side, frame_velocity_km_s,
-            gal_l_deg=frame_gal_l_deg, gal_b_deg=frame_gal_b_deg,
+            t_map,
+            n_side,
+            frame_velocity_km_s,
+            gal_l_deg=frame_gal_l_deg,
+            gal_b_deg=frame_gal_b_deg,
         )
     return t_map
 
@@ -362,6 +402,7 @@ def hqiv_cmb(
     max_ell: int = 1500,
     include_polarization: bool = True,
     cosmology: Optional[Any] = None,
+    bulk_seed: Optional[Any] = None,
     frame_velocity_km_s: Optional[float] = None,
     frame_gal_l_deg: float = 264.0,
     frame_gal_b_deg: float = 48.0,
@@ -370,14 +411,15 @@ def hqiv_cmb(
     """
     Run full HQIV CMB pipeline: C_ℓ → optional map (phenomenological).
 
-    Multipoles run out to max_ell (default 1500, minimum 1500). Returns C_ℓ (TT, EE, TE, BB),
-    σ₈(z=0), and full-sky map(s) if healpy available. Set frame_velocity_km_s to add the
-    kinematic dipole and generate the low-ℓ region (e.g. 370 for Solar System rest frame).
+    When bulk_seed is provided (from pyhqiv.bulk_seed.get_bulk_seed()), the background
+    Ω_k and H₀ are taken from HQIV bulk.py (authoritative until baryogenesis complete).
+    Multipoles run out to max_ell (default 1500, minimum 1500). Set frame_velocity_km_s
+    to add the kinematic dipole (e.g. 370 for Solar System rest frame).
     """
     max_ell = max(int(max_ell), 1500)
     cosmo = _get_cosmology(cosmology)
     ell_tt, c_tt = c_ell_spectrum("TT", max_ell=max_ell, cosmology=cosmo)
-    sigma8_z0 = sigma8(0.0, cosmology=cosmo)
+    sigma8_z0 = sigma8(0.0, cosmology=cosmo, bulk_seed=bulk_seed)
     result = {
         "ell": ell_tt,
         "C_ell_TT": c_tt,
@@ -393,7 +435,11 @@ def hqiv_cmb(
         result["C_ell_BB"] = c_bb
     try:
         t_map = full_sky_healpy_map(
-            n_side=n_side, map_type="T", include_isw_rees_sciama=True, cosmology=cosmo,
+            n_side=n_side,
+            map_type="T",
+            include_isw_rees_sciama=True,
+            cosmology=cosmo,
+            bulk_seed=bulk_seed,
             max_ell=max_ell,
             frame_velocity_km_s=frame_velocity_km_s,
             frame_gal_l_deg=frame_gal_l_deg,

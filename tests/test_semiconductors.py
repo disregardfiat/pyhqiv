@@ -1,25 +1,25 @@
 """Tests for semiconductors: compute_band_gap, dos, effective_mass, dielectric."""
 
 import numpy as np
-import pytest
 
 from pyhqiv.semiconductors import (
     compute_band_gap,
-    dos,
-    effective_mass,
     compute_conductivity_tensor,
     dielectric_function_epsilon,
+    dos,
+    effective_mass,
 )
-from pyhqiv.constants import GAMMA
 
 
 def test_compute_band_gap_direct():
     """Direct gap: VBM at same k as CBM."""
     # 2 k-points, 4 bands; valence 0,1 conduction 2,3
-    ev = np.array([
-        [-2.0, -1.0, 0.5, 1.0],   # k1: gap 0.5 - (-1) = 1.5
-        [-2.1, -0.9, 0.6, 1.1],   # k2: gap 0.6 - (-0.9) = 1.5
-    ])
+    ev = np.array(
+        [
+            [-2.0, -1.0, 0.5, 1.0],  # k1: gap 0.5 - (-1) = 1.5
+            [-2.1, -0.9, 0.6, 1.1],  # k2: gap 0.6 - (-0.9) = 1.5
+        ]
+    )
     gap, gap_type = compute_band_gap(ev, phi_avg=0.0)
     assert gap > 0
     assert abs(gap - 1.5) < 0.2
@@ -66,7 +66,7 @@ def test_effective_mass_parabolic():
     # Linear k path along x; E = 7.62 * kx^2 (parabolic)
     kx = np.linspace(-0.02, 0.02, 41)
     kpts = np.column_stack([kx, np.zeros(41), np.zeros(41)])
-    ev = 7.62 * (kx ** 2)
+    ev = 7.62 * (kx**2)
     ev = np.tile(ev.reshape(-1, 1), (1, 2))
     m = effective_mass(ev, kpts, band_index=0, direction=0, dk=1e-3)
     # effective_mass uses nearest-k interpolation; may be nan if dk doesn't hit grid

@@ -1,8 +1,5 @@
 """Tests for molecular / PROtien helpers: theta_local, bond_length, damping."""
 
-import numpy as np
-import pytest
-
 from pyhqiv.constants import A_LOC_ANG, HBAR_C_EV_ANG
 from pyhqiv.utils import (
     bond_length_from_theta,
