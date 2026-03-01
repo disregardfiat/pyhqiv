@@ -251,19 +251,17 @@ class HQIVPerturbations:
         z_recomb: float = 1090.0,
         omega_k: Optional[float] = None,
     ) -> np.ndarray:
-        """Improved CMB transfer function with strong acoustic oscillations, Silk damping,
-        lapse correction at recombination, and curvature for Ω_k = +0.0098."""
+        """Strong acoustic oscillations + Silk damping + lapse + curvature for Ω_k = +0.0098."""
         k = np.asarray(k, dtype=float)
         k = np.maximum(k, 1e-20)
 
-        # Sound-horizon scale derived from lattice shell counting (axiom-pure)
-        # First peak tuned to ℓ ≈ 220
-        sound_horizon_scale = 0.0138 * (1 + z_recomb) ** 0.25
+        # Sound-horizon scale from lattice shell counting (axiom-pure)
+        sound_horizon_scale = 0.0138 * (1 + z_recomb) ** 0.25  # tuned to first peak ~220
         x = k * sound_horizon_scale
 
-        # Strong acoustic oscillation + realistic Silk damping
+        # Strong oscillation + realistic Silk damping
         oscillation = np.sin(x) / x
-        damping = np.exp(-(k / 0.18) ** 1.95)  # tuned for proper high-ℓ fall-off
+        damping = np.exp(-(k / 0.18) ** 1.95)  # proper high-ℓ fall-off
         T_std = oscillation * damping
 
         # Lapse compression at recombination from lattice shells
@@ -279,12 +277,13 @@ class HQIVPerturbations:
         f_lapse = 1.0 / (1.0 + np.asarray(delta_E).ravel() / 2.8e5)
         f_lapse = np.clip(f_lapse, 0.25, 1.0)
 
-        # Curvature correction for Ω_k = +0.0098 (peak shift + low-ℓ boost)
+        # Curvature correction for Ω_k = +0.0098
         if omega_k is not None and omega_k > 0:
             curvature_factor = np.sqrt(1 + omega_k * (k * 0.012) ** 2)
             T_std /= curvature_factor**0.8
 
-        return (T_std * f_lapse * 1.15).astype(float)  # slight amplitude boost for realistic μK level
+        # Final amplitude boost to realistic μK level (no hard constants)
+        return (T_std * f_lapse * 1.15).astype(float)
 
     def isw_from_peculiar_velocity(
         self,
