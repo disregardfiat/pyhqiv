@@ -1,8 +1,9 @@
 """
-HQIV CMB: C_ℓ + σ₈ + full-sky Healpy map from cosmology_full.
+HQIV CMB: C_ℓ + σ₈ + full-sky map. Two paths:
 
-Thin wrapper over pyhqiv.cosmology_full so the cosmology package exposes
-a single T_Pl → now API. Replace this module with the full simulator when ready.
+- HQIVCMBMap (here and in cmb_map): axiom-pure, respects Ω_k^true = +0.0098
+  (curved_line_of_sight, curvature in transfer, ISW, growth_to_sigma8).
+- run_hqiv_cmb_to_map: thin wrapper over cosmology_full (phenomenological).
 """
 
 from __future__ import annotations
@@ -10,6 +11,9 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from pyhqiv.cosmology import HQIVCosmology
+from pyhqiv.cosmology.cmb_map import HQIVCMBMap
+
+__all__ = ["HQIVCMBMap", "run_hqiv_cmb_to_map"]
 
 
 def run_hqiv_cmb_to_map(

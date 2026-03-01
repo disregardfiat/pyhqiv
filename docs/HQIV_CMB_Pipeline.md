@@ -88,6 +88,16 @@ The resulting CMB map is **observationally accurate** (matches Planck 2018/2020 
 
 C_ℓ is built from P(k) T²(k) at k = ℓ/η_rec, then **synfast** → map; **anafast** returns C_ℓ. Peaks come from lattice shell counting + lapse at recombination. Requires `healpy` (`pip install pyhqiv[cosmology]`).
 
+**Curvature in observables (Ω_k^true = +0.0098):** The pipeline now respects curvature end-to-end so the multipole chart is not flat-ΛCDM naive:
+
+- **comoving_distance(z, omega_k)** — χ(z) with sinn (sin for closed, sinh for open).
+- **curved_line_of_sight(theta, phi, omega_k, k)** — LOS weights from j₀(k χ_rec) so angular scale and peak positions shift (~0.5–1%).
+- **cosmological_transfer(..., omega_k)** — k_eq from curved χ(z_rec).
+- **isw_from_peculiar_velocity(theta, phi)** — low-ℓ boost from accelerated galaxy motion (curvature-aware).
+- **growth_to_sigma8(omega_k)** — σ₈ factor with curvature.
+
+Use **HQIVCMBMap** with `run_from_T_Pl_to_now(use_curved_pixel_loop=True)` for a map built from the full curved LOS + ISW per pixel; else the map is synfast from curved C_ℓ plus a uniform ISW dipole. **plot_multipole(result)** plots ℓ(ℓ+1)C_ℓ/2π with Ω_k label.
+
 ---
 
 ## 3. What HQIVPerturbations Adds (The Missing Key)

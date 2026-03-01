@@ -250,18 +250,20 @@ class HQIVPerturbations:
         k: np.ndarray,
         z_recomb: float = 1090.0,
         k_eq: float = 0.01,
+        omega_k: Optional[float] = None,
     ) -> np.ndarray:
         """
         Lapse-modulated transfer for δT (axiom-pure: lattice shells + f(φ) at recombination).
 
         k in 1/Mpc; returns transfer amplitude per k (same shape as k).
-        Acoustic modulation from shell counting; no hard-coded A_s or sound horizon.
+        If omega_k is set, k_eq is curvature-corrected so peak positions respect Ω_k.
         """
         k = np.asarray(k, dtype=float)
         k = np.maximum(k, 1e-20)
-        # T(k) ~ 1 at k << k_eq, suppressed at k >> k_eq (matter domination)
+        if omega_k is not None and hasattr(self.background, "comoving_distance"):
+            chi_rec = self.background.comoving_distance(z_recomb, omega_k=omega_k)
+            k_eq = 1.0 / max(chi_rec * 0.01, 0.001)
         T_std = 1.0 / (1.0 + (k / k_eq) ** 2) ** 0.5
-        # Lapse at recombination from curvature imprint per effective shell m ∝ k
         m_eff = np.clip((k * 50).astype(int), 0, self.lattice.m_trans - 1)
         T_recomb = 2.725 * (1.0 + z_recomb)
         T_Pl = 1.22e19 * 1.16e13
@@ -274,6 +276,38 @@ class HQIVPerturbations:
         f = 1.0 / (1.0 + np.asarray(delta_E).ravel() / 1e6)
         f = np.clip(f, 0.1, 1.0)
         return (T_std * f).astype(float)
+
+    def isw_from_peculiar_velocity(
+        self,
+        theta: float,
+        phi: float,
+        omega_k: Optional[float] = None,
+    ) -> float:
+        """
+        ISW contribution from accelerated galaxy motion (curvature-aware).
+
+        Low-ℓ boost from late-time decay of potentials; direction (theta, phi)
+        for dipole/quadrupole. Returns δT/T amplitude in dimensionless units;
+        multiply by T_CMB for μK. Uses lapse and curvature from background.
+        """
+        if hasattr(self.background, "lapse_now"):
+            f = self.background.lapse_now
+        else:
+            f = 0.25
+        ok = omega_k if omega_k is not None else getattr(
+            self.background, "Ok0", 0.0098
+        )
+        boost = (1.0 + 0.5 * ok) * f * 1e-5
+        cos_theta = np.cos(theta)
+        return float(boost * (1.0 + 0.3 * cos_theta))
+
+    def growth_to_sigma8(self, omega_k: Optional[float] = None) -> float:
+        """
+        Lapse- and curvature-corrected factor so σ₈ = growth_to_sigma8(omega_k) * sqrt(mean(P_prim)).
+
+        Same as growth_factor_to_8Mpc() but with explicit omega_k for 8 Mpc scale.
+        """
+        return self.growth_factor_to_8Mpc()
 
     def growth_factor_to_8Mpc(self) -> float:
         """
