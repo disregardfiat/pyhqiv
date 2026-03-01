@@ -54,6 +54,7 @@ def cmb_pipeline_status() -> Dict[str, Any]:
         "map_generation_healpix": "not_implemented",
         "secondaries_lensing_isw_rees_sciama": "not_implemented",
         "design_doc": "docs/HQIV_CMB_Pipeline.md",
+        "optional_module": "pyhqiv.cosmology_full (universe_evolver, hqiv_cmb, sigma8, c_ell, healpy_map, los_isw; install pyhqiv[cosmology])",
     }
 
 

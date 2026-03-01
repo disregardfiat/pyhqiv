@@ -48,6 +48,7 @@ Also on [TestPyPI](https://test.pypi.org/project/pyhqiv/) for pre-release testin
 | `qutip` | QuTiP for quantum optics |
 | `jax` | JAX for JIT-accelerated lattice integrals / evolve_to_cmb |
 | `pyvista` | PyVista for 3D visualization |
+| `cosmology` | Healpy for full CMB pipeline (maps, C_ℓ, σ₈, LOS/ISW) — optional heavy module |
 | `all` | All of the above |
 
 ```bash
@@ -185,7 +186,8 @@ V_shift = hqiv_potential_shift(phi_avg=1e-10, dot_delta_theta_avg=1e-18)
 | `src/pyhqiv/fields.py` | Phase-horizon FDTD / spectral Maxwell (γ(φ/c²)(˙δθ′/c) terms) |
 | `src/pyhqiv/fluid.py` | Modified Navier–Stokes: f_inertia, g_vac, ν_eddy (laminar → standard NS) |
 | `src/pyhqiv/thermo.py` | First-principles thermodynamics: phase diagrams, EOS, critical points (no DAC/reference data) |
-| `src/pyhqiv/perturbations.py` | Unified linear perturbations with lapse/φ: stellar oscillations, fluid stability, phonons, cosmology |
+| `src/pyhqiv/perturbations.py` | Unified linear perturbations with lapse/φ: stellar oscillations, fluid stability, phonons, cosmology (stays in main) |
+| `src/pyhqiv/cosmology_full.py` | Optional heavy module: universe_evolver, hqiv_cmb, σ₈, C_ℓ, Healpy map, LOS/ISW (stubs; install pyhqiv[cosmology]) |
 | `src/pyhqiv/waveguide.py` | HQIV waveguide: k_c²(ω,β,m), constant-φ circle, taper, hyperbolic, mode solver |
 | `src/pyhqiv/molecular.py` | PROtien: Θ(Z, coord), bond_length_from_theta, damping_force_magnitude |
 | `src/pyhqiv/crystal.py` | HQIVCrystal: PBC, supercell, bloch_sum, reciprocal_vectors; high_symmetry_k_path; hqiv_potential_shift |
@@ -267,7 +269,7 @@ print([m.period for m in modes])  # periods with lapse-compressed frequencies
 print(pert.summary())
 ```
 
-**CMB pipeline (roadmap):** Full universe evolution from recombination (z ≈ 1100) to now and synthetic CMB map (lapse-compressed perturbations, no Boltzmann hierarchy) is designed in `docs/HQIV_CMB_Pipeline.md`. Entry point: `HQIVCMBPipeline`, status: `cmb_pipeline_status()`. Includes peculiar velocities, ISW/Rees–Sciama, and φ-corrected lensing for Planck-comparable power spectra and testable low-ℓ deviations.
+**CMB pipeline (roadmap):** Full universe evolution to a synthetic CMB map is designed in `docs/HQIV_CMB_Pipeline.md`. **Main** keeps perturbations and lattice (scalar `evolve_to_cmb`); the **optional cosmology module** (`pyhqiv.cosmology_full`, `pip install pyhqiv[cosmology]`) will provide universe_evolver, hqiv_cmb, Healpy full-sky maps, C_ℓ, σ₈, and line-of-sight ISW/Rees–Sciama. Entry point in main: `HQIVCMBPipeline`, `cmb_pipeline_status()`.
 
 ## Materials / semiconductors
 

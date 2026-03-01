@@ -40,6 +40,7 @@ mda = ["MDAnalysis>=2.0"]
 qutip = ["qutip>=4.7"]
 jax = ["jax>=0.4", "jaxlib>=0.4"]
 pyvista = ["pyvista>=0.38"]
+cosmology = ["healpy>=1.15"]
 all = ["pyhqiv[ase,mda,qutip,jax,pyvista]"]
 
 [project.urls]

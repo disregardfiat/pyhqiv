@@ -1,6 +1,20 @@
 # HQIV CMB Pipeline: First-Principles Universe Evolution to Synthetic CMB Map
 
-**Status:** Design / roadmap. Implemented pieces: `DiscreteNullLattice`, `HQIVCosmology`, `HQIVPerturbations`. Remaining: Boltzmann hierarchy replacement, line-of-sight integration, map generation, secondaries.
+**Status:** Design / roadmap. Implemented pieces: `DiscreteNullLattice`, `HQIVCosmology`, `HQIVPerturbations` (in **main**). Full pipeline (universe evolver, Healpy, C_ℓ, σ₈, LOS/ISW) lives in the **optional cosmology module** (`pyhqiv.cosmology_full`, heavy).
+
+---
+
+## 0. Main vs optional module
+
+| In **main** (always) | In **optional cosmology** (heavy, `pip install pyhqiv[cosmology]`) |
+|----------------------|---------------------------------------------------------------------|
+| `DiscreteNullLattice.evolve_to_cmb` (scalar) | `universe_evolver`, `hqiv_cmb` |
+| `HQIVCosmology`, Ω_k, lapse, ages | Full-sky Healpy map generator |
+| `HQIVPerturbations` (linear response, cosmological_perturbation) | C_ℓ multipole power spectrum / chart |
+| `cmb_pipeline_status`, `HQIVCMBPipeline` (stub) | σ₈ calculation |
+| — | Line-of-sight ISW/Rees–Sciama (galaxy accelerated motion) |
+
+Perturbations stay in the main codebase; the full “run the universe to now” map (seeding from lattice, evolving perturbations, LOS projection, Healpy map + C_ℓ + σ₈) is in the optional cosmology module so the core package stays lean.
 
 ---
 
@@ -84,13 +98,21 @@ Radial time gradient and Hubble gradient are encoded in φ(τ, r) and f(φ) alon
 
 ## 6. Pipeline Steps (Implementation Checklist)
 
+Implemented in **main** (today):
+
+- [x] **Background** — `HQIVCosmology.evolve_to_cmb` (scalar: Ω_k, lapse, ages); no map.
+- [x] **Linear perturbations** — `HQIVPerturbations.cosmological_perturbation`, `linear_response`.
+
+Planned in **optional cosmology module** (`pyhqiv.cosmology_full`, Healpy):
+
 - [ ] **Background at z_rec** — Use `HQIVCosmology` + lattice to define T_rec, a_rec, φ(τ_rec).
-- [ ] **Primordial spectrum** — Scale-invariant (or nearly) from combinatorial invariant; no separate inflation module required for minimal version.
-- [ ] **HQIV Boltzmann equations** — Replace standard δ' and θ' (baryon velocity) evolution with f(φ)-weighted terms; photon hierarchy with lapse in opacity and sound horizon.
-- [ ] **Perturbation evolution z_rec → z = 0** — Integrate δ, θ, δT/T, polarization with f(φ(τ)) and δE(m) on each shell.
-- [ ] **Line-of-sight integration** — δT/T(ℓ, m) and E/B from integral over τ with visibility and f(φ).
-- [ ] **Secondaries** — Lensing (convergence κ from φ-corrected LSS), ISW, Rees–Sciama (peculiar velocities from D(a) with f(φ)).
-- [ ] **Map generation** — HEALPix (or similar) full-sky T, Q, U; power spectra C_ℓ^TT, C_ℓ^EE, C_ℓ^TE, C_ℓ^κκ and cross with galaxies.
+- [ ] **Primordial spectrum** — Scale-invariant from combinatorial invariant.
+- [ ] **HQIV Boltzmann equations** — δ' and θ' with f(φ); photon hierarchy with lapse.
+- [ ] **Perturbation evolution z_rec → z = 0** — Integrate δ, θ, δT/T, polarization with f(φ(τ)) and δE(m).
+- [ ] **Line-of-sight integration** — δT/T(ℓ, m) and E/B; **ISW/Rees–Sciama** (galaxy accelerated motion).
+- [ ] **σ₈** — Amplitude at 8 h⁻¹ Mpc from HQIV growth.
+- [ ] **C_ℓ** — Multipole power spectrum (TT, EE, TE, BB) and chart.
+- [ ] **Map generation** — HEALPix full-sky T, Q, U; secondaries (lensing, ISW, Rees–Sciama).
 
 ---
 
