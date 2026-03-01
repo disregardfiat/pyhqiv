@@ -10,6 +10,7 @@ lapse compression f(a_loc, φ) = a_loc/(a_loc + φ/6).
 """
 
 from pyhqiv.cosmology.background import HQIVCosmology
+from pyhqiv.cosmology.cmb_map import HQIVCMBMap
 from pyhqiv.cosmology.universe_evolver import HQIVUniverseEvolver
 
-__all__ = ["HQIVCosmology", "HQIVUniverseEvolver"]
+__all__ = ["HQIVCosmology", "HQIVCMBMap", "HQIVUniverseEvolver"]

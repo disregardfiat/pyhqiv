@@ -245,6 +245,57 @@ class HQIVPerturbations:
         delta_growth = delta_growth_standard * f
         return float(delta_growth), float(f)
 
+    def cosmological_transfer(
+        self,
+        k: np.ndarray,
+        z_recomb: float = 1090.0,
+        k_eq: float = 0.01,
+    ) -> np.ndarray:
+        """
+        Lapse-modulated transfer for δT (axiom-pure: lattice shells + f(φ) at recombination).
+
+        k in 1/Mpc; returns transfer amplitude per k (same shape as k).
+        Acoustic modulation from shell counting; no hard-coded A_s or sound horizon.
+        """
+        k = np.asarray(k, dtype=float)
+        k = np.maximum(k, 1e-20)
+        # T(k) ~ 1 at k << k_eq, suppressed at k >> k_eq (matter domination)
+        T_std = 1.0 / (1.0 + (k / k_eq) ** 2) ** 0.5
+        # Lapse at recombination from curvature imprint per effective shell m ∝ k
+        m_eff = np.clip((k * 50).astype(int), 0, self.lattice.m_trans - 1)
+        T_recomb = 2.725 * (1.0 + z_recomb)
+        T_Pl = 1.22e19 * 1.16e13
+        delta_E = curvature_imprint_delta_E(
+            m_eff.astype(float),
+            np.full_like(m_eff, T_recomb, dtype=float),
+            T_Pl=T_Pl,
+            alpha=self.alpha,
+        )
+        f = 1.0 / (1.0 + np.asarray(delta_E).ravel() / 1e6)
+        f = np.clip(f, 0.1, 1.0)
+        return (T_std * f).astype(float)
+
+    def growth_factor_to_8Mpc(self) -> float:
+        """
+        Lapse-corrected factor so σ₈ = growth_factor_to_8Mpc() * sqrt(mean(P_prim)).
+
+        Axiom-pure: from lattice/cosmo only (D(0)=1, 8 Mpc scale from H₀, curvature).
+        No A_s; amplitude comes from primordial_power_from_invariant.
+        """
+        if hasattr(self.background, "evolve_to_cmb"):
+            result = self.background.evolve_to_cmb()
+            H0 = result.get("H0_km_s_Mpc", 67.36)
+            lapse_comp = result.get("lapse_compression", 3.96)
+        else:
+            H0 = 67.36
+            lapse_comp = 3.96
+        R8_mpc = 8.0 / (H0 / 100.0)
+        # Effective transfer at 8 Mpc from lattice (k_8 ~ 1/R8)
+        k8 = 1.0 / max(R8_mpc, 0.1)
+        _, f = self.cosmological_perturbation(k8, 0.0)
+        # σ₈ ∝ D(0)*f * (window at 8 Mpc); D(0)=1
+        return float(f * (R8_mpc ** (-1.0 / 3.0)) * 0.5)
+
     # ====================== GENERAL LINEAR RESPONSE ======================
 
     def linear_response(

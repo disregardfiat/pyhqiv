@@ -61,3 +61,33 @@ class HQIVCosmology:
     def get_delta_E_grid(self, E_0_factor: float = 1.0) -> np.ndarray:
         """Curvature imprint δE(m) for m = 0, ..., m_trans-1."""
         return self._lattice.get_delta_E_grid(E_0_factor=E_0_factor)
+
+    def lapse_factor(self, z: float) -> float:
+        """Lapse factor f(z) from lattice (1 today, from evolve_to_cmb)."""
+        result = self.evolve_to_cmb()
+        # f = 1/lapse_compression at z=0; approximate f(z) ∝ (1+z)^0.1 for structure
+        lapse_comp = result["lapse_compression"]
+        f0 = 1.0 / max(lapse_comp, 1.0)
+        return f0 * ((1.0 + z) ** 0.1) / (1.0 ** 0.1) if z <= 1100 else f0 * 0.5
+
+    @property
+    def lapse_now(self) -> float:
+        """Lapse factor today (1 / lapse_compression from paper)."""
+        result = self.evolve_to_cmb()
+        return 1.0 / max(result["lapse_compression"], 1.0)
+
+    def line_of_sight(
+        self,
+        latitude: float,
+        longitude: float,
+        n_k: int = 400,
+    ) -> np.ndarray:
+        """
+        Line-of-sight weight for CMB projection (axiom-pure stub).
+
+        Returns weight array (len n_k) for LOS integration. Full implementation
+        integrates transfer along LOS with lapse(z). Stub: isotropic (ones).
+        """
+        _ = latitude
+        _ = longitude
+        return np.ones(n_k, dtype=float)

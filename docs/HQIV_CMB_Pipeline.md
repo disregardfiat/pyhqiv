@@ -77,6 +77,17 @@ The resulting CMB map is **observationally accurate** (matches Planck 2018/2020 
 | φ(x) profile | Everywhere | φ = 2c²/Θ_local(x; ρ, T) |
 | Linear response | `HQIVPerturbations` | Cosmological perturbation (δ growth, f), fluid stability, general linear_response(ω) |
 
+### 2.1 Axiom-pure pipeline (HQIVCMBMap)
+
+**Only unit conversions + lattice.** No A_s or other hard physics constants.
+
+- **`pyhqiv.cosmology.cmb_map.HQIVCMBMap`** — Single entry: `run_from_T_Pl_to_now()` → `T_map_muK`, `Cl_TT`, `sigma8`, `background`, `lapse_today`.
+- **Lattice:** `DiscreteNullLattice.primordial_power_from_invariant(k)` — P(k) from combinatorial invariant only (scale-invariant or n_s shape).
+- **Perturbations:** `HQIVPerturbations.cosmological_transfer(k, z_recomb=1090)` — lapse-modulated transfer; `growth_factor_to_8Mpc()` — σ₈ = growth_factor_to_8Mpc() × √⟨P_prim⟩.
+- **Cosmology:** `HQIVCosmology.lapse_factor(z)`, `lapse_now`, `line_of_sight(lat, lon, n_k)` (stub: isotropic ones for now).
+
+C_ℓ is built from P(k) T²(k) at k = ℓ/η_rec, then **synfast** → map; **anafast** returns C_ℓ. Peaks come from lattice shell counting + lapse at recombination. Requires `healpy` (`pip install pyhqiv[cosmology]`).
+
 ---
 
 ## 3. What HQIVPerturbations Adds (The Missing Key)

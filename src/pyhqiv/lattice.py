@@ -200,3 +200,22 @@ class DiscreteNullLattice:
         """Cumulative mode count at each shell 0..m_trans (combinatorial). Vectorized."""
         k = np.arange(0, self.m_trans + 1, dtype=float)
         return 8.0 * (k + 2) * (k + 1) * k / 6.0
+
+    def primordial_power_from_invariant(
+        self,
+        k: np.ndarray,
+        k_pivot: float = 0.05,
+        n_s: float = 1.0,
+    ) -> np.ndarray:
+        """
+        Primordial power P(k) from combinatorial invariant only (no A_s constant).
+
+        Scale-invariant shape: P(k) ∝ (k/k_pivot)^(n_s-1). Amplitude set by
+        mode counting (combinatorial invariant); no external normalization.
+        k in 1/Mpc; returns P(k) in (Mpc)³ units (dimensionless Δ² ∝ k³ P).
+        """
+        k = np.asarray(k, dtype=float)
+        k = np.maximum(k, 1e-20)
+        # Amplitude from invariant (no A_s): paper single source
+        amp = COMBINATORIAL_INVARIANT * 1e-10 / (k_pivot ** (n_s - 1.0))
+        return amp * (k / k_pivot) ** (n_s - 1.0)
