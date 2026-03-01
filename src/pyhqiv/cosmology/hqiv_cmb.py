@@ -30,7 +30,17 @@ except ImportError:
 
 
 class HQIVCMBMap:
-    """Full T_Pl → now pipeline. Respects Ω_k^true = +0.0098 everywhere."""
+    """
+    Full T_Pl → now pipeline. Produces clean multipole + σ₈ + map.
+
+    Orchestrator that:
+    1. Calls primordial_power_from_invariant(k)
+    2. Runs pert.cosmological_transfer(k, z_recomb=1090, omega_k=Ok0)
+    3. Does curved-sky line-of-sight projection (curved_line_of_sight, respects Ω_k)
+    4. Adds ISW term from isw_from_peculiar_velocity (galaxy accelerated motion)
+    5. Runs hp.anafast to get clean C_ℓ
+    6. Computes σ₈ from growth_to_sigma8(omega_k) * sqrt(mean(Pk_prim))
+    """
 
     def __init__(self, nside: int = 1024, gamma: float = 0.40, lmax: int = 2500) -> None:
         self.lattice = DiscreteNullLattice(gamma=gamma)
@@ -104,7 +114,7 @@ class HQIVCMBMap:
         )
         plt.xlabel("Multipole ℓ")
         plt.ylabel(r"$\ell(\ell+1)C_\ell / 2\pi$  [μK²]")
-        plt.title("HQIV CMB Multipole — T_Pl to now (axiom-pure)")
+        plt.title("HQIV CMB Multipole — T_Pl to now (clean)")
         plt.legend()
         plt.grid(True, which="both", ls="--")
         if out_path:
