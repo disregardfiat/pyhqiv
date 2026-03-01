@@ -1,9 +1,11 @@
 """
 Modified Navier-Stokes (HQIV fluid): f(a_loc, φ), g_vac, ν_eddy.
 
-From the paper (Ettinger, Feb 2026): modified inertia f = a_loc/(a_loc + φ/6),
-vacuum source g_vac = -γ ∇(φ δ̇θ′)/6, and eddy viscosity ν_eddy = γ Θ_local |δ̇θ′| ℓ_coh² C.
-Laminar limit |a| ≫ φ/6 → f→1, g_vac→0 → standard Navier-Stokes.
+The single-source axiom is E_tot = m c² + ħ c/Δx with Δx ≤ Θ_local(x), giving
+φ(x) = 2c²/Θ_local(x) and the lapse compression f(a_loc, φ) = a_loc/(a_loc + φ/6).
+This module implements that f in the momentum equation (modified inertia), the
+vacuum source g_vac = -γ ∇(φ δ̇θ′)/6, and eddy viscosity ν_eddy = γ Θ_local |δ̇θ′| ℓ_coh² C
+(paper Ettinger, Feb 2026). Laminar limit |a| ≫ φ/6 → f→1, g_vac→0 → standard Navier-Stokes.
 """
 
 from __future__ import annotations

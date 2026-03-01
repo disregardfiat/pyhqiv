@@ -58,13 +58,18 @@ pip install pyhqiv[all]
 
 ## Quick start
 
+**Cosmology (one call):** Evolve to the CMB and get Ω_k^true, wall-clock/apparent ages, and lapse:  
+`result = HQIVCosmology().evolve_to_cmb(T0_K=2.725)` → Ω_k ≈ 0.0098, age 51.2 / 13.8 Gyr, lapse ≈ 3.96.
+
 ```python
-from pyhqiv import DiscreteNullLattice, HQIVSystem
+from pyhqiv import DiscreteNullLattice, HQIVSystem, HQIVCosmology
 import numpy as np
 
-lattice = DiscreteNullLattice(m_trans=500, gamma=0.40)
-result = lattice.evolve_to_cmb(T0_K=2.725)  # Omega_true_k ≈ 0.0098
+# Cosmology
+result = HQIVCosmology().evolve_to_cmb(T0_K=2.725)  # Omega_true_k ≈ 0.0098
 
+# Fields
+lattice = DiscreteNullLattice(m_trans=500, gamma=0.40)
 sys = HQIVSystem.from_atoms([(0, 0, 0), (1.5, 0, 0)], charges=[1, -1], gamma=0.40)
 grid = np.mgrid[-2:2:11j, -2:2:11j, -2:2:11j].reshape(3, -1).T
 E, B = sys.compute_fields(grid, t=0.0)
@@ -79,8 +84,9 @@ from pyhqiv import (
     GAMMA, ALPHA, T_PL_GEV, T_LOCK_GEV, T_CMB_K, M_TRANS,
     COMBINATORIAL_INVARIANT, OMEGA_TRUE_K_PAPER, LAPSE_COMPRESSION_PAPER,
     HBAR_C_EV_ANG, A_LOC_ANG,
-    # Lattice
+    # Lattice & cosmology
     DiscreteNullLattice,
+    HQIVCosmology,
     # Phase lift
     HQIVPhaseLift,
     # Algebra (so(8), hypercharge)
@@ -107,10 +113,12 @@ alg = OctonionHQIVAlgebra(verbose=False)
 dim, _ = alg.lie_closure_dimension()  # 28
 data = alg.hypercharge_paper_data()
 
-# --- lattice: δE(m), evolve_to_cmb ---
+# --- lattice & cosmology: δE(m), evolve_to_cmb, Ω_k, ages, lapse ---
 lattice = DiscreteNullLattice(m_trans=500, gamma=0.40)
 result = lattice.evolve_to_cmb(T0_K=2.725)
 delta_E = lattice.get_delta_E_grid()
+cosmo = HQIVCosmology()
+cosmo_result = cosmo.evolve_to_cmb(T0_K=2.725)  # Omega_true_k, 51.2/13.8 Gyr, lapse ≈ 3.96
 
 # --- phase: δθ′(E′), ˙δθ′, lapse ---
 phase = HQIVPhaseLift(gamma=0.40)

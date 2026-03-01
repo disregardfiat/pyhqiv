@@ -49,7 +49,7 @@ Repository = "https://github.com/disregardfiat/pyhqiv"
 
 [tool.setuptools_scm]
 write_to = "src/pyhqiv/_version.py"
-fallback_version = "0.0.0+unknown"
+fallback_version = "0.4.0+unknown"
 
 [tool.setuptools.packages.find]
 where = ["src"]

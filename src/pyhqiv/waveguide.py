@@ -1,10 +1,12 @@
 """
 HQIV waveguide: phase-horizon corrected Maxwell in a guide.
 
-From paper Sec. 3.3, 3.7, 5.1: modified curl equations with D/Dt = ∂/∂t + δ̇θ′ ∂/∂δθ′,
-phase-fiber coupling ∂/∂δθ′ → im, leading to (∇⊥² + k_c²) E_t = 0 with
-k_c² = ω²/c² - β² + 2imωδ̇θ′ + m²(δ̇θ′)². Geometry design: constant-φ circle,
-adiabatic taper, hyperbolic cross-section, rectangular correction.
+The single-source axiom E_tot = m c² + ħ c/Δx with Δx ≤ Θ_local(x) yields
+φ = 2c²/Θ_local and the phase-horizon clock δθ′; all corrections here follow from
+that. Modified curl equations use D/Dt = ∂/∂t + δ̇θ′ ∂/∂δθ′, with phase-fiber
+coupling ∂/∂δθ′ → im, giving (∇⊥² + k_c²) E_t = 0 and
+k_c² = ω²/c² - β² + 2imωδ̇θ′ + m²(δ̇θ′)² (paper Sec. 3.3, 3.7, 5.1). Geometry
+design: constant-φ circle, adiabatic taper, hyperbolic cross-section, rectangular correction.
 """
 
 from __future__ import annotations

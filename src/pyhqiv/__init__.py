@@ -39,6 +39,7 @@ from pyhqiv.constants import (
 )
 from pyhqiv.algebra import OctonionHQIVAlgebra
 from pyhqiv.lattice import DiscreteNullLattice
+from pyhqiv.cosmology import HQIVCosmology
 from pyhqiv.phase import HQIVPhaseLift
 from pyhqiv.atom import HQIVAtom
 from pyhqiv.system import HQIVSystem
@@ -96,6 +97,7 @@ __all__ = [
     "AGE_APPARENT_GYR_PAPER",
     "OctonionHQIVAlgebra",
     "DiscreteNullLattice",
+    "HQIVCosmology",
     "HQIVPhaseLift",
     "HQIVAtom",
     "HQIVSystem",
