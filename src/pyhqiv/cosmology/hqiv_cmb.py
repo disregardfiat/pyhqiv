@@ -15,8 +15,7 @@ from pyhqiv.lattice import DiscreteNullLattice
 from pyhqiv.perturbations import HQIVPerturbations
 from pyhqiv.cosmology.background import HQIVCosmology
 
-# CMB monopole in μK (δT/T → μK)
-T_CMB_MUK = 2.725e6
+from pyhqiv.constants import T_CMB_K, T_CMB_MUK, Z_RECOMB
 
 try:
     import healpy as hp
@@ -54,7 +53,7 @@ class HQIVCMBMap:
             raise ImportError("healpy is required for HQIVCMBMap.run_from_T_Pl_to_now")
 
         # 1. Background (perfect)
-        bg = self.lattice.evolve_to_cmb(T0_K=2.725)
+        bg = self.lattice.evolve_to_cmb(T0_K=T_CMB_K)
 
         # 2. Primordial power from lattice invariant
         k = np.logspace(-5, 0, 800)
@@ -62,7 +61,7 @@ class HQIVCMBMap:
 
         # 3. Lapse + curvature-aware transfer
         delta_T_transfer = self.pert.cosmological_transfer(
-            k, z_recomb=1090.0, omega_k=self.cosmo.Ok0
+            k, z_recomb=Z_RECOMB, omega_k=self.cosmo.Ok0
         )
 
         # 4. Full-sky projection with galaxy accelerated motion (ISW)

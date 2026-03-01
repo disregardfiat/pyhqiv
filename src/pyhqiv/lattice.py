@@ -15,6 +15,7 @@ from pyhqiv.constants import (
     ALPHA,
     COMBINATORIAL_INVARIANT,
     GAMMA,
+    K_PIVOT_FIDUCIAL,
     LAPSE_COMPRESSION_PAPER,
     M_TRANS,
     OMEGA_TRUE_K_PAPER,
@@ -204,7 +205,7 @@ class DiscreteNullLattice:
     def primordial_power_from_invariant(
         self,
         k: np.ndarray,
-        k_pivot: float = 0.05,
+        k_pivot: float = K_PIVOT_FIDUCIAL,
         n_s: float = 1.0,
     ) -> np.ndarray:
         """

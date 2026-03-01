@@ -11,14 +11,17 @@ from typing import Dict, Optional, Union
 
 import numpy as np
 
-from pyhqiv.constants import T_CMB_K
+from pyhqiv.constants import (
+    H0_KM_S_MPC_PAPER,
+    OMEGA_L0_FIDUCIAL,
+    OMEGA_M0_FIDUCIAL,
+    T_CMB_K,
+    Z_RECOMB,
+)
 from pyhqiv.lattice import DiscreteNullLattice
 
-# Fiducial flat-ΛCDM for E(z) when computing curved χ(z). Only unit conversions.
-H0_KM_S_MPC = 67.36
-OMEGA_M0 = 0.315
-OMEGA_L0 = 0.685
-C_H0_MPC = 299792.458 / H0_KM_S_MPC  # c/H0 in Mpc
+# c/H0 in Mpc (unit conversion; H0 from paper age)
+C_H0_MPC = 299792.458 / H0_KM_S_MPC_PAPER
 
 
 class HQIVCosmology:
@@ -118,7 +121,7 @@ class HQIVCosmology:
         """
         if omega_k is None:
             omega_k = self.Ok0
-        omega_m = OMEGA_M0
+        omega_m = OMEGA_M0_FIDUCIAL
         omega_l = 1.0 - omega_m - omega_k
         z_arr = np.linspace(0.0, z, max(n_z, 2))
         e_z = np.sqrt(
@@ -145,7 +148,7 @@ class HQIVCosmology:
         phi: float,
         omega_k: Optional[float] = None,
         k: Optional[np.ndarray] = None,
-        z_rec: float = 1090.0,
+        z_rec: float = Z_RECOMB,
     ) -> np.ndarray:
         """
         LOS weight for curved sky (Ω_k) so peak positions shift correctly.

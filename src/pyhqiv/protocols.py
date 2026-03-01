@@ -12,6 +12,13 @@ from typing import Any, Dict, Optional, Protocol, Union
 
 import numpy as np
 
+from pyhqiv.constants import (
+    AGE_APPARENT_GYR_PAPER,
+    AGE_WALL_GYR_PAPER,
+    LAPSE_COMPRESSION_PAPER,
+    T_CMB_K,
+)
+
 
 class NullLatticeProtocol(Protocol):
     """
@@ -42,7 +49,7 @@ class NullLatticeProtocol(Protocol):
 
     def evolve_to_cmb(
         self,
-        T0_K: float = 2.725,
+        T0_K: float = T_CMB_K,
         E_0_factor: float = 1.0,
         use_jax: bool = False,
     ) -> Dict[str, Any]:
@@ -98,7 +105,7 @@ class NullLatticeBase(ABC):
 
     def evolve_to_cmb(
         self,
-        T0_K: float = 2.725,
+        T0_K: float = T_CMB_K,
         E_0_factor: float = 1.0,
         use_jax: bool = False,
     ) -> Dict[str, Any]:
@@ -106,9 +113,9 @@ class NullLatticeBase(ABC):
         omega_k = self.omega_k_true(E_0_factor=E_0_factor, use_jax=use_jax)
         return {
             "Omega_true_k": omega_k,
-            "age_wall_Gyr": 51.2,
-            "age_apparent_Gyr": 13.8,
-            "lapse_compression": 3.96,
+            "age_wall_Gyr": AGE_WALL_GYR_PAPER,
+            "age_apparent_Gyr": AGE_APPARENT_GYR_PAPER,
+            "lapse_compression": LAPSE_COMPRESSION_PAPER,
             "T_CMB_K": T0_K,
             "m_trans": self.m_trans,
             "gamma": self.gamma,

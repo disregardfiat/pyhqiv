@@ -14,7 +14,7 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 
-from pyhqiv.constants import C_SI, GAMMA
+from pyhqiv.constants import C_SI, GAMMA, LAPSE_COMPRESSION_PAPER
 from pyhqiv.fluid import f_inertia
 from pyhqiv.utils import phi_from_theta_local
 
@@ -139,7 +139,9 @@ class HQIVSolarCore:
         """
         return self.lapse_factor(r)
 
-    def luminosity_shift_apparent_to_true(self, lapse_compression: float = 3.96) -> float:
+    def luminosity_shift_apparent_to_true(
+        self, lapse_compression: float = LAPSE_COMPRESSION_PAPER
+    ) -> float:
         """
         Apparent luminosity L_app vs true (wall-clock) L_true: L_app = L_true / lapse_compression
         for bolometric power per unit apparent time. Returns lapse_compression (e.g. 3.96).
@@ -148,7 +150,7 @@ class HQIVSolarCore:
 
     def standard_vs_hqiv_table(
         self,
-        lapse_compression: float = 3.96,
+        lapse_compression: float = LAPSE_COMPRESSION_PAPER,
     ) -> dict:
         """
         Numerical comparison: standard SSM vs HQIV-corrected.

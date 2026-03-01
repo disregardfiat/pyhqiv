@@ -16,7 +16,18 @@ from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
-from pyhqiv.constants import ALPHA, GAMMA
+from pyhqiv.constants import (
+    ALPHA,
+    COMBINATORIAL_INVARIANT,
+    GAMMA,
+    H0_KM_S_MPC_PAPER,
+    LAPSE_COMPRESSION_PAPER,
+    OMEGA_M0_FIDUCIAL,
+    OMEGA_L0_FIDUCIAL,
+    T_CMB_K,
+    T_CMB_MUK,
+    T_PL_K,
+)
 from pyhqiv.cosmology import HQIVCosmology
 from pyhqiv.lattice import curvature_imprint_delta_E
 from pyhqiv.perturbations import HQIVPerturbations
@@ -25,9 +36,6 @@ from pyhqiv.perturbations import HQIVPerturbations
 _trapz = getattr(np, "trapezoid", getattr(np, "trapz", None))
 if _trapz is None:
     from scipy.integrate import trapezoid as _trapz  # type: ignore
-
-# CMB monopole in μK (for kinematic dipole)
-T_CMB_MUK = 2.725e6
 
 __all__ = [
     "universe_evolver",
@@ -39,16 +47,15 @@ __all__ = [
     "add_kinematic_dipole",
 ]
 
-# Fiducial cosmology (flat ΛCDM-like for transfer/growth; HQIV modifies via f(φ))
-H0_KM_S_MPC = 67.36
-H0_SI = H0_KM_S_MPC * 1e3 / 3.086e22  # 1/s
+# From paper / constants only
+H0_KM_S_MPC = H0_KM_S_MPC_PAPER
+H0_SI = H0_KM_S_MPC * 1e3 / 3.086e22  # 1/s (unit conversion)
 HUBBLE_MPC = 3000.0 / H0_KM_S_MPC  # c/H0 in Mpc
-OMEGA_M0 = 0.315
-OMEGA_L0 = 1.0 - OMEGA_M0
-N_S = 0.9649  # scalar spectral index
-K_PIVOT = 0.05  # 1/Mpc
-R8_MPC = 8.0 / (H0_KM_S_MPC / 100.0)  # 8 h⁻¹ Mpc in Mpc
-T_PL_K = 1.22e19 * 1.16e13  # Planck T in K (approx)
+OMEGA_M0 = OMEGA_M0_FIDUCIAL
+OMEGA_L0 = OMEGA_L0_FIDUCIAL
+N_S = 0.9649  # fiducial scalar index (phenomenological sigma8; not from paper)
+K_PIVOT = 0.05  # fiducial 1/Mpc (phenomenological; not from paper)
+R8_MPC = 8.0 / (H0_KM_S_MPC / 100.0)  # 8 h⁻¹ Mpc (unit)
 
 
 def _get_cosmology(cosmology: Optional[Any]) -> HQIVCosmology:
@@ -70,7 +77,7 @@ def _get_background(
         return {
             "Omega_true_k": bulk_seed.get("Omega_true_k", bulk_seed.get("omega_k_true")),
             "H0_km_s_Mpc": bulk_seed.get("H0_km_s_Mpc", H0_KM_S_MPC),
-            "lapse_compression": bulk_seed.get("lapse_compression", 3.96),
+            "lapse_compression": bulk_seed.get("lapse_compression", LAPSE_COMPRESSION_PAPER),
         }
     cosmo = _get_cosmology(cosmology)
     result = cosmo.evolve_to_cmb()
@@ -84,9 +91,11 @@ def _get_background(
 def _lapse_f_from_lattice(k: float, z: float) -> float:
     """Lapse factor f(z) from curvature imprint at effective shell m ∝ k."""
     m = np.clip(int(k * 50), 0, 499)
-    T = 2.725 * (1.0 + z)
+    T = T_CMB_K * (1.0 + z)
     delta_E = curvature_imprint_delta_E(np.array([m]), np.array([T]), alpha=ALPHA)
-    f = 1.0 / (1.0 + float(np.asarray(delta_E).flat[0]) / 1e6)
+    f = 1.0 / (
+        1.0 + float(np.asarray(delta_E).flat[0]) / (COMBINATORIAL_INVARIANT * 0.2)
+    )
     return float(np.clip(f, 0.1, 1.0))
 
 

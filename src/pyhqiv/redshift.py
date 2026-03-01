@@ -11,7 +11,13 @@ from typing import Optional, Union
 
 import numpy as np
 
-from pyhqiv.constants import LAPSE_COMPRESSION_PAPER
+from pyhqiv.constants import (
+    AGE_APPARENT_GYR_PAPER,
+    AGE_WALL_GYR_PAPER,
+    GAMMA,
+    LAPSE_COMPRESSION_PAPER,
+    OMEGA_TRUE_K_PAPER,
+)
 from pyhqiv.fluid import f_inertia
 from pyhqiv.lattice import DiscreteNullLattice
 from pyhqiv.phase import HQIVPhaseLift
@@ -58,7 +64,7 @@ def z_total_apparent(
 
 def wall_clock_age_at_emission_Gyr(
     z_apparent: Union[float, np.ndarray],
-    age_wall_Gyr: float = 51.2,
+    age_wall_Gyr: float = AGE_WALL_GYR_PAPER,
     lapse_compression: float = LAPSE_COMPRESSION_PAPER,
 ) -> np.ndarray:
     """
@@ -86,8 +92,8 @@ class HQIVRedshift:
     def __init__(
         self,
         lapse_compression: float = LAPSE_COMPRESSION_PAPER,
-        age_wall_Gyr: float = 51.2,
-        gamma: float = 0.40,
+        age_wall_Gyr: float = AGE_WALL_GYR_PAPER,
+        gamma: float = GAMMA,
     ) -> None:
         self.lapse_compression = lapse_compression
         self.age_wall_Gyr = age_wall_Gyr
@@ -182,8 +188,8 @@ class HQIVRedshift:
         if self._lattice is not None:
             return self._lattice.evolve_to_cmb()
         return {
-            "Omega_true_k": 0.0098,
+            "Omega_true_k": OMEGA_TRUE_K_PAPER,
             "age_wall_Gyr": self.age_wall_Gyr,
-            "age_apparent_Gyr": 13.8,
+            "age_apparent_Gyr": AGE_APPARENT_GYR_PAPER,
             "lapse_compression": self.lapse_compression,
         }

@@ -50,7 +50,7 @@ def get_bulk_seed(
     hqiv_path: Optional[str] = None,
     n_steps: int = 6000,
     n_loga: int = 4000,
-    T_cmb_k: float = 2.725,
+    T_cmb_k: Optional[float] = None,
     outpath: Optional[str] = None,
     quiet: bool = True,
     **kwargs: Any,
@@ -89,12 +89,14 @@ def get_bulk_seed(
     finally:
         sys.path[:] = saved_path
 
-    H_GEV_TO_KM_S_MPC = 1.56e38 * 2.998e5  # from bulk.py
+    from pyhqiv.constants import LAPSE_COMPRESSION_PAPER, T_CMB_K
+
+    H_GEV_TO_KM_S_MPC = 1.56e38 * 2.998e5  # from bulk.py (unit conversion)
     try:
         result = hqiv_bulk.forward_4d_evolution(
             n_steps=n_steps,
             n_loga=n_loga,
-            T_cmb_k=T_cmb_k,
+            T_cmb_k=T_cmb_k if T_cmb_k is not None else T_CMB_K,
             outpath=outpath or (str(hm / "hqiv_lattice_table.dat")),
             **kwargs,
         )
@@ -106,8 +108,6 @@ def get_bulk_seed(
         return None
 
     H0_km_s_Mpc = float(result["H0_gev"]) * H_GEV_TO_KM_S_MPC
-    # Paper lapse when using bulk background (bulk does not compute lapse)
-    LAPSE_PAPER = 3.96
     return {
         "omega_k_true": result["omega_k_true"],
         "Omega_true_k": result["omega_k_true"],
@@ -117,7 +117,7 @@ def get_bulk_seed(
         "H0_gev": result["H0_gev"],
         "H0_km_s_Mpc": H0_km_s_Mpc,
         "table_path": result["outpath"],
-        "lapse_compression": LAPSE_PAPER,
+        "lapse_compression": LAPSE_COMPRESSION_PAPER,
         "data": result.get("data"),
     }
 

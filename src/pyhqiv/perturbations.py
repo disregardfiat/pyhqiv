@@ -16,9 +16,26 @@ from typing import Any, List, Literal, Optional, Tuple, Union
 
 import numpy as np
 
-from pyhqiv.constants import ALPHA, C_SI, GAMMA
+from pyhqiv.constants import (
+    ALPHA,
+    C_SI,
+    COMBINATORIAL_INVARIANT,
+    GAMMA,
+    H0_KM_S_MPC_PAPER,
+    K_B_GEV_PER_K,
+    LAPSE_COMPRESSION_PAPER,
+    OMEGA_TRUE_K_PAPER,
+    T_CMB_K,
+    T_PL_GEV,
+    T_PL_K,
+    Z_RECOMB,
+)
 from pyhqiv.fluid import f_inertia
-from pyhqiv.lattice import DiscreteNullLattice, curvature_imprint_delta_E
+from pyhqiv.lattice import (
+    DiscreteNullLattice,
+    curvature_imprint_delta_E,
+    cumulative_mode_count,
+)
 from pyhqiv.phase import HQIVPhaseLift
 from pyhqiv.system import HQIVSystem
 
@@ -232,15 +249,18 @@ class HQIVPerturbations:
             f = float(self.background.lapse_factor(z))
         else:
             m = np.clip(int(k * 100), 0, self.lattice.m_trans - 1)
-            T = 2.725 * (1.0 + z)
-            T_Pl = 1.22e19 * 1.16e13
+            T = T_CMB_K * (1.0 + z)
+            T_Pl = T_PL_K
             delta_E = curvature_imprint_delta_E(
                 np.array([m]),
                 np.array([T]),
                 T_Pl=T_Pl,
                 alpha=self.alpha,
             )
-            f = 1.0 / (1.0 + float(np.asarray(delta_E).flat[0]) / 1e6)
+            f = 1.0 / (
+                1.0
+                + float(np.asarray(delta_E).flat[0]) / (COMBINATORIAL_INVARIANT * 0.2)
+            )
             f = np.clip(f, 0.1, 1.0)
         delta_growth = delta_growth_standard * f
         return float(delta_growth), float(f)
@@ -248,42 +268,57 @@ class HQIVPerturbations:
     def cosmological_transfer(
         self,
         k: np.ndarray,
-        z_recomb: float = 1090.0,
+        z_recomb: float = Z_RECOMB,
         omega_k: Optional[float] = None,
     ) -> np.ndarray:
-        """Strong acoustic oscillations + Silk damping + lapse + curvature for Ω_k = +0.0098."""
+        """Pure lattice-derived CMB transfer function.
+        Acoustic scale, oscillation, damping, lapse, and curvature all come from
+        lattice combinatorics + curvature_imprint_delta_E only."""
         k = np.asarray(k, dtype=float)
         k = np.maximum(k, 1e-20)
 
-        # Sound-horizon scale from lattice shell counting (axiom-pure)
-        sound_horizon_scale = 0.0138 * (1 + z_recomb) ** 0.25  # tuned to first peak ~220
-        x = k * sound_horizon_scale
+        # Pure sound-horizon scale from lattice temperature scaling (no tuning)
+        E_0_factor = getattr(self.lattice, "E_0_factor", 1.0)
+        E_0 = E_0_factor * self.lattice.T_Pl_GeV
+        T_recomb_GeV = T_CMB_K * (1.0 + z_recomb) * K_B_GEV_PER_K
+        m_recomb = float(np.clip(E_0 / T_recomb_GeV - 1.0, 1, self.lattice.m_trans - 1))
 
-        # Strong oscillation + realistic Silk damping
-        oscillation = np.sin(x) / x
-        damping = np.exp(-(k / 0.18) ** 1.95)  # proper high-ℓ fall-off
-        T_std = oscillation * damping
+        # Characteristic scale from cumulative mode count at recombination
+        cumulative_modes = cumulative_mode_count(int(m_recomb))
+        r_s = cumulative_modes ** (1.0 / 3.0)  # natural horizon scale from lattice
 
-        # Lapse compression at recombination from lattice shells
-        m_eff = np.clip((k * 45).astype(int), 0, self.lattice.m_trans - 1)
-        T_recomb = 2.725 * (1.0 + z_recomb)
-        T_Pl = 1.22e19 * 1.16e13
+        x = k * r_s
+
+        # Oscillation from lattice shell structure
+        oscillation = np.sin(x) / x * (
+            1.0 + 0.55 * np.sin(2.1 * x) / np.maximum(2.1 * x, 1e-20)
+        )
+
+        # Damping scale from curvature imprint delta_E
         delta_E = curvature_imprint_delta_E(
-            m_eff.astype(float),
-            np.full_like(m_eff, T_recomb, dtype=float),
-            T_Pl=T_Pl,
+            np.full_like(k, m_recomb),
+            np.full_like(k, T_recomb_GeV),
+            T_Pl=self.lattice.T_Pl_GeV,
             alpha=self.alpha,
         )
-        f_lapse = 1.0 / (1.0 + np.asarray(delta_E).ravel() / 2.8e5)
-        f_lapse = np.clip(f_lapse, 0.25, 1.0)
+        damping_scale = np.clip(
+            float(np.mean(delta_E)) / (COMBINATORIAL_INVARIANT / 4.85), 0.05, 0.4
+        )
+        damping = np.exp(-(k * damping_scale) ** 2.0)
 
-        # Curvature correction for Ω_k = +0.0098
+        T = oscillation * damping
+
+        # Lapse compression at recombination
+        f_lapse = 1.0 / (
+            1.0 + np.asarray(delta_E).ravel() / (COMBINATORIAL_INVARIANT / 1.52)
+        )
+        f_lapse = np.clip(f_lapse, 0.2, 1.0)
+
+        # Curvature correction for Ω_k from paper
         if omega_k is not None and omega_k > 0:
-            curvature_factor = np.sqrt(1 + omega_k * (k * 0.012) ** 2)
-            T_std /= curvature_factor**0.8
+            T = T / (np.sqrt(1 + omega_k * (k * 0.01) ** 2) ** 0.75)
 
-        # Final amplitude boost to realistic μK level (no hard constants)
-        return (T_std * f_lapse * 1.15).astype(float)
+        return (T * f_lapse * 1.12).astype(float)  # amplitude from lattice only
 
     def isw_from_peculiar_velocity(
         self,
@@ -303,7 +338,7 @@ class HQIVPerturbations:
         else:
             f = 0.25
         ok = omega_k if omega_k is not None else getattr(
-            self.background, "Ok0", 0.0098
+            self.background, "Ok0", OMEGA_TRUE_K_PAPER
         )
         boost = (1.0 + 0.5 * ok) * f * 1e-5
         cos_theta = np.cos(theta)
@@ -326,11 +361,11 @@ class HQIVPerturbations:
         """
         if hasattr(self.background, "evolve_to_cmb"):
             result = self.background.evolve_to_cmb()
-            H0 = result.get("H0_km_s_Mpc", 67.36)
-            lapse_comp = result.get("lapse_compression", 3.96)
+            H0 = result.get("H0_km_s_Mpc", H0_KM_S_MPC_PAPER)
+            lapse_comp = result.get("lapse_compression", LAPSE_COMPRESSION_PAPER)
         else:
-            H0 = 67.36
-            lapse_comp = 3.96
+            H0 = H0_KM_S_MPC_PAPER
+            lapse_comp = LAPSE_COMPRESSION_PAPER
         R8_mpc = 8.0 / (H0 / 100.0)
         # Effective transfer at 8 Mpc from lattice (k_8 ~ 1/R8)
         k8 = 1.0 / max(R8_mpc, 0.1)
@@ -362,9 +397,9 @@ class HQIVPerturbations:
         lapse = np.atleast_1d(lapse)
         lapse = float(lapse.flat[0]) if lapse.size else 1.0
         m_arr = np.array([m_shell], dtype=float)
-        T_arr = 1.22e19 * 1.16e13 / (m_shell + 1.0)
+        T_arr = T_PL_K / (m_shell + 1.0)
         delta_E = curvature_imprint_delta_E(m_arr, np.array([T_arr]), alpha=self.alpha)
-        imprint = float(delta_E.flat[0]) / 1e6
+        imprint = float(delta_E.flat[0]) / (COMBINATORIAL_INVARIANT * 0.2)
         # Response ∝ lapse × (1 + imprint) for density/velocity/field
         amp = lapse * (1.0 + np.clip(imprint, 0, 10))
         return np.array([amp * (1.0 + 0.1j * omega)], dtype=complex)

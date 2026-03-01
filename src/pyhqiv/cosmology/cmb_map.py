@@ -11,12 +11,10 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
-from pyhqiv.constants import GAMMA
+from pyhqiv.constants import GAMMA, OMEGA_TRUE_K_PAPER, T_CMB_K, T_CMB_MUK, Z_RECOMB
 from pyhqiv.cosmology.background import HQIVCosmology
 from pyhqiv.lattice import DiscreteNullLattice
 from pyhqiv.perturbations import HQIVPerturbations
-
-T_CMB_MUK = 2.725e6  # CMB monopole in μK (δT/T → μK)
 
 
 class HQIVCMBMap:
@@ -46,8 +44,8 @@ class HQIVCMBMap:
 
     def run_from_T_Pl_to_now(
         self,
-        T0_K: float = 2.725,
-        z_recomb: float = 1090.0,
+        T0_K: float = T_CMB_K,
+        z_recomb: float = Z_RECOMB,
         n_k: int = 600,
         use_curved_pixel_loop: bool = False,
     ) -> Dict[str, Any]:
@@ -129,7 +127,7 @@ class HQIVCMBMap:
         cl = result["Cl_TT"]
         ell_plot = np.arange(len(cl), dtype=float)
         d_ell = ell_plot * (ell_plot + 1) * cl / (2.0 * np.pi)
-        ok = result.get("Omega_k_true", getattr(self.cosmo, "Ok0", 0.0098))
+        ok = result.get("Omega_k_true", getattr(self.cosmo, "Ok0", OMEGA_TRUE_K_PAPER))
 
         plt.figure(figsize=(11, 7))
         plt.loglog(
