@@ -149,17 +149,21 @@ class HQIVCosmology:
         omega_k: Optional[float] = None,
         k: Optional[np.ndarray] = None,
         z_rec: float = Z_RECOMB,
+        dynamic_hubble: bool = False,
     ) -> np.ndarray:
         """
         LOS weight for curved sky (Ω_k) so peak positions shift correctly.
 
         Uses χ(z_rec) from comoving_distance(z_rec, omega_k) and spherical
         Bessel j0(k χ) for isotropic weight; direction (theta, phi) reserved
-        for future anisotropic ISW/Doppler.
+        for future anisotropic ISW/Doppler. If dynamic_hubble=True, uses
+        lapse-compressed radial: χ = comoving_distance(z_rec) * lapse_factor(z_rec).
         """
         if omega_k is None:
             omega_k = self.Ok0
         chi_rec = self.comoving_distance(z_rec, omega_k=omega_k)
+        if dynamic_hubble:
+            chi_rec = chi_rec * self.lapse_factor(z_rec)
         if k is None:
             k = np.logspace(-5, 0, 800)
         k = np.asarray(k, dtype=float)

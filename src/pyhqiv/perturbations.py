@@ -269,56 +269,68 @@ class HQIVPerturbations:
         self,
         k: np.ndarray,
         z_recomb: float = Z_RECOMB,
+        T_cmb_K: Optional[float] = None,
         omega_k: Optional[float] = None,
-    ) -> np.ndarray:
-        """Pure lattice-derived CMB transfer function.
-        Acoustic scale, oscillation, damping, lapse, and curvature all come from
-        lattice combinatorics + curvature_imprint_delta_E only."""
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Full HQIV transfer function with modified inertia f(φ) and coherent fluid structure.
+
+        Returns (transfer, f_inertia) so callers can use f_inertia.mean() for coherent ISW.
+        z_recomb and T_cmb_K are input-driven: users may set any recombination redshift and
+        CMB temperature (in K) in the correct energy range.
+        """
         k = np.asarray(k, dtype=float)
         k = np.maximum(k, 1e-20)
 
-        # Pure sound-horizon scale from lattice temperature scaling (no tuning)
+        T_cmb = T_cmb_K if T_cmb_K is not None else T_CMB_K
+        # Lapse-compressed temperature at recombination (from lattice if background provides lapse)
+        if hasattr(self.background, "lapse_factor"):
+            lapse_at_recomb = self.background.lapse_factor(z_recomb)
+        else:
+            lapse_at_recomb = 1.0
+        T_recomb_K = T_cmb * (1.0 + z_recomb) * lapse_at_recomb
+        T_recomb_GeV = T_recomb_K * K_B_GEV_PER_K
+
         E_0_factor = getattr(self.lattice, "E_0_factor", 1.0)
         E_0 = E_0_factor * self.lattice.T_Pl_GeV
-        T_recomb_GeV = T_CMB_K * (1.0 + z_recomb) * K_B_GEV_PER_K
-        m_recomb = float(np.clip(E_0 / T_recomb_GeV - 1.0, 1, self.lattice.m_trans - 1))
+        m_recomb = float(E_0 / T_recomb_GeV - 1.0)
+        m_recomb = np.clip(m_recomb, 1, self.lattice.m_trans - 1)
 
-        # Characteristic scale from cumulative mode count at recombination
-        cumulative_modes = cumulative_mode_count(int(m_recomb))
-        r_s = cumulative_modes ** (1.0 / 3.0)  # natural horizon scale from lattice
-
-        x = k * r_s
-
-        # Oscillation from lattice shell structure
-        oscillation = np.sin(x) / x * (
-            1.0 + 0.55 * np.sin(2.1 * x) / np.maximum(2.1 * x, 1e-20)
-        )
-
-        # Damping scale from curvature imprint delta_E
+        # Curvature imprint → φ at recombination
         delta_E = curvature_imprint_delta_E(
             np.full_like(k, m_recomb),
             np.full_like(k, T_recomb_GeV),
             T_Pl=self.lattice.T_Pl_GeV,
             alpha=self.alpha,
         )
-        damping_scale = np.clip(
-            float(np.mean(delta_E)) / (COMBINATORIAL_INVARIANT / 4.85), 0.05, 0.4
+        phi = np.asarray(delta_E).ravel() * 2.0  # φ = 2 c² / Θ_local from axiom
+        f_inertia = 1.0 / (1.0 + phi / 6.0)  # modified inertia of particles
+        f_inertia = np.clip(f_inertia, 0.15, 1.0)
+
+        # Sound speed with modified inertia (coherent fluid structure)
+        c_s_eff = 1.0 / np.sqrt(3.0) * np.sqrt(f_inertia)
+
+        # Acoustic scale from lattice horizon at recombination
+        r_s = cumulative_mode_count(int(m_recomb)) ** (1.0 / 3.0)
+
+        x = k * r_s / c_s_eff  # coherent oscillation with modified inertia
+
+        # Coherent oscillation + Silk damping (from lattice imprint)
+        oscillation = np.sin(x) / x * (
+            1.0 + 0.55 * np.sin(2.1 * x) / np.maximum(2.1 * x, 1e-20)
         )
-        damping = np.exp(-(k * damping_scale) ** 2.0)
+        damping = np.exp(-(k * np.mean(delta_E) / 3.2e5) ** 2.1)
 
         T = oscillation * damping
 
-        # Lapse compression at recombination
-        f_lapse = 1.0 / (
-            1.0 + np.asarray(delta_E).ravel() / (COMBINATORIAL_INVARIANT / 1.52)
-        )
+        # Final lapse compression on the coherent structure
+        f_lapse = 1.0 / (1.0 + np.asarray(delta_E).ravel() / 3.2e5)
         f_lapse = np.clip(f_lapse, 0.2, 1.0)
 
-        # Curvature correction for Ω_k from paper
+        # Curvature correction for Ω_k = +0.0098
         if omega_k is not None and omega_k > 0:
             T = T / (np.sqrt(1 + omega_k * (k * 0.01) ** 2) ** 0.75)
 
-        return (T * f_lapse * 1.12).astype(float)  # amplitude from lattice only
+        return (T * f_inertia * f_lapse).astype(float), f_inertia
 
     def isw_from_peculiar_velocity(
         self,
