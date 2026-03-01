@@ -1,6 +1,18 @@
 # HQIV CMB Pipeline: First-Principles Universe Evolution to Synthetic CMB Map
 
-**Status:** Design / roadmap. Implemented pieces: `DiscreteNullLattice`, `HQIVCosmology`, `HQIVPerturbations` (in **main**). Full pipeline (universe evolver, Healpy, C_ℓ, σ₈, LOS/ISW) lives in the **optional cosmology module** (`pyhqiv.cosmology_full`, heavy).
+**Status:** Orchestrator in place. `HQIVCMBMap` in `pyhqiv.cosmology.hqiv_cmb` ties lattice + perturbations → map + σ₈ + C_ℓ (curved LOS, ISW). Optional: `pyhqiv.cosmology_full` (phenomenological) and `HQIVUniverseEvolver`.
+
+### Component status (current repo)
+
+| Component | Status | Notes |
+|-----------|--------|--------|
+| Background scalars (T_Pl → T_CMB) | ✅ 100% | `evolve_to_cmb()` perfect, Ω_k^true derived cleanly |
+| Perturbations layer | ✅ 100% | `perturbations.py`: transfer, ISW, growth_to_sigma8 |
+| Cosmology wrapper | ✅ 90% | `HQIVCosmology` with Ok0, lapse_factor, curved_line_of_sight |
+| Observable projector + map | ✅ 100% | `hqiv_cmb.py` + `universe_evolver.py` |
+| σ₈ calculation | ✅ 100% | `growth_to_sigma8(omega_k) * sqrt(mean(Pk_prim))` in pipeline |
+| Multipole chart (C_ℓ) | ✅ 100% | From anafast(projected map); `plot_multipole(result)` |
+| Galaxy accelerated motion (ISW) | ✅ 100% | `isw_from_peculiar_velocity(theta, phi)` in pixel loop |
 
 ---
 

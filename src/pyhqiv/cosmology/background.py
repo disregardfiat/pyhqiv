@@ -158,7 +158,7 @@ class HQIVCosmology:
             omega_k = self.Ok0
         chi_rec = self.comoving_distance(z_rec, omega_k=omega_k)
         if k is None:
-            k = np.logspace(-5, 0, 400)
+            k = np.logspace(-5, 0, 800)
         k = np.asarray(k, dtype=float)
         k = np.maximum(k, 1e-20)
         x = k * chi_rec
