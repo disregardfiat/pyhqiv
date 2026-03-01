@@ -15,15 +15,12 @@ from pyhqiv.constants import (
     M_TRANS,
     OMEGA_TRUE_K_PAPER,
     T_CMB_K,
-    T_LOCK_GEV,
     T_PL_GEV,
     GAMMA,
     AGE_WALL_GYR_PAPER,
     AGE_APPARENT_GYR_PAPER,
     LAPSE_COMPRESSION_PAPER,
-    SEC_PER_GYR,
 )
-from pyhqiv.constants import C_SI  # noqa: F401  # for future use
 
 
 def discrete_mode_count(m: int) -> float:
@@ -35,19 +32,12 @@ def discrete_mode_count(m: int) -> float:
 
 def cumulative_mode_count(m_max: int) -> float:
     """Cumulative new modes from m=0 to m_max-1: sum of 8*binom(m+2,2) over integer m.
-    Hockey-stick: sum_{k=0}^{m} binom(k+2,2) = binom(m+3, 3).
-    So sum 8*binom(k+2,2) = 8*binom(m_max+2+1, 3) = 8*binom(m_max+3, 3).
-    For m_max = 501 (shells 0..500): 8 * (504*503*502)/6.
+    Hockey-stick: sum_{k=0}^{m_max-1} binom(k+2, 2) = binom(m_max+2, 3).
+    So cumulative = 8 * binom(m_max+2, 3) = 8 * (m_max+2)*(m_max+1)*m_max / 6.
     """
     if m_max <= 0:
         return 0.0
-    # sum_{m=0}^{m_max-1} 8 * (m+2)(m+1)/2 = 4 * sum (m+2)(m+1) = 4 * sum (m^2 + 3m + 2)
-    # = 4 * [ (m_max-1)m_max(2m_max-1)/6 + 3*(m_max-1)m_max/2 + 2*m_max ]
-    # Alternatively: dN_cum/dm = binom(m+3, 2) per paper; integrated count matches.
-    total = 0.0
-    for m in range(int(m_max)):
-        total += discrete_mode_count(m)
-    return total
+    return 8.0 * (m_max + 2) * (m_max + 1) * m_max / 6.0
 
 
 def curvature_imprint_delta_E(
@@ -76,18 +66,43 @@ def omega_k_from_shell_integral(
     E_0_factor: float = 1.0,
     omega_k_reference: float = OMEGA_TRUE_K_PAPER,
     reference_m_trans: int = M_TRANS,
+    use_jax: bool = False,
 ) -> float:
     """
     Ω_k^true from integrated curvature imprint m=0 to m_trans-1.
     First-principles shape; calibration so that at reference_m_trans we get omega_k_reference.
+    If use_jax=True and jax is installed, uses JAX for the shell integral (JIT-friendly).
     """
+    if use_jax:
+        try:
+            import jax.numpy as jnp
+
+            E_0 = E_0_factor * T_Pl
+            m_arr = jnp.arange(0, int(m_trans), dtype=jnp.float64)
+            R_h = m_arr + 1.0
+            T = E_0 / jnp.maximum(R_h, 1e-300)
+            shell_frac = 1.0 / (m_arr + 1.0)
+            ln_t = 1.0 + alpha * jnp.log(jnp.maximum(T_Pl / jnp.maximum(T, 1e-300), 1.0))
+            delta_E = shell_frac * ln_t * COMBINATORIAL_INVARIANT
+            integral = float(jnp.sum(delta_E))
+
+            m_ref = jnp.arange(0, int(reference_m_trans), dtype=jnp.float64)
+            T_ref = E_0 / (m_ref + 1.0)
+            ln_t_ref = 1.0 + alpha * jnp.log(
+                jnp.maximum(T_Pl / jnp.maximum(T_ref, 1e-300), 1.0)
+            )
+            delta_E_ref = (1.0 / (m_ref + 1.0)) * ln_t_ref * COMBINATORIAL_INVARIANT
+            integral_ref = float(jnp.sum(delta_E_ref))
+            if integral_ref <= 0:
+                return omega_k_reference
+            return float(omega_k_reference * integral / integral_ref)
+        except ImportError:
+            pass
     E_0 = E_0_factor * T_Pl
     m_arr = np.arange(0, int(m_trans), dtype=float)
     R_h = m_arr + 1.0
     T = E_0 / np.maximum(R_h, 1e-300)
     delta_E = curvature_imprint_delta_E(m_arr, T, T_Pl=T_Pl, alpha=alpha)
-    # Integral is sum of δE shape (normalized); paper says integral → Ω_k
-    # We calibrate so integral at m_trans=500 gives 0.0098
     integral = np.sum(delta_E)
 
     m_ref = np.arange(0, int(reference_m_trans), dtype=float)
@@ -112,14 +127,13 @@ class DiscreteNullLattice:
         gamma: float = GAMMA,
         alpha: float = ALPHA,
         T_Pl_GeV: float = T_PL_GEV,
-        seed: Optional[int] = None,
+        seed: Optional[int] = None,  # ignored, kept for API compatibility
     ) -> None:
         self.m_trans = m_trans
         self.gamma = gamma
         self.alpha = alpha
         self.T_Pl_GeV = T_Pl_GeV
-        self._rng = np.random.default_rng(seed)
-        self._cache: Dict[str, np.ndarray] = {}
+        _ = seed  # unused; kept for backward compatibility
 
     def shell_temperature(self, m: np.ndarray, E_0_factor: float = 1.0) -> np.ndarray:
         """T(m) = E_0 / (m+1) with E_0 = E_0_factor * T_Pl."""
@@ -135,14 +149,14 @@ class DiscreteNullLattice:
         )
 
     def mode_count_per_shell(self, m: np.ndarray) -> np.ndarray:
-        """New modes per shell: 8 * binom(m+2, 2)."""
+        """New modes per shell: 8 * binom(m+2, 2). Vectorized over m."""
         m = np.asarray(m, dtype=float)
-        out = np.zeros_like(m)
-        for i, mm in enumerate(m):
-            out[i] = discrete_mode_count(int(np.clip(mm, 0, self.m_trans - 1)))
-        return out
+        m_int = np.clip(np.round(m).astype(int), 0, max(0, self.m_trans - 1))
+        return 8.0 * (m_int + 2) * (m_int + 1) / 2.0
 
-    def omega_k_true(self, E_0_factor: float = 1.0) -> float:
+    def omega_k_true(
+        self, E_0_factor: float = 1.0, use_jax: bool = False
+    ) -> float:
         """Ω_k^true from shell integral 0..m_trans (paper ≈ +0.0098)."""
         return omega_k_from_shell_integral(
             m_trans=self.m_trans,
@@ -151,19 +165,22 @@ class DiscreteNullLattice:
             E_0_factor=E_0_factor,
             omega_k_reference=OMEGA_TRUE_K_PAPER,
             reference_m_trans=M_TRANS,
+            use_jax=use_jax,
         )
 
     def evolve_to_cmb(
         self,
         T0_K: float = T_CMB_K,
         E_0_factor: float = 1.0,
+        use_jax: bool = False,
     ) -> Dict[str, float]:
         """
         Evolve lattice to CMB hypersurface T = T0_K. Returns Omega_true_k,
         age_wall_Gyr, apparent_age_Gyr, lapse_compression, and related.
         Paper: 51.2 Gyr wall-clock, 13.8 Gyr apparent, lapse ≈ 3.96.
+        If use_jax=True and jax is installed, shell integral uses JAX.
         """
-        omega_k = self.omega_k_true(E_0_factor=E_0_factor)
+        omega_k = self.omega_k_true(E_0_factor=E_0_factor, use_jax=use_jax)
         # Wall-clock age from paper (deterministic from lattice + Friedmann)
         age_wall_Gyr = AGE_WALL_GYR_PAPER
         age_apparent_Gyr = AGE_APPARENT_GYR_PAPER
@@ -184,8 +201,6 @@ class DiscreteNullLattice:
         return self.delta_E(m_arr, E_0_factor=E_0_factor)
 
     def get_cumulative_mode_counts(self) -> np.ndarray:
-        """Cumulative mode count at each shell 0..m_trans (combinatorial)."""
-        return np.array(
-            [cumulative_mode_count(k) for k in range(0, self.m_trans + 1)],
-            dtype=float,
-        )
+        """Cumulative mode count at each shell 0..m_trans (combinatorial). Vectorized."""
+        k = np.arange(0, self.m_trans + 1, dtype=float)
+        return 8.0 * (k + 2) * (k + 1) * k / 6.0

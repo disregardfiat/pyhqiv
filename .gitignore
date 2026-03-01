@@ -6,6 +6,7 @@ dist/
 build/
 *.egg-info/
 *.egg
+src/pyhqiv/_version.py
 
 # Python
 __pycache__/
@@ -18,5 +19,6 @@ htmlcov/
 # IDE / OS
 .idea/
 .vscode/
+.cursor/
 .DS_Store
 *.swp

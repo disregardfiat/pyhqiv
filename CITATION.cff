@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use pyhqiv, please cite the paper below."
+title: Horizon-Quantized Informational Vacuum (HQIV) Framework
+authors:
+  - family-names: "Ettinger"
+    given-names: "Steven Jr"
+    orcid: ""
+date-released: 2026-02-27
+doi: 10.5281/zenodo.18794889
+url: "https://github.com/disregardfiat/pyhqiv"
+version: "0.3.0"
+license: MIT
+repository-code: "https://github.com/disregardfiat/pyhqiv"
+preferred-citation:
+  type: article
+  title: "Horizon-Quantized Informational Vacuum (HQIV): A Unified Framework from Causal Horizon Monogamy and Discrete Null-Lattice Combinatorics"
+  authors:
+    - family-names: Ettinger
+      given-names: Steven Jr
+  year: 2026
+  publisher: Zenodo
+  doi: "10.5281/zenodo.18794889"
+  url: "https://doi.org/10.5281/zenodo.18794889"

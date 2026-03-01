@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # needed for setuptools_scm
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[jax]"
+          pip install ruff mypy pytest pytest-cov build twine
+
+      - name: Ruff
+        run: ruff check src tests
+
+      - name: Pytest
+        run: pytest tests/ -v --cov=pyhqiv --cov-report=term-missing --cov-fail-under=0
+
+      - name: Mypy
+        run: mypy src/pyhqiv --no-error-summary 2>/dev/null || true
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Update CITATION.cff (version / date)
+        run: |
+          python -m pip install --upgrade pip setuptools_scm
+          python scripts/update_citation_cff.py
+
+      - name: Build
+        run: |
+          pip install build twine
+          python -m build
+          twine check dist/*

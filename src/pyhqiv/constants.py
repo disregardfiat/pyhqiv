@@ -39,3 +39,9 @@ K_B_SI: Final[float] = 1.380649e-23  # J/K
 
 # --- Gyr conversion (H in 1/s, age in s → Gyr) ---
 SEC_PER_GYR: Final[float] = 3.1536e16
+
+# --- Molecular / protein (PROtien, Å units) ---
+# ħc in eV·Å for E = ħc/Θ when Θ is in Å (informational energy)
+HBAR_C_EV_ANG: Final[float] = 1973.27  # eV·Å
+# Reference scale in damping denominator a_loc (Å)
+A_LOC_ANG: Final[float] = 1.0

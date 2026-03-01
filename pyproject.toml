@@ -1,27 +1,32 @@
 [build-system]
-requires = ["setuptools>=61", "wheel"]
+requires = ["setuptools>=61", "wheel", "setuptools_scm>=7"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyhqiv"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Horizon-Quantized Informational Vacuum (HQIV) framework — discrete null lattice, phase-horizon Maxwell, octonion algebra, and protein-scale field simulation"
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "HQIV Team" }
+    { name = "Steven Ettinger Jr" },
+    { name = "HQIV Team" },
+]
+maintainers = [
+    { name = "Steven Ettinger Jr" },
 ]
 keywords = ["HQIV", "cosmology", "quantum Maxwell", "octonion", "discrete lattice", "phase-horizon"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
@@ -38,8 +43,13 @@ pyvista = ["pyvista>=0.38"]
 all = ["pyhqiv[ase,mda,qutip,jax,pyvista]"]
 
 [project.urls]
-Documentation = "https://github.com/disregardfiat/hqiv"
-Repository = "https://github.com/disregardfiat/hqiv"
+Documentation = "https://github.com/disregardfiat/pyhqiv"
+Repository = "https://github.com/disregardfiat/pyhqiv"
+"Bug Tracker" = "https://github.com/disregardfiat/pyhqiv/issues"
+
+[tool.setuptools_scm]
+write_to = "src/pyhqiv/_version.py"
+fallback_version = "0.0.0+unknown"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -56,3 +66,8 @@ target-version = "py39"
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
 ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_unused_ignores = true
+ignore_missing_imports = true

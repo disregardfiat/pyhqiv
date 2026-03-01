@@ -132,3 +132,22 @@ def test_hypercharge_4x4_block():
     # Should be ±1/6, ±1/2 (imaginary parts)
     assert abs(np.abs(ev).min() - 1.0 / 6.0) < 0.1
     assert abs(np.abs(ev).max() - 0.5) < 0.1
+
+
+def test_lie_closure_max_iter_param():
+    """lie_closure_dimension(max_iter=40) and max_iter=100 both give dimension 28."""
+    alg = OctonionHQIVAlgebra(verbose=False)
+    dim40, _ = alg.lie_closure_dimension(max_iter=40)
+    dim100, _ = alg.lie_closure_dimension(max_iter=100)
+    assert dim40 == 28
+    assert dim100 == 28
+
+
+def test_hypercharge_block_weight_param():
+    """hypercharge_coefficients(block_weight=1e15) and 1e12 both yield valid Y."""
+    alg = OctonionHQIVAlgebra(verbose=False)
+    c1, Y1, _ = alg.hypercharge_coefficients(block_weight=1e15)
+    c2, Y2, _ = alg.hypercharge_coefficients(block_weight=1e12)
+    assert c1 is not None and Y1 is not None
+    assert c2 is not None and Y2 is not None
+    assert np.all(np.isfinite(Y1)) and np.all(np.isfinite(Y2))

@@ -117,13 +117,15 @@ class OctonionHQIVAlgebra:
                 idx += 1
         return M
 
-    def lie_closure_dimension(self, tol: float = 1e-10) -> Tuple[int, List[int]]:
+    def lie_closure_dimension(
+        self, tol: float = 1e-10, max_iter: int = 40
+    ) -> Tuple[int, List[int]]:
         """Iterative Lie closure in the 28-dim space of antisymmetric 8×8 (so(8))."""
         generators = self.g2_basis + [self.Delta]
         current = [g.copy() for g in generators]
         vecs = np.stack([self._pack_antisym(M) for M in current], axis=1)
         history: List[int] = [vecs.shape[1]]
-        for _ in range(40):
+        for _ in range(max_iter):
             new_mats: List[np.ndarray] = []
             for a, b in combinations(range(len(current)), 2):
                 comm = current[a] @ current[b] - current[b] @ current[a]
@@ -144,12 +146,14 @@ class OctonionHQIVAlgebra:
                 break
         return int(vecs.shape[1]), history
 
-    def lie_closure_basis(self, tol: float = 1e-10) -> List[np.ndarray]:
+    def lie_closure_basis(
+        self, tol: float = 1e-10, max_iter: int = 40
+    ) -> List[np.ndarray]:
         """Return the 28 basis matrices of so(8) as a list of 8×8 arrays."""
         generators = self.g2_basis + [self.Delta]
         current = [g.copy() for g in generators]
         vecs = np.stack([self._pack_antisym(M) for M in current], axis=1)
-        for _ in range(40):
+        for _ in range(max_iter):
             new_mats = []
             for a, b in combinations(range(len(current)), 2):
                 comm = current[a] @ current[b] - current[b] @ current[a]
@@ -182,7 +186,9 @@ class OctonionHQIVAlgebra:
         return color_gens
 
     def hypercharge_coefficients(
-        self, tol: float = 1e-12
+        self,
+        tol: float = 1e-12,
+        block_weight: float = 1e15,
     ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], List[np.ndarray]]:
         """Weighted least-squares: block (4×4) heavily weighted, then minimize ‖[Y,g₂]‖."""
         basis = self.lie_closure_basis(tol=tol)
@@ -204,7 +210,7 @@ class OctonionHQIVAlgebra:
                     A_comm.append(row)
         A_comm_arr = np.array(A_comm)
 
-        w = 1.0e15
+        w = block_weight
         A = np.vstack((w * A_block, A_comm_arr))
         b = np.concatenate((w * target, np.zeros(A_comm_arr.shape[0], dtype=np.float64)))
         c, _, _, _ = np.linalg.lstsq(A, b, rcond=1e-14)
