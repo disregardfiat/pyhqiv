@@ -39,7 +39,7 @@ from pyhqiv.constants import (
 )
 from pyhqiv.algebra import OctonionHQIVAlgebra
 from pyhqiv.lattice import DiscreteNullLattice
-from pyhqiv.cosmology import HQIVCosmology
+from pyhqiv.cosmology import HQIVCosmology, HQIVUniverseEvolver
 from pyhqiv.phase import HQIVPhaseLift
 from pyhqiv.atom import HQIVAtom
 from pyhqiv.system import HQIVSystem
@@ -119,6 +119,7 @@ __all__ = [
     "OctonionHQIVAlgebra",
     "DiscreteNullLattice",
     "HQIVCosmology",
+    "HQIVUniverseEvolver",
     "HQIVPhaseLift",
     "HQIVAtom",
     "HQIVSystem",

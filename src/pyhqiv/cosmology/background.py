@@ -1,12 +1,7 @@
 """
-HQIV Cosmology: single-entry API for lattice evolution, Ω_k, and lapse.
+HQIV Cosmology background: lattice evolution, Ω_k, and lapse.
 
-Core axiom: E_tot = m c² + ħ c/Δx with Δx ≤ Θ_local(x) → φ = 2c²/Θ_local,
-lapse compression f(a_loc, φ) = a_loc/(a_loc + φ/6). The discrete null lattice
-yields Ω_k^true, wall-clock age 51.2 Gyr, and apparent age 13.8 Gyr (lapse ≈ 3.96).
-
-This module wraps DiscreteNullLattice.evolve_to_cmb and related so cosmologists,
-astrophysicists, and JWST analysts get Ω_k, ages, and lapse in one call.
+Single-entry API for evolve_to_cmb(T0_K), omega_k_true, get_delta_E_grid.
 """
 
 from __future__ import annotations

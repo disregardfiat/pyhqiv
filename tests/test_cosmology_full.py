@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from pyhqiv import cosmology_full
+from pyhqiv.cosmology import HQIVUniverseEvolver
 
 
 def test_sigma8_returns_float():
@@ -111,3 +112,20 @@ def test_cmb_pipeline_status_mentions_optional_module():
     status = cmb_pipeline_status()
     assert "optional_module" in status
     assert "cosmology_full" in status["optional_module"]
+
+
+def test_hqiv_universe_evolver_run_from_T_Pl_to_now():
+    """HQIVUniverseEvolver.run_from_T_Pl_to_now returns T_map_muK, sigma8, C_ell."""
+    evolver = HQIVUniverseEvolver(nside=16, max_ell=100)
+    result = evolver.run_from_T_Pl_to_now()
+    assert "T_map_muK" in result
+    assert "sigma8" in result
+    assert "ell" in result
+    assert "C_ell_TT" in result
+    assert result["sigma8"] > 0
+    assert len(result["C_ell_TT"]) == len(result["ell"])
+    # T_map_muK may be None if healpy not installed
+    if result["T_map_muK"] is not None:
+        import healpy as hp
+        assert len(result["T_map_muK"]) == hp.nside2npix(evolver.nside)
+        assert np.all(np.isfinite(result["T_map_muK"]))
