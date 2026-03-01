@@ -103,6 +103,9 @@ from pyhqiv import (
     PhaseHorizonFDTD,
     # Crystal & response
     HQIVCrystal, hqiv_potential_shift, compute_conductivity, response_tensor_diagonal,
+    # Thermodynamics (phase diagrams, EOS, no reference data)
+    HQIVThermoSystem, compute_free_energy, HQIVHydrogen, PhaseDiagramGenerator,
+    hqiv_answer_thermo, plot_phase_diagram_standard_vs_hqiv, TESTABLE_PREDICTIONS,
 )
 
 # --- constants ---
@@ -181,6 +184,7 @@ V_shift = hqiv_potential_shift(phi_avg=1e-10, dot_delta_theta_avg=1e-18)
 | `src/pyhqiv/system.py` | HQIVSystem (multi-atom, monogamy γ, E/B on grid) |
 | `src/pyhqiv/fields.py` | Phase-horizon FDTD / spectral Maxwell (γ(φ/c²)(˙δθ′/c) terms) |
 | `src/pyhqiv/fluid.py` | Modified Navier–Stokes: f_inertia, g_vac, ν_eddy (laminar → standard NS) |
+| `src/pyhqiv/thermo.py` | First-principles thermodynamics: phase diagrams, EOS, critical points (no DAC/reference data) |
 | `src/pyhqiv/waveguide.py` | HQIV waveguide: k_c²(ω,β,m), constant-φ circle, taper, hyperbolic, mode solver |
 | `src/pyhqiv/molecular.py` | PROtien: Θ(Z, coord), bond_length_from_theta, damping_force_magnitude |
 | `src/pyhqiv/crystal.py` | HQIVCrystal: PBC, supercell, bloch_sum, reciprocal_vectors; high_symmetry_k_path; hqiv_potential_shift |
@@ -223,7 +227,20 @@ python examples/reproduce_paper.py --plot   # tables + figures (requires matplot
 python examples/reproduce_paper.py --plot --pyvista  # add 3D figure (requires pyvista)
 ```
 
-Figures are written to `examples/reproduce_paper_figures/`. For a thin HQIV→folding minimizer shim (ASE energy/forces from `HQIVSystem`), see `examples/folding_shim_example.py`.
+Figures are written to `examples/reproduce_paper_figures/`. For a thin HQIV→folding minimizer shim (ASE energy/forces from `HQIVSystem`), see `examples/folding_shim_example.py`. Thermodynamics examples (phase diagrams, no reference data): `examples/thermo_metallic_hydrogen_phase_diagram.py`, `examples/thermo_silicon_melting.py`, `examples/thermo_argon_critical.py`, `examples/thermo_answer_any_question.py`, `examples/thermo_ase_phase_stability.py`.
+
+## Thermodynamics (first principles, no DAC/reference data)
+
+From the single axiom **E_tot = m c² + ħ c/Δx** with **Δx ≤ Θ_local(ρ, T)** the package derives phase diagrams, equations of state, and critical points without diamond-anvil or empirical databases:
+
+- **HQIVThermoSystem**, **compute_free_energy(P, T, composition, gamma)** — Gibbs free energy with full φ and lapse correction.
+- **HQIVEquationOfState**, **HQIVIdealGas**, **HQIVRealGas**, **HQIVHydrogen** — EOS with lapse; metallic H2 transition at ρ ≈ 0.6–1.0 g/cm³ from φ only.
+- **PhaseDiagramGenerator** — P–T coexistence via Gibbs minimization (G1 = G2).
+- **hqiv_answer_thermo(question)** — One-function pipeline: parse question → build system from axiom → return answer + plot code.
+- **thermo_fluid_lapse**, **thermo_crystal_phi**, **thermo_ase_phase_stability** — Hooks with `fluid.py`, `crystal.py`, `ase_interface.py`.
+- **TESTABLE_PREDICTIONS**, **plot_phase_diagram_standard_vs_hqiv** — Falsifiable predictions and side-by-side standard vs HQIV plots.
+
+Enables the full "space model": solar core, rocket propellants, high-z stellar evolution from one equation → entire phase diagram.
 
 ## Materials / semiconductors
 

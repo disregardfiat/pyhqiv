@@ -67,6 +67,25 @@ from pyhqiv.response import compute_conductivity, response_tensor_diagonal
 from pyhqiv.solar_core import HQIVSolarCore, phi_solar_radial_profile
 from pyhqiv.redshift import HQIVRedshift, z_total_apparent, z_expansion_from_scale_factor
 from pyhqiv.orbit import HQIVOrbit, parker_perihelion_lapse
+from pyhqiv.thermo import (
+    HQIVThermoSystem,
+    HQIVEquationOfState,
+    HQIVIdealGas,
+    HQIVRealGas,
+    HQIVHydrogen,
+    PhaseDiagramGenerator,
+    compute_free_energy,
+    hqiv_answer_thermo,
+    phi_from_rho_T,
+    theta_local_from_density,
+    shell_fraction_energy_shift,
+    lapse_compression_thermo,
+    thermo_fluid_lapse,
+    thermo_crystal_phi,
+    thermo_ase_phase_stability,
+    TESTABLE_PREDICTIONS,
+    plot_phase_diagram_standard_vs_hqiv,
+)
 from pyhqiv.ase_interface import (
     HQIVCalculator,
     hqiv_energy_at_positions,
@@ -139,6 +158,23 @@ __all__ = [
     "z_expansion_from_scale_factor",
     "HQIVOrbit",
     "parker_perihelion_lapse",
+    "HQIVThermoSystem",
+    "HQIVEquationOfState",
+    "HQIVIdealGas",
+    "HQIVRealGas",
+    "HQIVHydrogen",
+    "PhaseDiagramGenerator",
+    "compute_free_energy",
+    "hqiv_answer_thermo",
+    "phi_from_rho_T",
+    "theta_local_from_density",
+    "shell_fraction_energy_shift",
+    "lapse_compression_thermo",
+    "thermo_fluid_lapse",
+    "thermo_crystal_phi",
+    "thermo_ase_phase_stability",
+    "TESTABLE_PREDICTIONS",
+    "plot_phase_diagram_standard_vs_hqiv",
 ]
 
 try:
