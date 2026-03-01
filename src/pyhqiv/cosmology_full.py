@@ -26,6 +26,9 @@ _trapz = getattr(np, "trapezoid", getattr(np, "trapz", None))
 if _trapz is None:
     from scipy.integrate import trapezoid as _trapz  # type: ignore
 
+# CMB monopole in μK (for kinematic dipole)
+T_CMB_MUK = 2.725e6
+
 __all__ = [
     "universe_evolver",
     "hqiv_cmb",
@@ -33,6 +36,7 @@ __all__ = [
     "c_ell_spectrum",
     "full_sky_healpy_map",
     "line_of_sight_isw_rees_sciama",
+    "add_kinematic_dipole",
 ]
 
 # Fiducial cosmology (flat ΛCDM-like for transfer/growth; HQIV modifies via f(φ))
@@ -242,19 +246,59 @@ def line_of_sight_isw_rees_sciama(
     return delta_cl
 
 
+def add_kinematic_dipole(
+    t_map_muK: np.ndarray,
+    n_side: int,
+    v_km_s: float,
+    gal_l_deg: float = 264.0,
+    gal_b_deg: float = 48.0,
+    T_cmb_muK: float = T_CMB_MUK,
+) -> np.ndarray:
+    """
+    Add kinematic dipole to a temperature map (μK) by boosting the reference frame.
+
+    Simulates the low-ℓ (dipole) region from observer velocity: ΔT/T = (v/c) cos θ,
+    so ΔT_muK = T_cmb_muK * (v_km_s / c_km_s) * cos(θ) where θ is angle between
+    pixel and velocity apex. Uses galactic (l, b) for apex; Planck dipole ≈
+    (l=264°, b=48°, v≈370 km/s). Returns a new map (does not modify in place).
+    """
+    try:
+        import healpy as hp
+    except ImportError as e:
+        raise ImportError(
+            "healpy is required for add_kinematic_dipole. "
+            "Install with: pip install pyhqiv[cosmology]"
+        ) from e
+    c_km_s = 299792.458
+    theta_apex = np.pi / 2.0 - np.radians(gal_b_deg)
+    phi_apex = np.radians(gal_l_deg)
+    apex_vec = np.array(hp.ang2vec(theta_apex, phi_apex), dtype=float)
+    npix = hp.nside2npix(n_side)
+    # Vectorized: pixel directions (3, npix) from healpy, then cos(θ) = apex · pix
+    pix_vecs = np.asarray(hp.pix2vec(n_side, np.arange(npix)))  # (3, npix)
+    cos_theta = np.dot(apex_vec, pix_vecs)  # (npix,)
+    out = np.asarray(t_map_muK, dtype=float).copy()
+    out += T_cmb_muK * (v_km_s / c_km_s) * cos_theta
+    return out
+
+
 def full_sky_healpy_map(
     n_side: int = 256,
     map_type: str = "T",
     include_isw_rees_sciama: bool = True,
     cosmology: Optional[Any] = None,
     max_ell: int = 1500,
+    frame_velocity_km_s: Optional[float] = None,
+    frame_gal_l_deg: float = 264.0,
+    frame_gal_b_deg: float = 48.0,
     **kwargs: Any,
 ) -> Any:
     """
     Full-sky HEALPix map (T and/or Q, U) with lapse and secondaries.
 
-    Requires healpy (pip install pyhqiv[cosmology]). Uses c_ell_spectrum and
-    optional line_of_sight_isw_rees_sciama for ΔC_ℓ.
+    Multipoles run out to max_ell (default 1500). If frame_velocity_km_s is set,
+    adds the kinematic dipole to the T map so the low-ℓ region is generated
+    (accelerated reference frame). Direction in galactic (l, b) degrees.
     """
     try:
         import healpy as hp
@@ -264,6 +308,7 @@ def full_sky_healpy_map(
             "Install with: pip install pyhqiv[cosmology]"
         ) from e
 
+    max_ell = max(int(max_ell), 1500)
     ell_tt, c_tt = c_ell_spectrum("TT", max_ell=max_ell, cosmology=cosmology)
     if include_isw_rees_sciama:
         delta_cl = line_of_sight_isw_rees_sciama(ell_tt, cosmology=cosmology)
@@ -276,6 +321,11 @@ def full_sky_healpy_map(
 
     if map_type.upper() == "T":
         t_map = hp.synfast(cl_arr, n_side, verbose=False)
+        if frame_velocity_km_s is not None and frame_velocity_km_s != 0:
+            t_map = add_kinematic_dipole(
+                t_map, n_side, frame_velocity_km_s,
+                gal_l_deg=frame_gal_l_deg, gal_b_deg=frame_gal_b_deg,
+            )
         return t_map
     if map_type.upper() in ("QU", "Q", "U"):
         ell_ee, c_ee = c_ell_spectrum("EE", max_ell=max_ell, cosmology=cosmology)
@@ -288,27 +338,43 @@ def full_sky_healpy_map(
         t_map, q_map, u_map = hp.synfast(
             [cl_arr, cl_ee, cl_bb, te, eb, tb], n_side, verbose=False
         )
+        if frame_velocity_km_s is not None and frame_velocity_km_s != 0:
+            t_map = add_kinematic_dipole(
+                t_map, n_side, frame_velocity_km_s,
+                gal_l_deg=frame_gal_l_deg, gal_b_deg=frame_gal_b_deg,
+            )
         if map_type.upper() == "QU":
             return t_map, q_map, u_map
         if map_type.upper() == "Q":
             return q_map
         return u_map
     t_map = hp.synfast(cl_arr, n_side, verbose=False)
+    if frame_velocity_km_s is not None and frame_velocity_km_s != 0:
+        t_map = add_kinematic_dipole(
+            t_map, n_side, frame_velocity_km_s,
+            gal_l_deg=frame_gal_l_deg, gal_b_deg=frame_gal_b_deg,
+        )
     return t_map
 
 
 def hqiv_cmb(
     n_side: int = 256,
-    max_ell: int = 2000,
+    max_ell: int = 1500,
     include_polarization: bool = True,
     cosmology: Optional[Any] = None,
+    frame_velocity_km_s: Optional[float] = None,
+    frame_gal_l_deg: float = 264.0,
+    frame_gal_b_deg: float = 48.0,
     **kwargs: Any,
 ) -> Dict[str, Any]:
     """
-    Run full HQIV CMB pipeline: primordial → C_ℓ → optional map.
+    Run full HQIV CMB pipeline: C_ℓ → optional map (phenomenological).
 
-    Returns C_ℓ (TT, EE, TE, BB), σ₈(z=0), and full-sky map(s) if healpy available.
+    Multipoles run out to max_ell (default 1500, minimum 1500). Returns C_ℓ (TT, EE, TE, BB),
+    σ₈(z=0), and full-sky map(s) if healpy available. Set frame_velocity_km_s to add the
+    kinematic dipole and generate the low-ℓ region (e.g. 370 for Solar System rest frame).
     """
+    max_ell = max(int(max_ell), 1500)
     cosmo = _get_cosmology(cosmology)
     ell_tt, c_tt = c_ell_spectrum("TT", max_ell=max_ell, cosmology=cosmo)
     sigma8_z0 = sigma8(0.0, cosmology=cosmo)
@@ -326,9 +392,12 @@ def hqiv_cmb(
         result["C_ell_TE"] = c_te
         result["C_ell_BB"] = c_bb
     try:
-        import healpy as hp
         t_map = full_sky_healpy_map(
-            n_side=n_side, map_type="T", include_isw_rees_sciama=True, cosmology=cosmo
+            n_side=n_side, map_type="T", include_isw_rees_sciama=True, cosmology=cosmo,
+            max_ell=max_ell,
+            frame_velocity_km_s=frame_velocity_km_s,
+            frame_gal_l_deg=frame_gal_l_deg,
+            frame_gal_b_deg=frame_gal_b_deg,
         )
         result["T_map"] = t_map
         result["n_side"] = n_side

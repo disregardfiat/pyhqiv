@@ -1,9 +1,11 @@
 """
-Full universe evolver: T_Pl → now with lapse-compressed CMB map.
+Full universe evolver: T_Pl → now with CMB map + σ₈ (phenomenological).
 
-HQIVUniverseEvolver(nside=1024).run_from_T_Pl_to_now() returns a physically
-consistent full-sky map including lapse-compressed galaxy accelerated motion
-(ISW/Rees–Sciama), σ₈, and C_ℓ.
+HQIVUniverseEvolver(nside=1024).run_from_T_Pl_to_now() returns a full-sky map
+(T_map_muK), σ₈, and C_ℓ. Currently these are **phenomenological**: the map
+is synfast(C_ℓ_template), σ₈ from growth + P(k) template, C_ℓ from a template —
+not from first-principles primordial seeding, forward evolution, or
+line-of-sight projection. See docs/HQIV_CMB_Pipeline.md §0.1 for what's missing.
 
 Install pyhqiv[cosmology] for healpy map generation.
 """
@@ -18,7 +20,12 @@ from pyhqiv.cosmology.hqiv_cmb import run_hqiv_cmb_to_map
 
 class HQIVUniverseEvolver:
     """
-    Evolve from Planck epoch to now and produce HQIV CMB map + σ₈.
+    Evolve from Planck epoch to now and produce CMB map + σ₈ (phenomenological).
+
+    Returns T_map_muK (from C_ℓ template + synfast), σ₈ (growth + P(k) template),
+    and C_ℓ. Not yet from first-principles: no primordial seeding, no forward
+    evolution of δT/T, no project_to_sky() or anafast(projected map). See
+    cmb_pipeline_status() and docs/HQIV_CMB_Pipeline.md.
 
     Usage:
 
@@ -32,11 +39,17 @@ class HQIVUniverseEvolver:
         self,
         nside: int = 256,
         cosmology: Optional[HQIVCosmology] = None,
-        max_ell: int = 2000,
+        max_ell: int = 1500,
+        frame_velocity_km_s: Optional[float] = None,
+        frame_gal_l_deg: float = 264.0,
+        frame_gal_b_deg: float = 48.0,
     ) -> None:
         self.nside = nside
         self.cosmology = cosmology or HQIVCosmology()
-        self.max_ell = max_ell
+        self.max_ell = max(max_ell, 1500)
+        self.frame_velocity_km_s = frame_velocity_km_s
+        self.frame_gal_l_deg = frame_gal_l_deg
+        self.frame_gal_b_deg = frame_gal_b_deg
 
     def run_from_T_Pl_to_now(self) -> Dict[str, Any]:
         """
@@ -53,6 +66,9 @@ class HQIVUniverseEvolver:
             max_ell=self.max_ell,
             include_polarization=True,
             cosmology=self.cosmology,
+            frame_velocity_km_s=self.frame_velocity_km_s,
+            frame_gal_l_deg=self.frame_gal_l_deg,
+            frame_gal_b_deg=self.frame_gal_b_deg,
         )
         # Healpy synfast returns maps in μK when C_ℓ are in μK²; expose as T_map_muK
         t_map = raw.get("T_map")

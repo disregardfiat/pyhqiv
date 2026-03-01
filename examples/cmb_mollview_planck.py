@@ -27,12 +27,17 @@ from pyhqiv.cosmology import HQIVUniverseEvolver
 def main() -> None:
     ap = argparse.ArgumentParser(description="HQIV CMB mollview + Planck C_ℓ comparison")
     ap.add_argument("--nside", type=int, default=64, help="HEALPix nside (small for quick run)")
-    ap.add_argument("--max-ell", type=int, default=1500, help="Max multipole for C_ℓ")
+    ap.add_argument("--max-ell", type=int, default=1500, help="Max multipole for C_ℓ (minimum 1500)")
+    ap.add_argument("--frame-velocity", type=float, default=None, metavar="KM_S", help="Add kinematic dipole: observer velocity in km/s (e.g. 370 for Solar System)")
     ap.add_argument("--mollview", action="store_true", help="Show full-sky mollview (requires healpy)")
     ap.add_argument("--save", type=str, default="", help="Save figure path (e.g. cmb_comparison.png)")
     args = ap.parse_args()
 
-    evolver = HQIVUniverseEvolver(nside=args.nside, max_ell=args.max_ell)
+    evolver = HQIVUniverseEvolver(
+        nside=args.nside,
+        max_ell=max(args.max_ell, 1500),
+        frame_velocity_km_s=args.frame_velocity,
+    )
     result = evolver.run_from_T_Pl_to_now()
 
     print(f"σ₈ = {result['sigma8']:.4f}")

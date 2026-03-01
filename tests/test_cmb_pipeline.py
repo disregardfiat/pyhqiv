@@ -6,12 +6,14 @@ from pyhqiv.cmb_pipeline import HQIVCMBPipeline, cmb_pipeline_status
 
 
 def test_cmb_pipeline_status():
-    """cmb_pipeline_status returns dict with implemented vs not-implemented."""
+    """cmb_pipeline_status returns dict with first-principles vs phenomenological."""
     status = cmb_pipeline_status()
     assert status["background"] == "implemented"
     assert status["perturbations_class"] == "implemented"
     assert status["boltzmann_hierarchy"] == "not_implemented"
-    assert "implemented" in status["line_of_sight_integration"] or status["line_of_sight_integration"] == "not_implemented"
+    assert status["line_of_sight_projection"] == "not_implemented (no project_to_sky)"
+    assert "phenomenological" in status["sigma8"]
+    assert "phenomenological" in status["c_ell_spectrum"]
     assert "Omega_k_true" in status
     assert status.get("Omega_k_true") is not None
     assert "design_doc" in status

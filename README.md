@@ -284,7 +284,7 @@ print([m.period for m in modes])  # periods with lapse-compressed frequencies
 print(pert.summary())
 ```
 
-**CMB pipeline:** Full universe evolution to a synthetic CMB map is in `docs/HQIV_CMB_Pipeline.md`. Use **HQIVUniverseEvolver** (`pyhqiv.cosmology`) with `run_from_T_Pl_to_now()` for a full-sky map (µK) and σ₈; it delegates to the optional module `pyhqiv.cosmology_full` (σ₈, C_ℓ, Healpy, LOS/ISW). Install `pyhqiv[cosmology]` for maps. Entry points: `HQIVCMBPipeline`, `cmb_pipeline_status()`, and `examples/cmb_mollview_planck.ipynb` for mollview + Planck comparison.
+**CMB pipeline:** Full universe evolution to a synthetic CMB map is in `docs/HQIV_CMB_Pipeline.md`. Use **HQIVUniverseEvolver** (`pyhqiv.cosmology`) with `run_from_T_Pl_to_now()` for a full-sky map (µK) and σ₈; it delegates to the optional module `pyhqiv.cosmology_full`. **Caveat:** the current map and σ₈ are **phenomenological** (C_ℓ template + synfast, growth-based σ₈); the first-principles chain (primordial seeding → forward evolution → LOS projection → anafast) is not yet implemented. See `cmb_pipeline_status()` and doc §0.1 for the gap.
 
 ## Materials / semiconductors
 

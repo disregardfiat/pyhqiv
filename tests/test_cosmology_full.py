@@ -115,8 +115,8 @@ def test_cmb_pipeline_status_mentions_optional_module():
 
 
 def test_hqiv_universe_evolver_run_from_T_Pl_to_now():
-    """HQIVUniverseEvolver.run_from_T_Pl_to_now returns T_map_muK, sigma8, C_ell."""
-    evolver = HQIVUniverseEvolver(nside=16, max_ell=100)
+    """HQIVUniverseEvolver.run_from_T_Pl_to_now returns T_map_muK, sigma8, C_ell (multipoles out to ≥1500)."""
+    evolver = HQIVUniverseEvolver(nside=16, max_ell=1500)
     result = evolver.run_from_T_Pl_to_now()
     assert "T_map_muK" in result
     assert "sigma8" in result
@@ -124,8 +124,27 @@ def test_hqiv_universe_evolver_run_from_T_Pl_to_now():
     assert "C_ell_TT" in result
     assert result["sigma8"] > 0
     assert len(result["C_ell_TT"]) == len(result["ell"])
+    assert result["ell"][-1] >= 1500
     # T_map_muK may be None if healpy not installed
     if result["T_map_muK"] is not None:
         import healpy as hp
         assert len(result["T_map_muK"]) == hp.nside2npix(evolver.nside)
         assert np.all(np.isfinite(result["T_map_muK"]))
+
+
+def test_add_kinematic_dipole():
+    """add_kinematic_dipole adds frame-velocity dipole to a map (low-ℓ region)."""
+    try:
+        import healpy as hp
+    except ImportError:
+        pytest.skip("healpy not installed")
+    from pyhqiv import cosmology_full
+    n_side = 16
+    npix = hp.nside2npix(n_side)
+    zero_map = np.zeros(npix)
+    # v=370 km/s, T_CMB ~ 2.725e6 μK → dipole amplitude ~ 3360 μK
+    dipped = cosmology_full.add_kinematic_dipole(zero_map, n_side, v_km_s=370.0)
+    assert np.all(np.isfinite(dipped))
+    assert dipped.min() < -1000 and dipped.max() > 1000
+    # Symmetry: mean of dipole over full sky should be ~0 (numerically)
+    assert np.abs(np.mean(dipped)) < 1.0

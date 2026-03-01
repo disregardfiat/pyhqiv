@@ -1,25 +1,22 @@
 """
 HQIV CMB pipeline: full universe evolution → synthetic CMB map.
 
-This module is the **entry point** for the first-principles, single-axiom CMB
-pipeline that replaces the Boltzmann hierarchy + ΛCDM initial conditions with
-the discrete null lattice + lapse-compressed perturbations.
+This module is the **entry point** for the CMB pipeline. The design
+(docs/HQIV_CMB_Pipeline.md) is first-principles: lattice + lapse replace
+Boltzmann hierarchy + ΛCDM initial conditions. Pipeline steps:
 
-Pipeline (see docs/HQIV_CMB_Pipeline.md for full design):
+  1. Initialize background at z ≈ 1100 (lattice).
+  2. Seed primordial fluctuations (combinatorial invariant).
+  3. Evolve perturbations (δT/T, velocity, f(φ)).
+  4. Line-of-sight integration to z = 0 → full-sky T + polarization.
+  5. Secondaries: lensing, ISW, Rees–Sciama (peculiar velocities).
 
-  1. Initialize background HQIV cosmology at z ≈ 1100 (recombination from lattice).
-  2. Seed primordial fluctuations (scale-invariant from combinatorial invariant).
-  3. Evolve perturbations with HQIV-modified Boltzmann equations (δT/T, velocity, f(φ)).
-  4. Line-of-sight integration to z = 0 → full-sky T + polarization (E/B).
-  5. Secondaries: lensing (φ-corrected LSS), ISW, Rees–Sciama (peculiar velocities).
-
-Peculiar velocities and accelerated galactic motion: growth factor D(a) is
-modified by f(φ) → distinctive low-ℓ power (CMB anomaly), v_pec ~ 300–600 km/s
-today, and cross-correlations with DESI/Euclid.
-
-Current status: design and stub. Background (lattice, cosmology) and linear
-perturbations (HQIVPerturbations) exist; Boltzmann hierarchy replacement,
-LOS integration, and map generation are not yet implemented.
+**Current status:** The pipeline stops at scalar background evolution. Steps
+2–4 (primordial seeding, forward evolution, project_to_sky) are **not**
+implemented. What exists: background + point-wise cosmological_perturbation;
+optional cosmology_full provides **phenomenological** σ₈, C_ℓ template, and
+Healpy map (synfast(C_ℓ)), not from a projected sky. Use cmb_pipeline_status()
+for the exact gap; see doc §0.1 for "what's missing / why it feels wrong".
 """
 
 from __future__ import annotations
@@ -38,7 +35,10 @@ def cmb_pipeline_status() -> Dict[str, Any]:
     """
     Return status of CMB pipeline components (implemented vs planned).
 
-    Use this to see what exists and what remains for full map generation.
+    Use this to see what exists and what remains. The pipeline currently
+    stops at scalar background; σ₈, C_ℓ, and Healpy map are phenomenological
+    (templates / growth-based), not from first-principles LOS projection.
+    See docs/HQIV_CMB_Pipeline.md §0.1 for "what's missing".
     """
     cosmo = HQIVCosmology()
     result = cosmo.evolve_to_cmb()
@@ -48,14 +48,21 @@ def cmb_pipeline_status() -> Dict[str, Any]:
         "Omega_k_true": result.get("Omega_true_k"),
         "lapse_compression": result.get("lapse_compression"),
         "perturbations_class": "implemented",
-        "cosmological_perturbation": "implemented",
+        "cosmological_perturbation": "implemented (point-wise k,z only)",
+        # First-principles chain: not implemented
+        "primordial_seeding": "not_implemented",
+        "forward_evolution_boltzmann": "not_implemented",
+        "line_of_sight_projection": "not_implemented (no project_to_sky)",
+        "c_ell_from_sky": "not_implemented (no anafast(projected map))",
+        "sigma8_from_evolved_field": "not_implemented",
+        "nonlinear_rees_sciama": "not_implemented",
         "boltzmann_hierarchy": "not_implemented",
-        "line_of_sight_integration": "implemented (cosmology_full.line_of_sight_isw_rees_sciama)",
-        "map_generation_healpix": "implemented (cosmology_full.full_sky_healpy_map when healpy installed)",
-        "secondaries_lensing_isw_rees_sciama": "implemented (LOS ISW/RS in cosmology_full)",
-        "sigma8": "implemented (cosmology_full.sigma8)",
-        "c_ell_spectrum": "implemented (cosmology_full.c_ell_spectrum)",
-        "universe_evolver": "implemented (cosmology_full.universe_evolver)",
+        # Phenomenological (implemented in cosmology_full)
+        "sigma8": "phenomenological (cosmology_full.sigma8: growth + P(k) template)",
+        "c_ell_spectrum": "phenomenological (cosmology_full.c_ell_spectrum: template)",
+        "map_generation_healpix": "phenomenological (synfast(C_ell_template), not from projected sky)",
+        "line_of_sight_isw_delta_cl": "phenomenological (cosmology_full.line_of_sight_isw_rees_sciama)",
+        "universe_evolver": "implemented (cosmology_full.universe_evolver: z, a, D, f)",
         "design_doc": "docs/HQIV_CMB_Pipeline.md",
         "optional_module": "pyhqiv.cosmology_full (install pyhqiv[cosmology] for healpy map)",
     }
@@ -63,21 +70,14 @@ def cmb_pipeline_status() -> Dict[str, Any]:
 
 class HQIVCMBPipeline:
     """
-    Full universe evolution from recombination (z ≈ 1100) to now (z = 0)
-    and synthetic CMB map with lapse/φ corrections.
+    Full universe evolution from recombination to now (design); stub implementation.
 
     Uses DiscreteNullLattice + HQIVCosmology for background; HQIVPerturbations
-    for linear response. Final map includes secondaries (lensing, ISW,
-    Rees–Sciama from peculiar velocities with f(φ)-modified D(a)).
-
-    Usage (when implemented):
-
-        pipeline = HQIVCMBPipeline()
-        result = pipeline.run(z_rec=1100, n_side=256)
-        # result["T_map"], result["E_map"], result["B_map"], result["C_ell"]
-
-    Currently run() returns a minimal structure and raises NotImplementedError
-    for full map generation; use cmb_pipeline_status() for component status.
+    for point-wise linear response. First-principles map (seed → evolve →
+    project_to_sky → anafast) is not implemented: run(n_side=...) raises
+    NotImplementedError. For phenomenological map/σ₈/C_ℓ use
+    HQIVUniverseEvolver (cosmology package). See cmb_pipeline_status() and
+    docs/HQIV_CMB_Pipeline.md §0.1 for what's missing.
     """
 
     def __init__(

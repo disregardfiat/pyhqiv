@@ -18,6 +18,41 @@ Perturbations stay in the main codebase; the full “run the universe to now” 
 
 ---
 
+## 0.1 What's missing / why it feels wrong
+
+**The pipeline currently stops at scalar background evolution.** When you run "the full pipeline" you get correct global numbers (Ω_k, ages, lapse) but **no first-principles map**, no σ₈ from evolved fields, no multipole spectrum from a projected sky — which is why it feels wrong.
+
+| Missing piece | Status |
+|---------------|--------|
+| **Primordial fluctuation seeding** from lattice combinatorics | Not implemented. No scale-invariant spectrum from combinatorial invariant → initial δT/T, δ, θ. |
+| **Forward evolution of perturbations** (δT/T, velocity, density) with lapse/φ | Not implemented. No HQIV-modified Boltzmann equations integrated in time; only point-wise `cosmological_perturbation(k,z)`. |
+| **Line-of-sight projection** from recombination (z≈1090) to z=0 | Not implemented. No _project_to_sky(), no integration of transfer functions along LOS. |
+| **Healpy map** (T_map_muK) | Implemented **phenomenologically**: map = synfast(C_ℓ_template). Not from a projected sky. |
+| **σ₈** | Implemented **phenomenologically**: growth D(z) from perturbations + P(k) template, top-hat 8 h⁻¹ Mpc. Not from evolved density field. |
+| **C_ℓ** (TT/EE/TE) | Implemented **phenomenologically**: template (Sachs–Wolfe + first peak). Not from anafast(projected map). |
+| **Galaxy accelerated motion** (ISW/Rees–Sciama) | Implemented **phenomenologically**: ΔC_ℓ from D(z), f(z). No non-linear late-time peculiar velocities; no real Rees–Sciama from galaxy motions. |
+
+So: **first-principles chain** (seed → evolve → project → anafast → map, growth→σ₈) is **not** there. What exists is scalar background + phenomenological C_ℓ/σ₈/map/ISW so you get a number (e.g. σ₈ ≈ 0.81) and a map **shape**, but not a map that came from the lattice forward in time.
+
+---
+
+## 0.2 Root cause (technical)
+
+- **evolve_to_cmb** is intentionally **scalar** (fast, reproducible, paper-pinning). It does not produce per-ℓ or per-pixel information.
+- **HQIVPerturbations** and **cosmology_full** (growth, σ₈, C_ℓ, LOS ΔC_ℓ, Healpy) are **not wired** into a single top-level `run_from_T_Pl_to_now()` that does: primordial seeding → forward evolution (δT/T, δ, θ with f(φ)) → **project_to_sky()** (LOS integration z_rec → 0) → **anafast()** (or equivalent) to get C_ℓ from that sky → growth factor from evolved δ → **σ₈**.
+- There is no **non-linear** late-time step for galaxy peculiar motions; the "accelerated motion" ISW/Rees–Sciama is a phenomenological ΔC_ℓ, not from N-body or non-linear potentials.
+
+---
+
+## 0.3 Edge cases / numerical issues (even on the current path)
+
+- **High-z (T_Pl regime)** — Uses `E_0_factor`; works, but if you change `m_trans` the calibration can drift slightly.
+- **Lapse** — Applied at the end in the scalar path; not z-dependent along the evolution in the current implementation.
+- **Units** — No astropy.units; everything is pure floats (easy to add later).
+- **Large nside** — No JAX path for map/LOS; would be slow for high resolution.
+
+---
+
 ## 1. Why This Is Not a Toy Demo
 
 A single-axiom simulation replaces the **entire Boltzmann hierarchy + ΛCDM initial conditions** with:
@@ -98,19 +133,28 @@ Radial time gradient and Hubble gradient are encoded in φ(τ, r) and f(φ) alon
 
 ## 6. Pipeline Steps (Implementation Checklist)
 
+**First-principles (not implemented):**
+
+- [ ] **Primordial seeding** — Scale-invariant spectrum from combinatorial invariant → initial δT/T, δ, θ.
+- [ ] **Forward evolution** — HQIV Boltzmann equations (δT/T, δ, θ) integrated in time with f(φ).
+- [ ] **Line-of-sight projection** — _project_to_sky() from z_rec to z=0; transfer functions along LOS.
+- [ ] **C_ℓ from sky** — anafast(projected map), not template.
+- [ ] **σ₈ from evolved field** — Growth from evolved δ; top-hat 8 h⁻¹ Mpc on that field.
+- [ ] **Non-linear galaxy motions** — Rees–Sciama from peculiar velocities / N-body, not just ΔC_ℓ template.
+
 Implemented in **main** (today):
 
 - [x] **Background** — `HQIVCosmology.evolve_to_cmb` (scalar: Ω_k, lapse, ages); no map.
-- [x] **Linear perturbations** — `HQIVPerturbations.cosmological_perturbation`, `linear_response`.
+- [x] **Linear perturbations** — `HQIVPerturbations.cosmological_perturbation`, `linear_response` (point-wise k,z).
 
-Implemented in **optional cosmology module** (`pyhqiv.cosmology_full`):
+Implemented in **optional cosmology module** (`pyhqiv.cosmology_full`) — **phenomenological only**:
 
 - [x] **universe_evolver** — z_grid, a_grid, D(z), f(z) from lattice + perturbations.
-- [x] **σ₈** — `sigma8(z)` from HQIV growth D(z) and P(k) with top-hat filter at 8 h⁻¹ Mpc.
-- [x] **C_ℓ** — `c_ell_spectrum('TT'|'EE'|'TE'|'BB')` phenomenological template (μK²).
-- [x] **Line-of-sight ISW/Rees–Sciama** — `line_of_sight_isw_rees_sciama(ell)` ΔC_ℓ from D(z), f(z).
-- [x] **Full-sky Healpy map** — `full_sky_healpy_map(n_side)` when healpy installed (T or Q,U).
-- [x] **hqiv_cmb** — `hqiv_cmb()` returns C_ℓ, σ₈, optional T_map.
+- [x] **σ₈** — `sigma8(z)` from HQIV growth D(z) + P(k) template, top-hat 8 h⁻¹ Mpc (not from evolved field).
+- [x] **C_ℓ** — `c_ell_spectrum('TT'|'EE'|'TE'|'BB')` phenomenological template (μK²); not from anafast(sky).
+- [x] **Line-of-sight ISW/Rees–Sciama** — `line_of_sight_isw_rees_sciama(ell)` ΔC_ℓ from D(z), f(z); no non-linear motions.
+- [x] **Full-sky Healpy map** — `full_sky_healpy_map(n_side)` = synfast(C_ℓ_template); not from projected sky.
+- [x] **hqiv_cmb** — Returns C_ℓ, σ₈, optional T_map (all phenomenological).
 
 Still planned (heavy):
 
