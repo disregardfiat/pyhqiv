@@ -7,13 +7,12 @@ Curved-sky: comoving_distance(z, omega_k), curved_line_of_sight(theta, phi, omeg
 
 from __future__ import annotations
 
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
 import numpy as np
 
 from pyhqiv.constants import (
     H0_KM_S_MPC_PAPER,
-    OMEGA_L0_FIDUCIAL,
     OMEGA_M0_FIDUCIAL,
     T_CMB_K,
     Z_RECOMB,

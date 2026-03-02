@@ -23,20 +23,18 @@ from pyhqiv.constants import (
     GAMMA,
     H0_KM_S_MPC_PAPER,
     K_B_GEV_PER_K,
-    LAPSE_COMPRESSION_PAPER,
     OMEGA_TRUE_K_PAPER,
     R_S_REC_MPC,
     SILK_DAMPING_MPC,
     T_CMB_K,
-    T_PL_GEV,
     T_PL_K,
     Z_RECOMB,
 )
 from pyhqiv.fluid import f_inertia
 from pyhqiv.lattice import (
     DiscreteNullLattice,
-    curvature_imprint_delta_E,
     cumulative_mode_count,
+    curvature_imprint_delta_E,
 )
 from pyhqiv.phase import HQIVPhaseLift
 from pyhqiv.system import HQIVSystem
@@ -378,10 +376,8 @@ class HQIVPerturbations:
         if hasattr(self.background, "evolve_to_cmb"):
             result = self.background.evolve_to_cmb()
             H0 = result.get("H0_km_s_Mpc", H0_KM_S_MPC_PAPER)
-            lapse_comp = result.get("lapse_compression", LAPSE_COMPRESSION_PAPER)
         else:
             H0 = H0_KM_S_MPC_PAPER
-            lapse_comp = LAPSE_COMPRESSION_PAPER
         R8_mpc = 8.0 / (H0 / 100.0)
         # Effective transfer at 8 Mpc from lattice (k_8 ~ 1/R8)
         k8 = 1.0 / max(R8_mpc, 0.1)

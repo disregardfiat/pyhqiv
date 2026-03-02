@@ -40,19 +40,17 @@ from typing import Any, Dict, Optional
 
 import numpy as np
 
-from pyhqiv.constants import OMEGA_TRUE_K_PAPER
-
-from pyhqiv.lattice import DiscreteNullLattice
-from pyhqiv.perturbations import HQIVPerturbations
-from pyhqiv.cosmology.background import HQIVCosmology
-
 from pyhqiv.constants import (
     C_KM_S,
+    OMEGA_TRUE_K_PAPER,
     T_CMB_K,
     T_CMB_MUK,
     V_EARTH_ORBIT_KM_S,
     Z_RECOMB,
 )
+from pyhqiv.cosmology.background import HQIVCosmology
+from pyhqiv.lattice import DiscreteNullLattice
+from pyhqiv.perturbations import HQIVPerturbations
 
 try:
     import healpy as hp
@@ -150,7 +148,6 @@ class HQIVCMBMap:
         cl = np.zeros_like(ell)
         # dk/k integrand: use log spacing so d(ln k) = dk/k
         lnk = np.log(np.maximum(k, 1e-30))
-        dlnk = np.diff(lnk)
         for i in range(1, int(lmax) + 1):
             j_ell = spherical_jn(i, k * chi_rec)
             j_ell = np.maximum(np.asarray(j_ell, dtype=float), 0.0)  # j_ℓ²

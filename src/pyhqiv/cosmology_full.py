@@ -22,11 +22,10 @@ from pyhqiv.constants import (
     GAMMA,
     H0_KM_S_MPC_PAPER,
     LAPSE_COMPRESSION_PAPER,
-    OMEGA_M0_FIDUCIAL,
     OMEGA_L0_FIDUCIAL,
+    OMEGA_M0_FIDUCIAL,
     T_CMB_K,
     T_CMB_MUK,
-    T_PL_K,
 )
 from pyhqiv.cosmology import HQIVCosmology
 from pyhqiv.lattice import curvature_imprint_delta_E
