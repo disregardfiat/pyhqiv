@@ -1,6 +1,14 @@
 """
 pyhqiv: Python implementation of the Horizon-Quantized Informational Vacuum framework.
 
+.. warning::
+   Experimental status. All features are experimental. APIs and numerical results may change.
+   Public contribution and feedback are greatly appreciated.
+
+   The CMB pipeline in particular has known issues (analytic transfer vs full Boltzmann
+   hierarchy, phenomenological map vs first-principles projection, peak positions/shape).
+   See docs/HQIV_CMB_Pipeline.md for details.
+
 If you use this package in research, please cite:
 https://doi.org/10.5281/zenodo.18794889
 """

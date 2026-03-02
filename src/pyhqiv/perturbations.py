@@ -26,6 +26,7 @@ from pyhqiv.constants import (
     LAPSE_COMPRESSION_PAPER,
     OMEGA_TRUE_K_PAPER,
     R_S_REC_MPC,
+    SILK_DAMPING_MPC,
     T_CMB_K,
     T_PL_GEV,
     T_PL_K,
@@ -300,7 +301,8 @@ class HQIVPerturbations:
         # Oscillation from lattice shell structure (emergent); shape from lattice via m_recomb
         oscillation = np.sin(x) / np.maximum(x, 1e-20)
 
-        # Damping from curvature imprint width (lattice); scale in Mpc so k·damping_scale dimensionless
+        # Silk damping in Mpc: lattice-derived ratio can be 0 (constant m), giving sharp |sin| peaks.
+        # Use physical Silk scale so peaks broaden and decay at high k (high ℓ).
         delta_E = curvature_imprint_delta_E(
             np.full_like(k, m_recomb),
             np.full_like(k, T_recomb_GeV),
@@ -310,8 +312,13 @@ class HQIVPerturbations:
         mean_delta_E = np.mean(delta_E) + 1e-30
         r_s_lattice = cumulative_mode_count(int(m_recomb)) ** (1.0 / 3.0)
         damping_scale_lattice = np.std(delta_E) / mean_delta_E
-        damping_scale_mpc = r_s_mpc * (damping_scale_lattice / max(r_s_lattice, 1e-30))
-        damping = np.exp(-(k * damping_scale_mpc) ** 2.0)
+        # If lattice gives a sensible ratio use it, else use physical Silk scale (peaks not |sin|)
+        if r_s_lattice > 1e-10 and damping_scale_lattice > 1e-10:
+            damping_scale_mpc = r_s_mpc * (damping_scale_lattice / r_s_lattice)
+        else:
+            damping_scale_mpc = SILK_DAMPING_MPC
+        damping_scale_mpc = max(damping_scale_mpc, SILK_DAMPING_MPC * 0.1)  # at least some damping
+        damping = np.exp(-(k * damping_scale_mpc) ** 2.1)
 
         T = oscillation * damping
 

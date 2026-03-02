@@ -4,9 +4,15 @@
 [![CI](https://github.com/disregardfiat/pyhqiv/actions/workflows/ci.yml/badge.svg)](https://github.com/disregardfiat/pyhqiv/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18794889.svg)](https://doi.org/10.5281/zenodo.18794889)
 
+> **⚠️ Experimental status.** All features in this package are experimental. APIs and numerical results may change. Public contribution and feedback are greatly appreciated — please open issues or pull requests on [GitHub](https://github.com/disregardfiat/pyhqiv).
+
+> **Known issues:** The CMB pipeline in particular has known limitations (analytic transfer vs full Boltzmann hierarchy, phenomenological map from C_ℓ template, peak positions/shape vs CLASS-HQIV). See [docs/HQIV_CMB_Pipeline.md](docs/HQIV_CMB_Pipeline.md) for details.
+
+---
+
 **Why HQIV?** HQIV unifies causal-horizon monogamy with discrete null-lattice combinatorics to predict curvature (Ω_k), CMB-consistent ages, and phase-horizon corrections to Maxwell/fluids/molecules. See the [paper](https://doi.org/10.5281/zenodo.18794889) for the full framework.
 
-Production-ready, pip-installable Python package implementing the **Horizon-Quantized Informational Vacuum (HQIV)** framework exactly as defined in the paper:
+Pip-installable Python package implementing the **Horizon-Quantized Informational Vacuum (HQIV)** framework exactly as defined in the paper:
 
 > **Ettinger, Steven Jr**, *Horizon-Quantized Informational Vacuum (HQIV): A Unified Framework from Causal Horizon Monogamy and Discrete Null-Lattice Combinatorics*. Zenodo, 2026. [https://doi.org/10.5281/zenodo.18794889](https://doi.org/10.5281/zenodo.18794889)
 
@@ -326,6 +332,10 @@ pip install pre-commit && pre-commit install
 Runs ruff (lint + format), mypy, and generic hooks on commit. Config: `.pre-commit-config.yaml`.
 
 For releases, the CI build runs `scripts/update_citation_cff.py` to set `CITATION.cff` version and `date-released` from the current tag/date. You can run it manually with `--version X.Y.Z --date YYYY-MM-DD` to sync before a release.
+
+## Contributing
+
+Public contribution and feedback are greatly appreciated. Please open issues or pull requests on [GitHub](https://github.com/disregardfiat/pyhqiv). All features are experimental; we welcome bug reports, documentation improvements, and suggestions.
 
 ## License
 

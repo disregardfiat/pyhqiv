@@ -59,6 +59,10 @@ T_PL_K: Final[float] = T_PL_GEV * GEV_TO_K  # Planck T in K (unit conversion)
 # --- CMB monopole in μK (unit conversion from T_CMB_K) ---
 T_CMB_MUK: Final[float] = T_CMB_K * 1e6  # μK
 
+# --- Dipole: solar system only (galactic screens at ~3500 ly) ---
+C_KM_S: Final[float] = 2.99792458e5  # km/s (for dipole δT/T = v/c)
+V_EARTH_ORBIT_KM_S: Final[float] = 29.78  # Earth orbital speed; dipole δT_μK ≈ (v/c) T_CMB_MUK
+
 # --- Recombination redshift (standard cosmology reference; used for z_rec in transfer) ---
 Z_RECOMB: Final[float] = 1090.0
 
@@ -66,6 +70,11 @@ Z_RECOMB: Final[float] = 1090.0
 # Paper: acoustic scale set by horizon at recombination; CLASS-HQIV thermo gives rs_rec ~ 218 Mpc.
 # Used so transfer argument k·r_s is dimensionless when k is in 1/Mpc (peak position ℓ_A ≈ π χ_rec / r_s).
 R_S_REC_MPC: Final[float] = 218.0
+
+# --- Silk damping scale at recombination [Mpc] ---
+# Without this, damping_scale from lattice can be 0 (constant m) and peaks look like |sin|.
+# Standard CMB: Silk scale ~ 5–50 Mpc; use fraction of r_s so peaks broaden and decay at high ℓ.
+SILK_DAMPING_MPC: Final[float] = 50.0
 
 # --- Molecular / protein (Å units) ---
 HBAR_C_EV_ANG: Final[float] = 1973.27  # eV·Å

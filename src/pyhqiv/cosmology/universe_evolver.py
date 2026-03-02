@@ -1,6 +1,10 @@
 """
 Full universe evolver: T_Pl → now with CMB map + σ₈ (phenomenological).
 
+.. warning::
+   Experimental. The CMB pipeline has known issues (analytic transfer, phenomenological
+   map). See docs/HQIV_CMB_Pipeline.md.
+
 HQIVUniverseEvolver(nside=1024).run_from_T_Pl_to_now() returns a full-sky map
 (T_map_muK), σ₈, and C_ℓ. Currently these are **phenomenological**: the map
 is synfast(C_ℓ_template), σ₈ from growth + P(k) template, C_ℓ from a template —
@@ -22,17 +26,34 @@ class HQIVUniverseEvolver:
     """
     Evolve from Planck epoch to now and produce CMB map + σ₈ (phenomenological).
 
+    .. warning::
+       Experimental. Known issues: phenomenological map from C_ℓ template, no
+       first-principles LOS projection. See docs/HQIV_CMB_Pipeline.md.
+
     Returns T_map_muK (from C_ℓ template + synfast), σ₈ (growth + P(k) template),
     and C_ℓ. Not yet from first-principles: no primordial seeding, no forward
     evolution of δT/T, no project_to_sky() or anafast(projected map). See
     cmb_pipeline_status() and docs/HQIV_CMB_Pipeline.md.
 
-    Usage:
+    Parameters
+    ----------
+    nside : int
+        Healpy NSIDE for the output map.
+    cosmology : HQIVCosmology, optional
+        Background cosmology; uses default if None.
+    max_ell : int
+        Maximum multipole for C_ℓ.
+    bulk_seed : dict, optional
+        Output from get_bulk_seed(); uses bulk Ω_k, H₀ when provided.
+    frame_velocity_km_s, frame_gal_l_deg, frame_gal_b_deg
+        Observer frame for dipole.
 
-        evolver = HQIVUniverseEvolver(nside=1024)
-        result = evolver.run_from_T_Pl_to_now()
-        hp.mollview(result["T_map_muK"], title="HQIV CMB from Planck epoch to now")
-        print(f"σ₈ = {result['sigma8']:.4f}")
+    Example
+    -------
+    >>> evolver = HQIVUniverseEvolver(nside=1024)
+    >>> result = evolver.run_from_T_Pl_to_now()
+    >>> hp.mollview(result["T_map_muK"], title="HQIV CMB from Planck epoch to now")
+    >>> print(f"σ₈ = {result['sigma8']:.4f}")
     """
 
     def __init__(

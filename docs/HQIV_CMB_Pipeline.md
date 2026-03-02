@@ -1,5 +1,11 @@
 # HQIV CMB Pipeline: First-Principles Universe Evolution to Synthetic CMB Map
 
+> **⚠️ Experimental.** All features are experimental. Public contribution and feedback are greatly appreciated.
+>
+> **Known issues with the CMB pipeline:** The pipeline has known limitations compared to CLASS-HQIV: analytic transfer instead of full Boltzmann hierarchy, phenomenological map from C_ℓ template (synfast) rather than first-principles LOS projection, peak positions and shape differing from CLASS, and r_s / χ_rec scale mismatches. See §0.1 and §0.2 below for details.
+
+---
+
 **Status:** Orchestrator in place. `HQIVCMBMap` in `pyhqiv.cosmology.hqiv_cmb` ties lattice + perturbations → map + σ₈ + C_ℓ (curved LOS, ISW). Optional: `pyhqiv.cosmology_full` (phenomenological) and `HQIVUniverseEvolver`.
 
 ### Component status (current repo)
@@ -29,12 +35,14 @@ C_ℓ = (4π) ∫ (dk/k) P(k) T(k)² j_ℓ(k χ_rec)²
 | **Background** | Integrates HQVM 3H²−γH = 8πG_eff ρ → H(a), τ(a), conformal time in **one** timeline (~52 Gyr). Thermodynamics gives z_rec, visibility, **r_s in Mpc** (~218). | Scalar `evolve_to_cmb()` + FLRW-style `comoving_distance(z)` with Ω_m, Ω_k. **No** thermodynamics module; no r_s in Mpc from visibility. |
 | **Sound horizon r_s** | **rs_rec in Mpc** from thermo (e.g. ~218 Mpc). Transfer and C_ℓ use k in 1/Mpc, so k·r_s and k·χ_rec are both dimensionless. | **r_s = cumulative_mode_count(m_recomb)^(1/3)** in **lattice units** (dimensionless). Same k (1/Mpc) is used in transfer as in C_ℓ. So in the transfer, **x = k·r_s has units 1/Mpc** — wrong. Peak scale in T(k) does not match χ_rec; first acoustic peak position ℓ_A ≈ π χ_rec / r_s is wrong. |
 | **Transfer** | Full **Boltzmann hierarchy** Θ_ℓ(τ,k) and **line-of-sight** integral: Δ_Tℓ(k) = ∫ dτ S(τ,k) j_ℓ(k(τ0−τ)). Source S from thermo + potentials. | **Analytic** T(k): oscillation sin(k·r_s)/(k·r_s) + damping + f_inertia, f_lapse. **No** time integral; no visibility; r_s not in Mpc (see above). |
-| **Primordial** | **A_s = 2.1e-9**, n_s = 0.96, pivot k. | **primordial_power_from_invariant(k)** from combinatorial invariant; no A_s; amplitude differs. |
+| **Primordial** | **A_s = 2.1e-9**, n_s = 0.96, pivot k. | **primordial_power_from_invariant(k)** from combinatorial invariant; no A_s. With **bulk_seed**: low-ℓ amplitude tied to bulk first step (T_pk/n): P(k) scaled by Ω_k/0.0098 so the low monopole comes from the same curvature-imprint normalisation as η. |
 | **C_ℓ formula** | Full integral over k with **Δ_Tℓ(k)** from LOS. | C_ℓ = (4π) ∫ (dk/k) P(k) T(k)² j_ℓ(k χ_rec)². Same **structure**, but T(k) and P(k) differ; **r_s / χ_rec scale** wrong → peak positions and shape off. |
 | **Peak position** | ℓ_A ≈ π χ_rec / r_s (both in Mpc) tuned via γ, ω_b, h, α (peak_alignment_scan). | χ_rec in Mpc, r_s in lattice units → **ℓ_A wrong** unless r_s is converted to Mpc (e.g. calibrate r_s_Mpc = 218 at fiducial). |
 | **Boost / dipole** | No explicit “boost scale” in CLASS output; observer motion and ISW in the perturbation/LOS. | **ISW** from `isw_from_peculiar_velocity` added to map; **boost_scale** (default 0.1) for galactic/solar system–like dipole so gradient isn’t extreme. |
 
-**Summary:** The main differences that **change peak shape/position** are: (1) **r_s in Mpc** — we need the sound horizon in Mpc (e.g. from thermo or a calibration to CLASS r_s) so that the transfer argument k·r_s is dimensionless and the first peak in T(k) sits at the right k; (2) **full transfer** — we use an analytic T(k) instead of the integrated LOS source; (3) **primordial amplitude** — A_s vs invariant; (4) **boost** — we add a separate dipole term with boost_scale.
+**Bulk first step (T_pk/n, low monopole):** In HQIV the **very first step** of `bulk.py` (Phase 1: baryogenesis → lock-in) produces η and Ω_k^true from the curvature imprint δE(m). The paper’s single normalisation A ≈ 0.0098 sets η and the curvature budget; the **low monopole** / low-ℓ CMB amplitude is supposed to come from that same step. The pyhqiv pipeline now supports this: pass **bulk_seed** (from `get_bulk_seed()`) to `run_from_T_Pl_to_now(bulk_seed=...)`. Then Ω_k, lapse, and H₀ come from bulk, and the primordial power is scaled by (Ω_k / 0.0098) so the Sachs–Wolfe (low-ℓ) amplitude is set by the bulk first step. Without bulk_seed, the pipeline uses the in-package lattice only and does not apply this T_pk/n normalisation.
+
+**Summary:** The main differences that **change peak shape/position** are: (1) **r_s in Mpc** — we need the sound horizon in Mpc (e.g. from thermo or a calibration to CLASS r_s) so that the transfer argument k·r_s is dimensionless and the first peak in T(k) sits at the right k; (2) **full transfer** — we use an analytic T(k) instead of the integrated LOS source; (3) **primordial amplitude** — A_s vs invariant (with optional bulk_seed for low monopole); (4) **boost** — we add a separate dipole term with boost_scale.
 
 ---
 
