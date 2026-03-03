@@ -77,6 +77,7 @@ from pyhqiv.protocols import (
     PhaseLiftProtocol,
 )
 from pyhqiv.redshift import HQIVRedshift, z_expansion_from_scale_factor, z_total_apparent
+from pyhqiv.polarization import RedshiftDecomposition, decompose_redshift
 from pyhqiv.response import compute_conductivity, response_tensor_diagonal
 from pyhqiv.semiconductors import (
     compute_band_gap,
@@ -167,6 +168,8 @@ __all__ = [
     "HQIVRedshift",
     "z_total_apparent",
     "z_expansion_from_scale_factor",
+    "RedshiftDecomposition",
+    "decompose_redshift",
     "HQIVOrbit",
     "parker_perihelion_lapse",
     "HQIVPerturbations",

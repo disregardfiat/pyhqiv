@@ -1,8 +1,8 @@
 # Publish to PyPI when a version tag (v*) is pushed.
 # Version is taken from the tag via setuptools_scm (e.g. v0.4.0 → 0.4.0).
 #
-# Required GitHub secret: PYPI_API_TOKEN (PyPI API token with upload scope).
-# Or use trusted publishing: add environment "pypi" and set permissions.id-token: write.
+# Uses GitHub secret PYPI_API_TOKEN (PyPI API token with upload scope).
+# Token auth only — no OIDC/trusted publishing.
 
 name: Publish to PyPI
 
@@ -27,7 +27,7 @@ jobs:
       - name: Install build dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build setuptools_scm
+          pip install build setuptools_scm twine
 
       - name: Update CITATION.cff from tag
         run: |
@@ -38,7 +38,7 @@ jobs:
         run: python -m build
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/*

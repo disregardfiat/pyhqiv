@@ -162,10 +162,25 @@ f = f_inertia(0.1, 1.0)
 g_vac = g_vac_vector(1.0, 0.5, np.ones(3), np.zeros(3))
 nu = eddy_viscosity(Theta_local=1.0, dot_delta_theta=1e-18, l_coh=1e-3, coherence_factor=0.5)
 
-# --- molecular: Θ(Z,coord), bond length, damping ---
+# --- molecular: Θ(Z,coord), bond length, damping, torsion energy ---
 theta_C = molecular.theta_local(6, 2)  # ≈ 1.53 Å
 r_eq = molecular.bond_length_from_theta(1.53, 1.33)
 mag = molecular.damping_force_magnitude(1.0, 0.5, a_loc=1.0)
+
+# Temperature-aware backbone torsion energy and discrete coupling angles for PROtien
+# (angles in radians, Θ in Å, T in K):
+E_residue = molecular.hqiv_energy_for_angles(
+    phi=-1.0,
+    psi=0.5,
+    theta_local_ang=theta_C,
+    temperature=300.0,
+)
+angles, energies, dE = molecular.coupling_angle_energy_profile(
+    "phi",
+    theta_local_ang=theta_C,
+    temperature=300.0,
+    n_states=32,
+)
 
 # --- waveguide: k_c², radius, taper, mode solver ---
 from pyhqiv.waveguide import kc_squared_hqiv, waveguide_radius_constant_phi, hqiv_waveguide_mode_solver
@@ -210,7 +225,7 @@ V_shift = hqiv_potential_shift(phi_avg=1e-10, dot_delta_theta_avg=1e-18)
 | `src/pyhqiv/cosmology/` | Package: HQIVCosmology (background), HQIVUniverseEvolver (T_Pl→now map + σ₈), hqiv_cmb wrapper |
 | `src/pyhqiv/cosmology_full.py` | Optional heavy module: σ₈, C_ℓ, universe_evolver, Healpy map, LOS/ISW (install pyhqiv[cosmology]) |
 | `src/pyhqiv/waveguide.py` | HQIV waveguide: k_c²(ω,β,m), constant-φ circle, taper, hyperbolic, mode solver |
-| `src/pyhqiv/molecular.py` | PROtien: Θ(Z, coord), bond_length_from_theta, damping_force_magnitude |
+| `src/pyhqiv/molecular.py` | PROtien: Θ(Z, coord), bond_length_from_theta, damping_force_magnitude, torsion energy + coupling-angle profiles |
 | `src/pyhqiv/crystal.py` | HQIVCrystal: PBC, supercell, bloch_sum, reciprocal_vectors; high_symmetry_k_path; hqiv_potential_shift |
 | `src/pyhqiv/response.py` | compute_conductivity, response_tensor_diagonal (phase-horizon corrected) |
 | `src/pyhqiv/ase_interface.py` | HQIVCalculator (ASE: energy, forces, stress); hqiv_energy_at_positions, hqiv_forces_analytic, hqiv_stress_virial |
