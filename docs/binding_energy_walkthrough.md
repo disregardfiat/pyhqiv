@@ -142,6 +142,21 @@ No eps_delta, no algebraic Tr(M@Δ) for Θ; only masses → radii → μ. Same c
 
 One rule, one axiom, zero extra constants from Planck scale to biology.
 
+### 6.2.2 Paper dynamics: modified inertia in nuclear decay
+
+The paper’s **modified inertia** \(f(a_{\mathrm{loc}},\phi) = a_{\mathrm{loc}}/(a_{\mathrm{loc}} + \phi/6)\) (particle action \(S = -m c \int f \, ds\)) is applied to nuclear β-snap probability and decay rate:
+
+- **Snap probability**  
+  \(P_{\mathrm{snap}} = \exp(-\Delta E / kT_{\mathrm{eff}}) \times \varphi/(\varphi + \varphi_{\mathrm{crit}})\), with  
+  \(kT_{\mathrm{eff}} = (\hbar c/\Theta) \times f\).  
+  At the nucleus, \(a_{\mathrm{loc}} = c^2/\Theta_{\mathrm{avg}}\), \(\phi = 2c^2/\Theta_{\mathrm{avg}}\), so \(f = 3/4\) for a typical nuclear Θ. The effective thermal energy for barrier crossing is reduced (\(f < 1\)), so the Boltzmann factor is steeper — barrier crossing is harder in observer time.
+
+- **Decay rate**  
+  \(\lambda_{\mathrm{obs}} = (P_{\mathrm{snap}}/\tau_{\mathrm{tick}}) \times f / \mathrm{scale}\).  
+  Observer-time rate is scaled by \(f\) (same lapse as in \(d\tau = f \, dt\)), so half-lives are longer when \(f < 1\).
+
+**Implementation:** `NuclearConfig._lapse_f()` computes \(f\) from \(\Theta_{\mathrm{avg}}\) of unstable and stable configurations; `snap_probability` uses \(kT_{\mathrm{eff}} = kT_{\mathrm{horizon}} \times f\); `decay_rate_per_s` multiplies the raw rate by \(f\). See `pyhqiv.fluid.f_inertia`.
+
 ### 6.3 Universal integral and composition rule (paper-exact)
 
 The paper axiom is local; for any extended object the total energy is the volume integral of the local density:

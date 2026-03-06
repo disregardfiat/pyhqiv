@@ -26,6 +26,7 @@ from typing import List, Optional, Tuple, Union
 import numpy as np
 
 from pyhqiv.constants import C_SI, HBAR_C_MEV_FM, M_NEUTRON_MEV, M_PROTON_MEV
+from pyhqiv.fluid import f_inertia
 from pyhqiv.hqiv_scalings import get_hqiv_nuclear_constants
 from pyhqiv.horizon_network import HorizonNetwork, relax_nucleon_positions
 
@@ -249,9 +250,22 @@ class NuclearConfig:
         return float(np.min(self._theta_bound))
 
     def phi_si(self) -> float:
-        """φ = 2 c² / Θ_avg (m²/s²)."""
+        """φ = 2 c² / Θ_avg (m²/s²). Paper: φ(x) = 2c²/Θ_local(x)."""
         theta_avg = (self.theta_unstable_m() + self.theta_stable_m()) / 2.0
         return 2.0 * (C_SI**2) / max(theta_avg, 1e-30)
+
+    def _lapse_f(self) -> float:
+        """
+        Modified inertia f(a_loc, φ) = a_loc / (a_loc + φ/6). Paper particle action.
+
+        Use acceleration scale at the nucleus horizon: a_loc = c²/Θ_avg (so φ = 2a_loc).
+        When φ is large (compact nucleus), f < 1 → effective thermal energy for barrier crossing is reduced.
+        """
+        theta_avg = (self.theta_unstable_m() + self.theta_stable_m()) / 2.0
+        theta_avg = max(theta_avg, 1e-30)
+        a_loc = (C_SI**2) / theta_avg
+        phi = 2.0 * (C_SI**2) / theta_avg
+        return float(f_inertia(a_loc, phi))
 
     @property
     def binding_energy_mev(self) -> float:
@@ -337,24 +351,38 @@ class NuclearConfig:
         return snaps
 
     def snap_probability(self, delta_E_info_mev: float) -> float:
-        """Core HQIV snap probability."""
+        """
+        Core HQIV snap probability. Paper: Boltzmann × φ-damping × modified inertia.
+
+        P_snap = exp(-ΔE / kT_eff) × (φ/(φ+φ_crit)), with kT_eff = ħc/Θ × f(a_loc, φ).
+        Modified inertia f = a_loc/(a_loc+φ/6) reduces effective thermal energy when φ is large
+        (compact nucleus), so barrier crossing is harder — same f as in particle action S = -m c ∫ f ds.
+        """
         if delta_E_info_mev <= 0:
             return 0.0
         theta_avg = (self.theta_unstable_m() + self.theta_stable_m()) / 2.0
+        theta_avg = max(theta_avg, 1e-30)
         hbar_c_mev_m = HBAR_C_MEV_FM * 1e-15
-        kT_horizon = hbar_c_mev_m / max(theta_avg, 1e-30)
-        boltzmann = np.exp(-delta_E_info_mev / kT_horizon)
+        kT_horizon = hbar_c_mev_m / theta_avg
+        f = self._lapse_f()
+        kT_eff = kT_horizon * max(f, 0.01)
+        boltzmann = np.exp(-delta_E_info_mev / kT_eff)
         damping = self.phi_si() / max(self.phi_si() + self._phi_crit, 1e-30)
         return float(boltzmann * damping)
 
     def decay_rate_per_s(self) -> float:
-        """Total macroscopic decay constant."""
+        """
+        Total macroscopic decay constant. Paper: λ_obs = (P_snap/τ_tick) × f / scale.
+
+        Observer-time rate includes lapse f (S_particle = -m c ∫ f ds ⇒ dτ = f dt for rate scaling).
+        """
         snaps = self.allowed_snaps()
         if not snaps:
             return 0.0
         total_p = sum(self.snap_probability(de) for _, de, _ in snaps)
+        f = self._lapse_f()
         lam_raw = total_p / max(self._tau_tick, 1e-50)
-        return lam_raw / max(self._macro_scale, 1e-30)
+        return lam_raw * f / max(self._macro_scale, 1e-30)
 
     def half_life_s(self) -> Optional[float]:
         """Half-life in seconds (None if stable)."""

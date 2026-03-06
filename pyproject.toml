@@ -42,7 +42,7 @@ qutip = ["qutip>=4.7"]
 jax = ["jax>=0.4", "jaxlib>=0.4"]
 pyvista = ["pyvista>=0.38"]
 cosmology = ["healpy>=1.15"]
-dev = ["pytest>=7", "pytest-cov>=4"]
+dev = ["pytest>=7", "pytest-cov>=4", "matplotlib>=3.5"]
 all = ["pyhqiv[ase,mda,qutip,jax,pyvista]"]
 
 [project.urls]
