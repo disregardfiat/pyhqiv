@@ -1,6 +1,9 @@
 """
 Discrete null lattice: combinatorial evolution m=0..m_trans, δE(m), T(m),
-Ω_k^true from shell integral, evolve_to_cmb(T0). Paper Sec. 3, curvature imprint.
+Ω_k from shell integral, evolve_to_cmb(T0). Paper Sec. 3, curvature imprint.
+
+Ω_k is dynamic (HQIV_LEAN): Ω_k(n; N) = Ω_k_true · (∫₀ⁿ shape / ∫₀ᴺ shape).
+At the chosen horizon (n = N) we get Ω_k(N; N) = Ω_k_true. Not a constant.
 """
 
 from __future__ import annotations
@@ -17,6 +20,7 @@ from pyhqiv.constants import (
     GAMMA,
     K_PIVOT_FIDUCIAL,
     LAPSE_COMPRESSION_PAPER,
+    L_PLANCK_M,
     M_TRANS,
     OMEGA_TRUE_K_PAPER,
     T_CMB_K,
@@ -60,6 +64,96 @@ def curvature_imprint_delta_E(
     return shell_fraction * ln_term * N67
 
 
+def curvature_integral(
+    n: int,
+    T_Pl: float = T_PL_GEV,
+    alpha: float = ALPHA,
+    E_0_factor: float = 1.0,
+    use_jax: bool = False,
+) -> float:
+    """
+    Curvature integral up to depth n: sum of δE(m) for m = 0..n-1 (shells 0..n-1).
+    Matches HQIV_LEAN curvature_integral(n). Used in Ω_k(n; N) = Ω_k_true · (∫₀ⁿ shape / ∫₀ᴺ shape).
+    """
+    if n <= 0:
+        return 0.0
+    if use_jax:
+        try:
+            import jax.numpy as jnp
+
+            E_0 = E_0_factor * T_Pl
+            m_arr = jnp.arange(0, int(n), dtype=jnp.float64)
+            R_h = m_arr + 1.0
+            T = E_0 / jnp.maximum(R_h, 1e-300)
+            shell_frac = 1.0 / (m_arr + 1.0)
+            ln_t = 1.0 + alpha * jnp.log(jnp.maximum(T_Pl / jnp.maximum(T, 1e-300), 1.0))
+            delta_E = shell_frac * ln_t * COMBINATORIAL_INVARIANT
+            return float(jnp.sum(delta_E))
+        except ImportError:
+            pass
+    E_0 = E_0_factor * T_Pl
+    m_arr = np.arange(0, int(n), dtype=float)
+    R_h = m_arr + 1.0
+    T = E_0 / np.maximum(R_h, 1e-300)
+    delta_E = curvature_imprint_delta_E(m_arr, T, T_Pl=T_Pl, alpha=alpha)
+    return float(np.sum(delta_E))
+
+
+def x_over_theta_from_horizons(n: int, N: int) -> float:
+    """
+    Continuous 0 < x < θ term from the Planck distances of the two horizons.
+
+    Distance to shell m in Planck units is L_P * (m+1) (radial scale R_h = m+1).
+    So x = L_P * (n+1) at shell n, θ = L_P * (N+1) at horizon N, and
+    x/θ = (n+1)/(N+1). Used in Ω_k(n; N) so the curvature range 0 < x < θ
+    is set by the Planck distance of the two horizons.
+    """
+    if N <= 0:
+        return 1.0
+    return (float(n) + 1.0) / (float(N) + 1.0)
+
+
+def horizon_planck_distances_m(n: int, N: int) -> tuple[float, float]:
+    """
+    Planck distances (metres) to the two horizons: shell n and reference horizon N.
+
+    Distance to shell m = L_P * (m+1). Returns (distance_n, distance_N).
+    """
+    return (
+        L_PLANCK_M * (float(n) + 1.0),
+        L_PLANCK_M * (float(N) + 1.0),
+    )
+
+
+def omega_k_at_horizon(
+    n: int,
+    N: int,
+    T_Pl: float = T_PL_GEV,
+    alpha: float = ALPHA,
+    E_0_factor: float = 1.0,
+    omega_k_true: float = OMEGA_TRUE_K_PAPER,
+    use_jax: bool = False,
+    use_planck_distance_ratio: bool = True,
+) -> float:
+    """
+    Ω_k(n; N): spatial curvature at shell n relative to horizon N (dynamic, not constant).
+
+    Ω_k(n; N) = Ω_k_true · (∫₀ⁿ shape / ∫₀ᴺ shape) · (x/θ), where the 0 < x < θ term
+    is computed from the Planck distances of the two horizons: x/θ = (n+1)/(N+1)
+    (distance to shell n is L_P·(n+1), to horizon N is L_P·(N+1)). Set
+    use_planck_distance_ratio=False for the integral-only formula (HQIV_LEAN raw).
+    At the horizon (n = N): Ω_k(N; N) = Ω_k_true. Same normalization as η in baryogenesis.
+    """
+    integral_N = curvature_integral(N, T_Pl=T_Pl, alpha=alpha, E_0_factor=E_0_factor, use_jax=use_jax)
+    if integral_N <= 0:
+        return omega_k_true
+    integral_n = curvature_integral(n, T_Pl=T_Pl, alpha=alpha, E_0_factor=E_0_factor, use_jax=use_jax)
+    ratio = float(omega_k_true * integral_n / integral_N)
+    if use_planck_distance_ratio:
+        ratio *= x_over_theta_from_horizons(n, N)
+    return ratio
+
+
 def omega_k_from_shell_integral(
     m_trans: int = M_TRANS,
     T_Pl: float = T_PL_GEV,
@@ -68,56 +162,57 @@ def omega_k_from_shell_integral(
     omega_k_reference: float = OMEGA_TRUE_K_PAPER,
     reference_m_trans: int = M_TRANS,
     use_jax: bool = False,
+    use_planck_distance_ratio: bool = True,
 ) -> float:
     """
-    Ω_k^true from integrated curvature imprint m=0 to m_trans-1.
-    First-principles shape; calibration so that at reference_m_trans we get omega_k_reference.
-    If use_jax=True and jax is installed, uses JAX for the shell integral (JIT-friendly).
+    Ω_k at the transition shell relative to the reference horizon (today’s value).
+
+    Ω_k(m_trans; reference_m_trans) = omega_k_reference · (∫₀^{m_trans}/∫₀^{reference}) · (x/θ).
+    x/θ from Planck distances of the two horizons. At reference_m_trans we get omega_k_reference.
+    Equivalent to omega_k_at_horizon(m_trans, reference_m_trans).
     """
-    if use_jax:
-        try:
-            import jax.numpy as jnp
+    return omega_k_at_horizon(
+        n=m_trans,
+        N=reference_m_trans,
+        T_Pl=T_Pl,
+        alpha=alpha,
+        E_0_factor=E_0_factor,
+        omega_k_true=omega_k_reference,
+        use_jax=use_jax,
+        use_planck_distance_ratio=use_planck_distance_ratio,
+    )
 
-            E_0 = E_0_factor * T_Pl
-            m_arr = jnp.arange(0, int(m_trans), dtype=jnp.float64)
-            R_h = m_arr + 1.0
-            T = E_0 / jnp.maximum(R_h, 1e-300)
-            shell_frac = 1.0 / (m_arr + 1.0)
-            ln_t = 1.0 + alpha * jnp.log(jnp.maximum(T_Pl / jnp.maximum(T, 1e-300), 1.0))
-            delta_E = shell_frac * ln_t * COMBINATORIAL_INVARIANT
-            integral = float(jnp.sum(delta_E))
 
-            m_ref = jnp.arange(0, int(reference_m_trans), dtype=jnp.float64)
-            T_ref = E_0 / (m_ref + 1.0)
-            ln_t_ref = 1.0 + alpha * jnp.log(jnp.maximum(T_Pl / jnp.maximum(T_ref, 1e-300), 1.0))
-            delta_E_ref = (1.0 / (m_ref + 1.0)) * ln_t_ref * COMBINATORIAL_INVARIANT
-            integral_ref = float(jnp.sum(delta_E_ref))
-            if integral_ref <= 0:
-                return omega_k_reference
-            return float(omega_k_reference * integral / integral_ref)
-        except ImportError:
-            pass
-    E_0 = E_0_factor * T_Pl
-    m_arr = np.arange(0, int(m_trans), dtype=float)
-    R_h = m_arr + 1.0
-    T = E_0 / np.maximum(R_h, 1e-300)
-    delta_E = curvature_imprint_delta_E(m_arr, T, T_Pl=T_Pl, alpha=alpha)
-    integral = np.sum(delta_E)
-
-    m_ref = np.arange(0, int(reference_m_trans), dtype=float)
-    T_ref = E_0 / (m_ref + 1.0)
-    delta_E_ref = curvature_imprint_delta_E(m_ref, T_ref, T_Pl=T_Pl, alpha=alpha)
-    integral_ref = np.sum(delta_E_ref)
-
-    if integral_ref <= 0:
-        return omega_k_reference
-    return float(omega_k_reference * integral / integral_ref)
+def omega_k_partial(
+    n: int,
+    reference_m_trans: int = M_TRANS,
+    T_Pl: float = T_PL_GEV,
+    alpha: float = ALPHA,
+    E_0_factor: float = 1.0,
+    omega_k_true: float = OMEGA_TRUE_K_PAPER,
+    use_jax: bool = False,
+    use_planck_distance_ratio: bool = True,
+) -> float:
+    """
+    Ω_k(n; reference): partial curvature at shell n with fixed reference horizon (HQIV_LEAN omega_k_partial).
+    omega_k_partial(n) = omega_k_at_horizon(n, reference_m_trans). x/θ from Planck distances of the two horizons.
+    """
+    return omega_k_at_horizon(
+        n=n,
+        N=reference_m_trans,
+        T_Pl=T_Pl,
+        alpha=alpha,
+        E_0_factor=E_0_factor,
+        omega_k_true=omega_k_true,
+        use_jax=use_jax,
+        use_planck_distance_ratio=use_planck_distance_ratio,
+    )
 
 
 class DiscreteNullLattice:
     """
     Discrete null lattice: full combinatorial evolution from m=0 to m_trans,
-    δE(m), T(m), Ω_k^true, and evolve_to_cmb(T0) with wall-clock age and lapse.
+    δE(m), T(m), Ω_k (dynamic: Ω_k(n; N) at horizon N), and evolve_to_cmb(T0) with wall-clock age and lapse.
     """
 
     def __init__(
@@ -153,8 +248,58 @@ class DiscreteNullLattice:
         m_int = np.clip(np.round(m).astype(int), 0, max(0, self.m_trans - 1))
         return 8.0 * (m_int + 2) * (m_int + 1) / 2.0
 
+    def curvature_integral(self, n: int, E_0_factor: float = 1.0, use_jax: bool = False) -> float:
+        """Curvature integral up to depth n (sum of δE for m=0..n-1). HQIV_LEAN curvature_integral(n)."""
+        return curvature_integral(
+            n,
+            T_Pl=self.T_Pl_GeV,
+            alpha=self.alpha,
+            E_0_factor=E_0_factor,
+            use_jax=use_jax,
+        )
+
+    def omega_k_at_horizon(
+        self,
+        n: int,
+        N: int,
+        E_0_factor: float = 1.0,
+        omega_k_true: float = OMEGA_TRUE_K_PAPER,
+        use_jax: bool = False,
+        use_planck_distance_ratio: bool = True,
+    ) -> float:
+        """Ω_k(n; N) = omega_k_true · (∫₀ⁿ/∫₀ᴺ) · (x/θ). x/θ from Planck distances of the two horizons."""
+        return omega_k_at_horizon(
+            n,
+            N,
+            T_Pl=self.T_Pl_GeV,
+            alpha=self.alpha,
+            E_0_factor=E_0_factor,
+            omega_k_true=omega_k_true,
+            use_jax=use_jax,
+            use_planck_distance_ratio=use_planck_distance_ratio,
+        )
+
+    def omega_k_partial(
+        self,
+        n: int,
+        reference_m_trans: Optional[int] = None,
+        E_0_factor: float = 1.0,
+        use_jax: bool = False,
+    ) -> float:
+        """Ω_k(n; reference) with fixed reference horizon. HQIV_LEAN omega_k_partial. Default reference = M_TRANS."""
+        ref = self.m_trans if reference_m_trans is None else reference_m_trans
+        return omega_k_partial(
+            n,
+            reference_m_trans=ref,
+            T_Pl=self.T_Pl_GeV,
+            alpha=self.alpha,
+            E_0_factor=E_0_factor,
+            omega_k_true=OMEGA_TRUE_K_PAPER,
+            use_jax=use_jax,
+        )
+
     def omega_k_true(self, E_0_factor: float = 1.0, use_jax: bool = False) -> float:
-        """Ω_k^true from shell integral 0..m_trans (paper ≈ +0.0098)."""
+        """Ω_k at the transition shell (today): Ω_k(m_trans; reference). Paper ≈ +0.0098 when m_trans = reference."""
         return omega_k_from_shell_integral(
             m_trans=self.m_trans,
             T_Pl=self.T_Pl_GeV,

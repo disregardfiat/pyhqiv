@@ -32,6 +32,11 @@ https://doi.org/10.5281/zenodo.18794889
 
 from pyhqiv import defects, molecular, semiconductors, waveguide
 from pyhqiv.algebra import OctonionHQIVAlgebra
+from pyhqiv.energy_field import (
+    HQIVEnergyField,
+    effective_horizon_from_energy_mev,
+    merge_constituents,
+)
 from pyhqiv.ase_interface import (
     HQIVCalculator,
     hqiv_energy_at_positions,
@@ -78,6 +83,27 @@ from pyhqiv.protocols import (
 )
 from pyhqiv.redshift import HQIVRedshift, z_expansion_from_scale_factor, z_total_apparent
 from pyhqiv.polarization import RedshiftDecomposition, decompose_redshift
+from pyhqiv.hqiv_scalings import get_hqiv_nuclear_constants
+from pyhqiv.horizon_network import HorizonNetwork, relax_nucleon_positions, relax_quark_positions
+from pyhqiv.subatomic import (
+    color_singlet_projector,
+    make_proton_from_quark_states,
+    nucleon_effective_theta_m,
+    nucleon_energies_mev,
+    neutron_effective_theta_m,
+    neutron_energy_mev,
+    proton_effective_theta_m,
+    proton_energy_mev,
+    quark_binding_angles,
+    quark_state_matrix,
+)
+from pyhqiv.nuclear import (
+    Nuclide,
+    NuclearConfig,
+    nuclide_from_symbol,
+    half_life_nuclide_hqiv,
+    decay_chain_nuclide_hqiv,
+)
 from pyhqiv.response import compute_conductivity, response_tensor_diagonal
 from pyhqiv.semiconductors import (
     compute_band_gap,
@@ -170,6 +196,28 @@ __all__ = [
     "z_expansion_from_scale_factor",
     "RedshiftDecomposition",
     "decompose_redshift",
+    "get_hqiv_nuclear_constants",
+    "HorizonNetwork",
+    "relax_nucleon_positions",
+    "relax_quark_positions",
+    "HQIVEnergyField",
+    "effective_horizon_from_energy_mev",
+    "merge_constituents",
+    "color_singlet_projector",
+    "make_proton_from_quark_states",
+    "proton_energy_mev",
+    "neutron_energy_mev",
+    "proton_effective_theta_m",
+    "neutron_effective_theta_m",
+    "nucleon_energies_mev",
+    "nucleon_effective_theta_m",
+    "quark_binding_angles",
+    "quark_state_matrix",
+    "Nuclide",
+    "NuclearConfig",
+    "nuclide_from_symbol",
+    "half_life_nuclide_hqiv",
+    "decay_chain_nuclide_hqiv",
     "HQIVOrbit",
     "parker_perihelion_lapse",
     "HQIVPerturbations",

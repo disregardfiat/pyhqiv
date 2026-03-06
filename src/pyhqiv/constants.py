@@ -29,6 +29,9 @@ M_TRANS: Final[int] = 500  # discrete-to-continuous transition shell index
 # --- Combinatorial invariant: 6^7 √3 (stars-and-bars + Fano-plane) ---
 COMBINATORIAL_INVARIANT: Final[float] = (6**7) * math.sqrt(3)  # ≈ 4.849e5
 
+# --- Polarization / birefringence (z_rec = exp(beta_rad/KAPPA_BETA) - 1). Paper-derived when set. ---
+KAPPA_BETA: Final[float] = 1.0  # placeholder; replace with paper value when available
+
 # --- Paper fiducial outputs ---
 OMEGA_TRUE_K_PAPER: Final[float] = 0.0098  # true curvature from shell integral
 LAPSE_COMPRESSION_PAPER: Final[float] = 3.96  # 51.2 Gyr → 13.8 Gyr apparent
@@ -50,6 +53,8 @@ C_SI: Final[float] = 2.99792458e8  # m/s
 E_PL_SI: Final[float] = 1.956e9  # Planck energy in J
 HBAR_SI: Final[float] = 1.054571817e-34  # J·s
 K_B_SI: Final[float] = 1.380649e-23  # J/K
+# Planck length (m); √(ℏG/c³). For 0 < x < θ horizon-distance ratio in lattice.
+L_PLANCK_M: Final[float] = 1.616255e-35  # m (CODATA 2018 order)
 
 # --- Temperature: K ↔ GeV ---
 K_B_GEV_PER_K: Final[float] = 8.617333e-14  # GeV/K
@@ -79,6 +84,33 @@ SILK_DAMPING_MPC: Final[float] = 50.0
 # --- Molecular / protein (Å units) ---
 HBAR_C_EV_ANG: Final[float] = 1973.27  # eV·Å
 A_LOC_ANG: Final[float] = 1.0
+
+# --- Avogadro (for environment-derived Θ_ref: mean interparticle spacing) ---
+N_A: Final[float] = 6.02214076e23  # 1/mol (CODATA)
+
+# --- Standard Model / EM / QCD (reference values for tests and scalings) ---
+# Fine structure constant α_EM = e²/(4πε₀ℏc) ≈ 1/137.036 (CODATA); used in Coulomb mode reduction.
+ALPHA_EM_INV: Final[float] = 137.036  # 1/α_EM (dimensionless)
+# Weak mixing angle at M_Z: sin²θ_W ≈ 0.23122 (PDG)
+SIN2_THETA_W_MZ: Final[float] = 0.23122
+# Light quark masses (MeV/c², PDG central values; in full HQIV these are derived from the mass equation at now).
+M_U_MEV_QCD: Final[float] = 2.2
+M_D_MEV_QCD: Final[float] = 4.7
+
+# --- Nuclear / decay: first principles only; no preset B or Θ in engine ---
+# ħc and nucleon masses from CODATA (unit conversion / standard particle data only).
+HBAR_C_MEV_FM: Final[float] = 197.3  # ħc in MeV·fm (ΔE_info = ħc(1/Θ_u - 1/Θ_s))
+M_PROTON_MEV: Final[float] = 938.272  # proton rest mass (MeV/c²)
+M_NEUTRON_MEV: Final[float] = 939.565  # neutron rest mass (MeV/c²)
+T_PLANCK_S: Final[float] = 5.39e-44  # s (Planck time)
+# Observer-centric lattice tick: wall-clock tick scaled by lapse (51.2/13.8 Gyr → ~3.96)
+TAU_TICK_OBSERVER_S: Final[float] = T_PLANCK_S * (
+    AGE_WALL_GYR_PAPER / AGE_APPARENT_GYR_PAPER
+)  # ≈ 2.0e-43 s effective
+# Macroscopic decay scaling from forward_4d_evolution (Spin(8) triality / relational volume)
+MACROSCOPIC_DECAY_SCALE: Final[float] = LAPSE_COMPRESSION_PAPER * 1.0e54  # λ_macro = λ_raw / this
+# φ_crit: universal threshold from CMB T0 "now" hypersurface (m²/s²); damping φ/(φ+φ_crit)
+PHI_CRIT_SI: Final[float] = 1.0e30  # paper-derived order; nuclear φ ~ 2.8e30 so ratio ~1
 
 # ============== FIDUCIAL (not from paper) ==============
 # Used only for optional geometry / phenomenological sigma8. Not HQIV-derived.

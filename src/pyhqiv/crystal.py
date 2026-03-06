@@ -1,6 +1,13 @@
 """
 HQIV crystal: periodic boundary conditions, Bloch sum, lattice vectors.
 Minimal extension for full periodic DFT + HQIV corrections (band gaps, stress).
+
+Lattice calculations use the same HQIV picture as molecules: Θ(Z, coord) per site
+(from theta_local / theta_for_atom) and bond length r_eq = min(Θ_i, Θ_j) from
+bond_length_from_theta. Build graphene, silicon, or any crystal by setting
+lattice_vectors and atom positions from HQIV-derived nearest-neighbor distances
+(and theta_ref from theta_ref_from_environment(ρ, T, M) for environment-dependent
+coupling length). No empirical lattice constants required.
 """
 
 from __future__ import annotations
@@ -19,6 +26,11 @@ class HQIVCrystal(HQIVSystem):
     HQIV system with lattice vectors and PBC. Replicates the unit cell into a
     supercell for Bloch-phase sums. Observer-centric horizon φ(x) and δ̇θ′
     modulation enter via phase-lifted Bloch states.
+
+    Use the same HQIV-derived Θ and bond lengths as in molecular: set positions
+    and lattice_vectors from bond_length_from_theta(Θ_i, Θ_j) with Θ from
+    theta_local(Z, coord, theta_ref_ang), where theta_ref_ang can come from
+    theta_ref_from_environment(ρ, T, M) for the local conditions.
     """
 
     def __init__(

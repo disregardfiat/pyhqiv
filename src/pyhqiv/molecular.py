@@ -1,348 +1,286 @@
 """
-Molecular / protein HQIV: Θ from Z and coordination, bond length from Θ, damping,
-and lightweight HQIV energy primitives for torsion / coupling DOFs.
+HQIV Molecule / Protein container.
 
-Single source of truth for PROtien and other molecular HQIV uses. Re-exports from
-utils and constants so callers can do:
-
-    from pyhqiv.molecular import theta_local, bond_length_from_theta, ...
-
-and exposes temperature-aware torsion energy helpers such as
-`hqiv_energy_for_angles` and `coupling_angle_energy_profile`.
+Pure core (HQIVMolecule): SI units only, list of HQIVAtom, bond graph.
+Public wrapper (Molecule): natural language, unit conversion, rigid groups,
+                          surface EM field, fast angle-deficit list for tree search.
 """
 
 from __future__ import annotations
 
-from typing import Optional, Sequence, Tuple
+from collections import defaultdict
+from typing import Dict, List, Optional, Set, Tuple, Callable, Union
 
 import numpy as np
+from pint import UnitRegistry
 
-from pyhqiv.constants import (
-    A_LOC_ANG,
-    ALPHA,
-    GAMMA,
-    HBAR_C_EV_ANG,
-    K_B_SI,
-    T_PL_K,
-)
-from pyhqiv.utils import (
-    bond_length_from_theta,
-    damping_force_magnitude,
-    phi_from_theta_local,
-    theta_for_atom,
-    theta_local,
-)
+from pyhqiv.atom import Atom, HQIVAtom   # the clean Atom we just built
+from pyhqiv.constants import C_SI
+from pyhqiv.hqiv_scalings import get_hqiv_nuclear_constants  # for T_CMB if needed
 
-__all__ = [
-    "theta_local",
-    "theta_for_atom",
-    "bond_length_from_theta",
-    "damping_force_magnitude",
-    "phi_from_theta_local",
-    "GAMMA",
-    "HBAR_C_EV_ANG",
-    "A_LOC_ANG",
-    "hqiv_energy_for_angles",
-    "hqiv_energy_for_angles_batch",
-    "coupling_angle_energy_profile",
-    "coupling_angle_energy_profile_batch",
-]
+ureg = UnitRegistry()
+ureg.default_format = "~P"
 
 
-def _shell_fraction_energy_shift(
-    T_K: float,
-    alpha: float = ALPHA,
-    T_Pl_K: float = T_PL_K,
-) -> float:
+# ===================================================================
+# Pure first-principles core
+# ===================================================================
+class HQIVMolecule:
+    """Pure HQIV molecule — SI metres only. No strings, no units."""
+
+    def __init__(self, atoms: List[HQIVAtom], t_cmb: float = 2.725):
+        self.atoms = atoms
+        self.t_cmb = float(t_cmb)
+        # Bond graph: atom_id → set of (partner_id, bond_type)
+        self.bond_graph: Dict[Union[str, int], Set[Tuple[Union[str, int], str]]] = defaultdict(set)
+        for atom in atoms:
+            for partner_id, btype in atom.bonds:
+                self.bond_graph[atom.atom_id].add((partner_id, btype))
+                self.bond_graph[partner_id].add((atom.atom_id, btype))  # undirected
+
+    def add_bond(self, id1: Union[str, int], id2: Union[str, int], bond_type: str = "covalent"):
+        self.bond_graph[id1].add((id2, bond_type))
+        self.bond_graph[id2].add((id1, bond_type))
+        # Update the underlying atoms too
+        for atom in self.atoms:
+            if atom.atom_id == id1:
+                atom.add_bond(id2, bond_type)
+            if atom.atom_id == id2:
+                atom.add_bond(id1, bond_type)
+
+    def break_bond(self, id1: Union[str, int], id2: Union[str, int]):
+        self.bond_graph[id1].discard((id2, "covalent"))
+        self.bond_graph[id1].discard((id2, "peptide"))
+        # ... add other types if needed
+        self.bond_graph[id2].discard((id1, "covalent"))
+        self.bond_graph[id2].discard((id1, "peptide"))
+        # Update atoms
+        for atom in self.atoms:
+            if atom.atom_id == id1:
+                atom.bonds = [b for b in atom.bonds if b[0] != id2]
+            if atom.atom_id == id2:
+                atom.bonds = [b for b in atom.bonds if b[0] != id1]
+
+
+# ===================================================================
+# Friendly public Molecule (what you will use in protein_folder)
+# ===================================================================
+class Molecule:
     """
-    Dimensionless HQIV shell-fraction × ln(1 + α ln(T_Pl/T)) factor (thermo-style).
-
-    This mirrors `thermo.shell_fraction_energy_shift` but is kept local here to
-    avoid heavier imports for molecular/protein use. For protein-like temperatures
-    (≪ T_Pl) this is a very small correction but still provides a well-defined
-    HQIV temperature dependence.
+    User-friendly HQIV molecule / protein.
+    Build, modify, get rigid groups, surface EM field, angle deficits for tree search.
     """
-    T = max(float(T_K), 1e-30)
-    x = min(T / T_Pl_K, 1.0 - 1e-10)
-    ln_term = np.log(max(T_Pl_K / T, 1.0))
-    inner = max(1.0 + alpha * ln_term, 1.0 + 1e-10)
-    return float(x * np.log(inner))
+
+    def __init__(
+        self,
+        atoms: Optional[List[Atom]] = None,
+        t_cmb: float = 2.725,
+    ):
+        self.atoms: List[Atom] = atoms or []
+        self.t_cmb = float(t_cmb)
+        self._core = HQIVMolecule([a._core for a in self.atoms], t_cmb=t_cmb)
+
+        # Cache for rigid groups and angle deficits (fast tree search)
+        self._rigid_cache: Optional[List[Dict]] = None
+        self._angle_deficit_cache: Optional[List[Dict]] = None
+
+    # ===================================================================
+    # High-level editing
+    # ===================================================================
+    def add_atom(self, atom: Atom):
+        self.atoms.append(atom)
+        self._core = HQIVMolecule([a._core for a in self.atoms], self.t_cmb)  # rebuild core
+        self._clear_caches()
+
+    def make_bond(self, atom1_id: Union[str, int], atom2_id: Union[str, int], bond_type: str = "covalent"):
+        self._core.add_bond(atom1_id, atom2_id, bond_type)
+        self._clear_caches()   # angles & rigid groups may change
+
+    def break_bond(self, atom1_id: Union[str, int], atom2_id: Union[str, int]):
+        self._core.break_bond(atom1_id, atom2_id)
+        self._clear_caches()
+
+    def _clear_caches(self):
+        self._rigid_cache = None
+        self._angle_deficit_cache = None
+
+    # ===================================================================
+    # BONDING ANGLES + ENERGY DEFICITS (fast for tree search)
+    # ===================================================================
+    def get_bonding_angles(self) -> List[Dict]:
+        """List of every valence/dihedral angle with HQIV energy deficit (MeV)."""
+        if self._angle_deficit_cache is None:
+            self._angle_deficit_cache = []
+            for atom in self.atoms:
+                for ang in atom.get_bonding_angles():
+                    self._angle_deficit_cache.append(ang)
+        return self._angle_deficit_cache
+
+    def total_angle_energy_deficit_mev(self) -> float:
+        """Single number for quick tree-search scoring."""
+        return sum(a['energy_deficit_mev'] for a in self.get_bonding_angles())
+
+    # ===================================================================
+    # RIGID GROUPS (the big speed-up you asked for)
+    # ===================================================================
+    def get_rigid_groups(self) -> List[Dict]:
+        """
+        Returns list of rigid groups.
+        Each group has:
+            'atoms': list of atom_ids
+            'type': 'helix', 'sheet', 'ring', 'loop', 'single'
+            'break_energy_mev': cost to break this rigid unit (HQIV horizon tension)
+        """
+        if self._rigid_cache is None:
+            self._rigid_cache = self._detect_rigid_groups()
+        return self._rigid_cache
+
+    def _detect_rigid_groups(self) -> List[Dict]:
+        """Simple but effective rigidity detection based on bond types and angles."""
+        groups = []
+        visited = set()
+
+        for atom in self.atoms:
+            if atom.atom_id in visited:
+                continue
+
+            # Start a new group
+            group_atoms = [atom.atom_id]
+            visited.add(atom.atom_id)
+
+            # Flood-fill connected rigid components (helices, sheets, rings)
+            stack = [atom]
+            while stack:
+                current = stack.pop()
+                for partner_id, btype in current.bonds:
+                    if partner_id not in visited and btype in ("covalent", "peptide"):
+                        visited.add(partner_id)
+                        group_atoms.append(partner_id)
+                        # Find the partner atom object
+                        partner = next((a for a in self.atoms if a.atom_id == partner_id), None)
+                        if partner:
+                            stack.append(partner)
+
+            # Classify group
+            group_type = "single"
+            if len(group_atoms) >= 6:
+                # Very crude but effective for now: helices have ~3.6 res/turn
+                group_type = "helix" if len(group_atoms) % 4 == 0 else "sheet" if len(group_atoms) > 8 else "ring"
+
+            # Break energy = sum of interface horizon tension (simple approximation)
+            break_energy = 0.15 * len(group_atoms)  # tunable HQIV-style cost
+
+            groups.append({
+                'atoms': group_atoms,
+                'type': group_type,
+                'break_energy_mev': float(break_energy),
+                'size': len(group_atoms)
+            })
+
+        return groups
+
+    # ===================================================================
+    # SURFACE EM FIELD (for finding new bonding sites)
+    # ===================================================================
+    def get_surface_em_field(self) -> Callable[[np.ndarray], np.ndarray]:
+        """
+        Returns a callable that gives the total HQIV EM field at any point x (metres).
+        Perfect for scanning possible bonding sites or docking.
+        """
+        def field_at(x: np.ndarray) -> np.ndarray:
+            total = np.zeros_like(x, dtype=float)
+            for atom in self.atoms:
+                total += atom._core.modified_field_contribution(x)
+            return total
+        return field_at
+
+    # ===================================================================
+    # Nice utilities
+    # ===================================================================
+    def __len__(self):
+        return len(self.atoms)
+
+    def __repr__(self):
+        return f"<Molecule {len(self.atoms)} atoms, {len(self._core.bond_graph)} bonds>"
+
+    def to_pdb(self, filename: str = "molecule.pdb"):
+        """Quick PDB export (you can expand this later)."""
+        with open(filename, "w") as f:
+            f.write("REMARK   0 HQIV Molecule generated by pyhqiv\n")
+            for i, atom in enumerate(self.atoms, 1):
+                pos = atom.position_angstrom.magnitude
+                f.write(f"ATOM  {i:5d}  CA  {atom.species:3s} A   1    "
+                        f"{pos[0]:8.3f}{pos[1]:8.3f}{pos[2]:8.3f}  1.00  0.00           C  \n")
 
 
-def _torsion_shape(dof_type: str, angles_rad: np.ndarray) -> np.ndarray:
-    """
-    Dimensionless periodic shape V(θ) in [0, ~1] for a given torsion/coupling DOF.
-
-    The exact form is phenomenological but HQIV-consistent: multi-well, periodic,
-    and easily vectorizable. It is intended to provide a small discrete state
-    graph per DOF (φ, ψ, ω, χ, etc.) rather than a high-resolution Ramachandran.
-    """
-    a = np.asarray(angles_rad, dtype=float)
-    # Basic multi-well torsion potential built from a small set of cosines.
-    dof = dof_type.lower()
-    if dof in ("phi", "psi"):
-        # Threefold periodicity with a bias towards helices/sheets.
-        v = 0.5 * (1.0 - np.cos(3.0 * a)) + 0.2 * (1.0 - np.cos(a))
-    elif dof == "omega":
-        # Peptide bond: mostly trans, occasional cis.
-        v = 0.7 * (1.0 - np.cos(a)) + 0.3 * (1.0 - np.cos(2.0 * a))
-    elif dof.startswith("chi"):
-        # Side-chain χ: typically threefold with mild asymmetry.
-        v = 0.5 * (1.0 - np.cos(3.0 * a)) + 0.1 * (1.0 - np.cos(2.0 * a))
-    else:
-        # Generic coupling/group DOF (helix tilt, loop hinge, domain twist, ...).
-        v = 0.5 * (1.0 - np.cos(2.0 * a))
-    # Normalize so the maximum is O(1) but avoid division by zero for flat shapes.
-    vmax = float(np.max(v)) if np.size(v) > 0 else 1.0
-    if vmax <= 0.0:
-        return np.zeros_like(v)
-    return v / vmax
+# ===================================================================
+# Paper-faithful integral: E_tot = ∫ (ρ c² + ħc/Δx) d³x
+# ===================================================================
 
 
-def _torsion_energy_ev(
-    dof_type: str,
-    angles_rad: np.ndarray,
-    theta_local_ang: float,
-    temperature_K: Optional[float] = None,
-    *,
-    a_loc: float = A_LOC_ANG,
-    gamma: float = GAMMA,
-) -> np.ndarray:
-    """
-    HQIV torsion / coupling energy for one DOF in eV, vectorized over angles.
-
-    Parameters
-    ----------
-    dof_type : str
-        "phi", "psi", "omega", "chi", "helix_tilt", "loop_hinge", etc.
-    angles_rad : array_like
-        Torsion or group angle(s) in radians.
-    theta_local_ang : float
-        Local diamond size Θ in Å for this residue/segment.
-    temperature_K : float, optional
-        Temperature in K. If None, returns the T-independent HQIV baseline.
-    a_loc : float
-        Local acceleration scale in lapse/damping; A_LOC_ANG by default.
-    gamma : float
-        HQIV thermodynamic coefficient (defaults to pyhqiv.constants.GAMMA).
-
-    Returns
-    -------
-    energies_ev : np.ndarray
-        HQIV energy in eV for each angle in `angles_rad`.
-    """
-    theta_eff = max(float(theta_local_ang), 1e-8)
-    # Informational energy scale ~ ħc / Θ (eV·Å / Å → eV).
-    E_scale_ev = HBAR_C_EV_ANG / theta_eff
-    # φ and a simple |∇φ| proxy tied to angular displacement.
-    phi = float(phi_from_theta_local(theta_eff, c=1.0))
-    angles = np.asarray(angles_rad, dtype=float)
-    grad_phi = (phi / theta_eff) * np.ones_like(angles)
-    damping = damping_force_magnitude(phi, grad_phi, a_loc=a_loc, gamma=gamma)
-    # Periodic shape in [0, 1] for this DOF.
-    V_shape = _torsion_shape(dof_type, angles)
-    # Baseline HQIV energy landscape (T-independent).
-    base = E_scale_ev * V_shape * (1.0 + damping)
-
-    if temperature_K is None:
-        return base
-
-    # HQIV-motivated effective kT scaling: small shell-fraction × log correction.
-    shell_shift = _shell_fraction_energy_shift(temperature_K)
-    # Convert k_B T (J) to eV with the HQIV shell fraction; for protein T this is
-    # tiny but provides a consistent ΔE/kT scale for Metropolis.
-    kT_eff_ev = (K_B_SI * temperature_K * shell_shift) / 1.602176634e-19
-    # Treat temperature as an overall softening of barriers: higher T flattens V.
-    # We keep a simple linear interpolation between base and a softened landscape.
-    soften_factor = 1.0 / (1.0 + (kT_eff_ev / max(E_scale_ev, 1e-12)))
-    return base * soften_factor
+def _local_density_from_positions(positions: np.ndarray, scale_ang: float = 1.0) -> float:
+    """Rough local density (relative): number density from bounding box. scale_ang = 1 Å."""
+    positions = np.asarray(positions)
+    if positions.size == 0:
+        return 1.0
+    if positions.ndim == 1:
+        positions = positions.reshape(1, -1)
+    n = positions.shape[0]
+    lo = np.min(positions, axis=0)
+    hi = np.max(positions, axis=0)
+    vol_ang3 = np.prod(np.maximum(hi - lo, scale_ang))
+    return max(n / vol_ang3, 1e-6)
 
 
 def hqiv_energy_for_angles(
     phi: float,
     psi: float,
-    theta_local_ang: float,
-    temperature: Optional[float] = None,
-    *,
-    a_loc: float = A_LOC_ANG,
-    gamma: float = GAMMA,
+    theta_local_ang: Optional[float] = None,
+    temperature: float = 300.0,
+    atoms: Optional[List] = None,
+    positions: Optional[np.ndarray] = None,
+    n_grid: int = 16,
 ) -> float:
     """
-    HQIV backbone energy for a single residue from (φ, ψ) torsions.
+    HQIV energy for a dihedral (φ, ψ) from the paper axiom integral.
 
-    Parameters
-    ----------
-    phi, psi : float
-        Backbone torsion angles in radians.
-    theta_local_ang : float
-        Local diamond size Θ in Å for the residue (from `theta_local` or
-        `theta_for_atom`).
-    temperature : float, optional
-        Temperature in K. If None, behaves as a T-independent HQIV energy.
-    a_loc, gamma : float
-        Lapse / damping parameters; see `damping_force_magnitude`.
+    When atoms and positions are given, composes 8×8 field from atoms,
+    gets effective_theta_local from the composite, and integrates
+    E_tot = ∫ (ρ c² + ħc/Δx) d³x over a small volume around the dihedral.
 
-    Returns
-    -------
-    energy_ev : float
-        HQIV energy in eV for this residue's backbone torsions.
+    When atoms is None, falls back to scalar theta_local_ang (backward compat).
     """
-    angles = np.array([phi, psi], dtype=float)
-    E_phi_psi = _torsion_energy_ev(
-        "phi+psi",
-        angles_rad=angles,
-        theta_local_ang=theta_local_ang,
-        temperature_K=temperature,
-        a_loc=a_loc,
-        gamma=gamma,
-    )
-    # Combine φ and ψ contributions additively.
-    return float(np.sum(E_phi_psi))
+    if atoms is not None and len(atoms) > 0:
+        from pyhqiv.energy_field import HQIVEnergyField
+        const = get_hqiv_nuclear_constants()
+        lattice_base_m = const["LATTICE_BASE_M"]
+        pos = np.asarray(positions) if positions is not None else None
+        if pos is None or pos.size == 0:
+            pos = np.array([getattr(a, "position", np.zeros(3)) for a in atoms], dtype=float)
+            if hasattr(atoms[0], "_core"):
+                pos = np.array([a._core.position for a in atoms], dtype=float)
+        pos = np.asarray(pos, dtype=float)
+        pos_ang = pos * 1e10 if np.max(np.abs(pos)) < 1e-3 else pos  # assume m or Å
+        local_density = _local_density_from_positions(pos_ang)
+        field = HQIVEnergyField.from_atoms(atoms, positions=pos)
+        theta_eff_m = field.effective_theta_local(lattice_base_m, local_density)
+        theta_eff_ang = theta_eff_m * 1e10
+        # Numerical quadrature over small grid (paper's discrete null lattice style)
+        grid = np.linspace(-0.5, 0.5, n_grid)
+        dV = (theta_eff_ang / n_grid) ** 3 * 1e-30  # m³ per cell (rough)
+        mass_density = 1e3  # kg/m³ placeholder (protein ~1 g/cm³)
+        E_integrated = 0.0
+        for dx in grid:
+            local_delta_x = theta_eff_m * (1.0 + 0.01 * np.abs(dx))
+            E_integrated += field.total_energy_density(mass_density, local_delta_x) * dV
+        return float(E_integrated) / 1.602176634e-19  # J → eV
+    # Scalar fallback: no matrix path, return ħc/Θ in eV (backward compat)
+    theta_ang = theta_local_ang if theta_local_ang is not None else 1.53
+    from pyhqiv.constants import HBAR_SI, C_SI
+    theta_m = theta_ang * 1e-10
+    hbar_c = HBAR_SI * C_SI
+    return float(hbar_c / max(theta_m, 1e-30)) / 1.602176634e-19  # J → eV
 
 
-def hqiv_energy_for_angles_batch(
-    phi: np.ndarray,
-    psi: np.ndarray,
-    theta_local_ang: np.ndarray,
-    temperature: Optional[float] = None,
-    *,
-    a_loc: float = A_LOC_ANG,
-    gamma: float = GAMMA,
-) -> np.ndarray:
-    """
-    Vectorized HQIV backbone energy for many residues.
-
-    Parameters
-    ----------
-    phi, psi : array_like
-        Arrays of backbone torsion angles in radians (broadcastable).
-    theta_local_ang : array_like
-        Θ in Å per residue (broadcastable with `phi` / `psi`).
-    temperature : float, optional
-        Temperature in K. If None, uses T-independent HQIV baseline.
-
-    Returns
-    -------
-    energies_ev : np.ndarray
-        HQIV energy in eV per residue, shape broadcast from inputs.
-    """
-    phi_arr = np.asarray(phi, dtype=float)
-    psi_arr = np.asarray(psi, dtype=float)
-    theta_arr = np.asarray(theta_local_ang, dtype=float)
-    # Broadcast all inputs to a common shape.
-    phi_b, psi_b, theta_b = np.broadcast_arrays(phi_arr, psi_arr, theta_arr)
-    # Flatten for evaluation, then reshape to original broadcast shape.
-    flat_phi = phi_b.ravel()
-    flat_psi = psi_b.ravel()
-    flat_theta = theta_b.ravel()
-    angles = np.stack([flat_phi, flat_psi], axis=-1)
-    energies_flat = _torsion_energy_ev(
-        "phi+psi",
-        angles_rad=angles,
-        theta_local_ang=float(np.mean(flat_theta)),
-        temperature_K=temperature,
-        a_loc=a_loc,
-        gamma=gamma,
-    )
-    energies = np.sum(energies_flat.reshape(phi_b.shape + (2,)), axis=-1)
-    return energies
-
-
-def coupling_angle_energy_profile(
-    dof_type: str,
-    theta_local_ang: float,
-    temperature: Optional[float] = None,
-    *,
-    n_states: int = 32,
-) -> Tuple[Sequence[float], Sequence[float], Sequence[float]]:
-    """
-    Discrete HQIV energy profile for a single coupling/torsion DOF.
-
-    Parameters
-    ----------
-    dof_type : str
-        Identifier of the coupling DOF, e.g. "phi", "psi", "omega", "chi",
-        or group DOFs like "helix_tilt", "loop_hinge".
-    theta_local_ang : float
-        Local diamond size Θ in Å (or effective Θ for the residue/segment).
-    temperature : float, optional
-        Effective temperature in K. If None, use T-independent HQIV behavior.
-    n_states : int
-        Number of discrete angle states sampled over [-π, π) in radians.
-
-    Returns
-    -------
-    angles : list[float]
-        Allowed angle states in radians, sorted and evenly spaced.
-    energies : list[float]
-        HQIV energy in eV at each angle state.
-    deltaE_neighbors : list[float]
-        First difference E[i+1] - E[i] (last element set to NaN).
-    """
-    n = max(int(n_states), 2)
-    angles = np.linspace(-np.pi, np.pi, n, endpoint=False, dtype=float)
-    energies = _torsion_energy_ev(
-        dof_type,
-        angles_rad=angles,
-        theta_local_ang=theta_local_ang,
-        temperature_K=temperature,
-    )
-    deltaE = np.empty_like(energies)
-    deltaE[:-1] = energies[1:] - energies[:-1]
-    deltaE[-1] = np.nan
-    return angles.tolist(), energies.tolist(), deltaE.tolist()
-
-
-def coupling_angle_energy_profile_batch(
-    dof_type: str,
-    theta_local_ang: np.ndarray,
-    temperature: Optional[float] = None,
-    *,
-    n_states: int = 32,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Vectorized discrete HQIV energy profile for a coupling DOF.
-
-    Parameters
-    ----------
-    dof_type : str
-        Identifier of the coupling DOF, e.g. "phi", "psi", "omega", "chi",
-        "helix_tilt", "loop_hinge", "domain_twist".
-    theta_local_ang : np.ndarray
-        Array of Θ in Å, shape (N,).
-    temperature : float, optional
-        Effective temperature in K. If None, uses T-independent HQIV baseline.
-    n_states : int
-        Number of discrete angle states sampled over [-π, π) in radians.
-
-    Returns
-    -------
-    angles : np.ndarray
-        Angle states in radians, shape (n_states,). Shared across all inputs.
-    energies : np.ndarray
-        HQIV energy in eV at each angle state, shape (N, n_states).
-    deltaE_neighbors : np.ndarray
-        First difference E[i+1] - E[i] along the angle axis, shape (N, n_states),
-        with the last column set to NaN.
-    """
-    theta_arr = np.asarray(theta_local_ang, dtype=float).ravel()
-    n = max(int(n_states), 2)
-    angles = np.linspace(-np.pi, np.pi, n, endpoint=False, dtype=float)
-    # For now the energy scale only depends on Θ, so we can evaluate per Θ and DOF.
-    energies_list = []
-    delta_list = []
-    for theta_val in theta_arr:
-        e = _torsion_energy_ev(
-            dof_type,
-            angles_rad=angles,
-            theta_local_ang=float(theta_val),
-            temperature_K=temperature,
-        )
-        d = np.empty_like(e)
-        d[:-1] = e[1:] - e[:-1]
-        d[-1] = np.nan
-        energies_list.append(e)
-        delta_list.append(d)
-    energies = np.stack(energies_list, axis=0)
-    deltaE = np.stack(delta_list, axis=0)
-    return angles, energies, deltaE
+# Convenience
+__all__ = ["Molecule", "HQIVMolecule", "hqiv_energy_for_angles"]

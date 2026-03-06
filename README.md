@@ -238,7 +238,7 @@ V_shift = hqiv_potential_shift(phi_avg=1e-10, dot_delta_theta_avg=1e-18)
 
 | Quantity | Value | Source |
 |----------|--------|--------|
-| Ω_k^true | +0.0098 | Shell integral m = 0 … 500 |
+| Ω_k | Dynamic (not constant) | Ω_k(n; N) = Ω_k_true · (∫₀ⁿ shape / ∫₀ᴺ shape); at horizon n=N → Ω_k_true ≈ +0.0098. See `omega_k_at_horizon`, `omega_k_partial` (HQIV_LEAN). |
 | m_trans | 500 | Discrete–continuous transition |
 | γ | 0.40 | Entanglement monogamy |
 | α | 0.60 | G_eff exponent |
@@ -249,8 +249,10 @@ V_shift = hqiv_potential_shift(phi_avg=1e-10, dot_delta_theta_avg=1e-18)
 
 ## Tests
 
+Install with dev extras for pytest, then run:
+
 ```bash
-pip install -e ".[all]"
+pip install -e ".[dev]"   # or: uv sync --extra dev
 pytest tests/ -v
 ```
 
@@ -264,7 +266,9 @@ pytest tests/ -v --cov=pyhqiv --cov-report=term-missing --cov-report=html
 
 CI runs pytest with `--cov=pyhqiv --cov-report=term-missing --cov-report=html` and uploads the HTML report as an artifact (7-day retention). Config: `.coveragerc`. To add a coverage badge, integrate [Codecov](https://codecov.io) or [Coveralls](https://coveralls.io) and add their badge to this README.
 
-The test `tests/test_paper_numbers.py` checks Ω_true_k, γ, combinatorial invariant, lapse factor, and lattice δE(m) / mode counts to 6 decimal places. Additional tests cover ASE calculator (energy/forces/stress), crystal (PBC, k-path), fluid, semiconductors (band_gap, DOS, effective_mass, dielectric), defects, export, and thermo (EOS, phase diagram, hqiv_answer_thermo).
+- **`tests/test_paper_numbers.py`** — Paper predictions: Ω_true_k, γ, combinatorial invariant, lapse factor, lattice δE(m) / mode counts to 6 decimal places.
+- **`tests/test_physical_values.py`** — Known physical/experimental values: CODATA (c, ℏ, k_B, Planck length), Planck 2018 (T_CMB, age), curvature bounds; **Standard Model** (fine structure 1/137.036, sin²θ_W at M_Z); **hydrogen/oxygen coupling** (Θ in Å via `theta_for_atom`, bond-length scale, H > O ordering); **ideal valence angles** (carbon sp³ 109.47°, oxygen basin); **nuclear binding energy** (B_ALPHA_MEV = 28.3 MeV, He-4/C-12/O-16 ballpark when HQIV B > 0).
+- Other tests: ASE calculator (energy/forces/stress), crystal (PBC, k-path), fluid, semiconductors (band_gap, DOS, effective_mass, dielectric), defects, export, thermo (EOS, phase diagram, hqiv_answer_thermo).
 
 ## Reproducibility
 
@@ -352,6 +356,7 @@ For releases, the CI build runs `scripts/update_citation_cff.py` to set `CITATIO
 
 Public contribution and feedback are greatly appreciated. Please open issues or pull requests on [GitHub](https://github.com/disregardfiat/pyhqiv). All features are experimental; we welcome bug reports, documentation improvements, and suggestions.
 
-## License
-
-MIT.
+**License note (March 2026)**  
+This project is released under the MIT License **with an explicit Government Use Restriction**.  
+Governments worldwide may **not** use, fork, or run this software without first purchasing a paid seat from me (Steven Ettinger). Seat availability and pricing are at my sole discretion.  
+Individuals, companies, universities, and non-profits continue to enjoy full MIT rights.

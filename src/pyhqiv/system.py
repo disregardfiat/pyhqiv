@@ -6,13 +6,15 @@ vectorized E/B/D/H on 3D grid, total Hamiltonian (QuTiP-ready). from_pdb optiona
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
+
+if TYPE_CHECKING:
+    from pyhqiv.energy_field import HQIVEnergyField
 
 import numpy as np
 
 from pyhqiv.atom import HQIVAtom
 from pyhqiv.constants import C_SI, GAMMA
-
 
 def _coulomb_field(
     grid: np.ndarray,
@@ -55,14 +57,16 @@ def _phase_corrected_epsilon(
     atoms: List[HQIVAtom],
     gamma: float,
     E_prime: float = 0.5,
+    energy_field: Optional[Any] = None,
 ) -> np.ndarray:
-    """Effective 1/ε from horizon: 1 + γ φ/Λ² style; here use φ/c² and ˙δθ′/c."""
+    """Effective 1/ε from horizon: 1 + γ φ/c² (˙δθ′/c). If energy_field is set, add its scalar φ."""
     phi_sum = np.zeros(grid.shape[0], dtype=float)
     for at in atoms:
         phi_sum += at.phi_local(grid)
+    if energy_field is not None:
+        phi_sum += energy_field.project_scalar_phi()
     phi_over_c2 = phi_sum / (C_SI**2)
     dtdc = np.arctan(E_prime) * (np.pi / 2.0) / C_SI
-    # Constitutive: ε_eff ∝ 1 + γ φ/c² (˙δθ′/c) for phase-horizon correction
     return 1.0 + gamma * phi_over_c2 * dtdc
 
 
@@ -76,9 +80,11 @@ class HQIVSystem:
         self,
         atoms: List[HQIVAtom],
         gamma: float = GAMMA,
+        energy_field: Optional["HQIVEnergyField"] = None,
     ) -> None:
         self.atoms = list(atoms)
         self.gamma = gamma
+        self.energy_field = energy_field
 
     @property
     def positions(self) -> np.ndarray:
@@ -170,7 +176,9 @@ class HQIVSystem:
             grid = grid.reshape(1, 3)
 
         if phase_corrected:
-            eps_eff = _phase_corrected_epsilon(grid, self.atoms, self.gamma, E_prime=E_prime)
+            eps_eff = _phase_corrected_epsilon(
+                grid, self.atoms, self.gamma, E_prime=E_prime, energy_field=self.energy_field
+            )
             E, B = _coulomb_field(grid, self.positions, self.charges, epsilon_eff=1.0 / eps_eff)
         else:
             E, B = _coulomb_field(grid, self.positions, self.charges)

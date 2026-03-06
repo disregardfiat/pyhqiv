@@ -32,6 +32,7 @@ classifiers = [
 dependencies = [
     "numpy>=1.20",
     "scipy>=1.7",
+    "pint>=0.23",
 ]
 
 [project.optional-dependencies]
@@ -41,6 +42,7 @@ qutip = ["qutip>=4.7"]
 jax = ["jax>=0.4", "jaxlib>=0.4"]
 pyvista = ["pyvista>=0.38"]
 cosmology = ["healpy>=1.15"]
+dev = ["pytest>=7", "pytest-cov>=4"]
 all = ["pyhqiv[ase,mda,qutip,jax,pyvista]"]
 
 [project.urls]
