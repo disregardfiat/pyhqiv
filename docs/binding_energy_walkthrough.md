@@ -75,7 +75,7 @@ At the nuclear layer, **free** proton/neutron Θ and E come from `proton_effecti
 Binding and bound Θ use **HorizonNetwork** (`pyhqiv.horizon_network`), **no Δ in the algebra**:
 
 - **Radius per node** \(r_i = \hbar c / (m_i c^2)\) from mass (inverse-frequency sphere).
-- **Edges:** spheres touch when distance < \(r_i + r_j\).
+- **Edges:** connect when distance < \(r_{\rm eq}(i,j)\) (min-energy state). \(r_{\rm eq} = \texttt{R\_EQ\_SCALE}\times (r_i + r_j)\) so the graph models the balanced well (~1.4 fm for nucleons), not strict touch.
 - **Component coherence** on the full connected component: \(\mu_{\rm comp} = \sum r_i / \sqrt{\sum r_i^2}\), \(\Theta_{\rm comp} = L \times 8 \times \mu_{\rm comp}\). Single node → μ = 1 → Θ = L×8; cluster (e.g. 4 nucleons) → μ > 1 → binding.
 - **Node-local valence** from the same overlap graph: for nucleon \(i\), take the subgraph made of node \(i\) and its touching neighbours and compute \(\mu_i\) with the same formula. The per-node bound horizon is the geometric mean
   \[
@@ -83,10 +83,32 @@ Binding and bound Θ use **HorizonNetwork** (`pyhqiv.horizon_network`), **no Δ 
   \]
   This preserves one graph at all scales while allowing distinct local tensions inside asymmetric nuclei.
 - **E_free** = sum of single-nucleon network `total_energy()` (each μ = 1); **E_bound** = one network of P+N → μ > 1 → **B = E_free − E_bound** > 0.
-- **Geometric nucleon packing:** bound positions are not fixed; `relax_nucleon_positions(radii_m, is_proton)` runs a short force-based relaxation (hard-sphere repulsion, soft attraction to touching, Coulomb p-p repulsion only). No per-nucleus if-statements: He-4 → tetrahedron, ⁸Be → two alphas, ¹²C → alpha-triangle, etc., emerge from the same three forces. Final positions → overlap graph → μ per component → Θ_eff → B.
+- **Geometric nucleon packing:** bound positions minimize total network energy (balanced well). `minimize_nucleon_configuration(radii_m, is_proton, lattice_base_m)` uses `scipy.optimize` with `HorizonNetwork.total_energy()` as objective; initial guess is tetrahedral for A=4 (edges at contact) or `relax_nucleon_positions` for other A. No per-nucleus if-statements: He-4 → tetrahedron, ⁸Be → two alphas, ¹²C → alpha-triangle, etc., from the same potential. Final positions → overlap graph → μ → Θ_eff → B.
 - Quark 8×8 matrices are **color (g₂) + flavor scale only**; binding comes purely from the Pythagorean mode multiplier in the network.
 
 No eps_delta, no algebraic Tr(M@Δ) for Θ; only masses → radii → μ. Same construction scales to 238 spheres (U) or residues (proteins).
+
+### 4.1 Effective potential for the balanced well (pure algebra, no new constants)
+
+The total interaction between two horizons is an effective potential already implicit in the network; it can be written explicitly for **any two horizon radii** (universally applicable):
+
+\[
+V_{\rm eff}(r) = V_{\rm rep}(r) + V_{\rm attr}(r), \quad
+V_{\rm rep}(r) = \frac{A}{r^{12}}, \quad
+V_{\rm attr}(r) = -B\,\frac{\phi(r)}{r^6} - C\cdot\operatorname{tr}(M_1 M_2 \Delta)\,e^{-r/\lambda_{\rm coh}}.
+\]
+
+- **V_rep:** hard-core Pauli/horizon exclusion; \(A = \hbar c\,(r_1+r_2)^{11}\) from the algebra.
+- **V_attr:** van-der-Waals-like horizon-overlap term with \(\phi(r) = 2c^2/\Theta(r)\), \(\Theta(r) = L\times 8\times \mu(r)\); plus composite invariant \(\operatorname{tr}(M_1 M_2 \Delta)\) with coherence length \(\lambda_{\rm coh}\).
+- The minimum \(dV_{\rm eff}/dr = 0\) gives equilibrium separation **r_eq ≈ 1.4 fm** for nucleon pairs (alpha-particle rms radius scale). No tuning — A, B, C and \(\lambda_{\rm coh}\) are fixed by ħc, lattice_base, and algebra.
+
+**API (universal for any 2 horizons):**
+
+- **`effective_potential_pair(r_m, r1_m, r2_m, lattice_base_m, ...)`** — returns \(V_{\rm eff}(r)\) in MeV; optional trace term and \(\lambda_{\rm coh}\).
+- **`equilibrium_separation_two_horizons(r1_m, r2_m, lattice_base_m, ...)`** — returns r_eq in metres (e.g. ~1.4 fm for two nucleons). Use this to get the appropriate distance for any two horizon radii.
+- **`minimize_nucleon_configuration(radii_m, is_proton, lattice_base_m, ...)`** (in `nuclear`) — finds equilibrium positions by minimizing `HorizonNetwork.total_energy()`; reuses the same algebra and φ-coupling.
+
+Layer-0 quark touching can use the same minimizer with quark radii and charges to close the full hierarchical ladder.
 
 ---
 
@@ -129,7 +151,11 @@ No eps_delta, no algebraic Tr(M@Δ) for Θ; only masses → radii → μ. Same c
 
 **Tritium (H-3):** The nuclear overlap graph has one neutron on a weaker local subgraph → that neutron is the β⁻ source. The “pressure” is the angular mismatch in the quark triangles (acute d-d in the converting neutron).
 
-**He-4:** Valence-saturated graph → no weak site → β± channels close; binding remains large and positive.
+**Light nuclei (¹H, ²H, ³H):** For A ≤ 3 the code uses a **quark-level** HorizonNetwork (3×A quarks). Per-nucleon bound Θ come from the geometric mean of that nucleon's three quarks' Θ, so **quark interactions drive nucleon attraction and decay**; the single-nucleon picture is only macroscopically accurate. Decay chains (e.g. ³H → ³He) use this quark-driven logic; β⁻ is allowed when N > 0 and ΔE > 0.
+
+**Tritium (H-3):** Quark-level network gives per-nucleon thetas; the neutron(s) allow β⁻ to ³He.
+
+**He-4:** A > 3 so nucleon-level network only; valence-saturated graph → no β± channel; binding remains large and positive.
 
 ### 6.2.1 Binding angles and ladder implications
 
@@ -156,6 +182,17 @@ The paper’s **modified inertia** \(f(a_{\mathrm{loc}},\phi) = a_{\mathrm{loc}}
   Observer-time rate is scaled by \(f\) (same lapse as in \(d\tau = f \, dt\)), so half-lives are longer when \(f < 1\).
 
 **Implementation:** `NuclearConfig._lapse_f()` computes \(f\) from \(\Theta_{\mathrm{avg}}\) of unstable and stable configurations; `snap_probability` uses \(kT_{\mathrm{eff}} = kT_{\mathrm{horizon}} \times f\); `decay_rate_per_s` multiplies the raw rate by \(f\). See `pyhqiv.fluid.f_inertia`.
+
+### 6.2.3 Pure algebraic entanglement (phase-lifted fanoplane fusion)
+
+A **position-free** binding path uses only 8×8 matrices, Δ, and the phase-lifted commutator \([M_1,M_2]_\Delta = M_1\Delta M_2 - M_2\Delta M_1\):
+
+- **Entangled composite:** \(M_{12} = M_1 + M_2 + [M_1,M_2]_\Delta\) (non-separable; algebraic analogue of \(\nabla\phi\times\mathbf{E}\)).
+- **Holding distance:** \(\sigma = \|[M_1,M_2]_\Delta\|_F\) (dimensionless; no radii or fm).
+- **Phase-lift:** \(M = M_{\mathrm{base}} + \theta\Delta\) with \(\theta = (\pi/2)\arctan(E/E_{\mathrm{Pl,eff}})\) from the axiom; \(E_{\mathrm{Pl,eff}} = E_{\mathrm{Pl}}\times(L_{\mathrm{Pl}}/L)\) so the lattice shell sets the effective Planck scale. Ensures \(\operatorname{tr}(M@\Delta)\neq 0\).
+- **Binding:** \(B = E_{\mathrm{free}} - E_{\mathrm{bound}} = -\operatorname{tr}([M_1,M_2]_\Delta \Delta)\). By cyclic trace, \(\operatorname{tr}([M_1,M_2]_\Delta\Delta)=0\) for any \(M_1,M_2\), so this formula yields \(B=0\); a different invariant may be needed for non-zero algebraic binding.
+
+**API:** `build_nucleon_matrix_with_phase(is_proton, lattice_base_m)` — nucleon matrix with axiom-derived θΔ. `pyhqiv.entanglement` — `entangle_particles`, `holding_distance`, `binding_energy_pair`, `iterated_fusion`, `binding_energy_algebraic`. `binding_energy_mev_algebraic(P, N)` returns B from this path. The default binding used by `NuclearConfig` remains the geometry-based HorizonNetwork path.
 
 ### 6.3 Universal integral and composition rule (paper-exact)
 

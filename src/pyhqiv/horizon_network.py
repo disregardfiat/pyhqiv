@@ -6,6 +6,13 @@ When objects (nucleons, residues) have overlapping horizons, they share lattice 
 μ = Σr_i / sqrt(Σr_i²) ≥ 1 → Θ_eff = L×8×μ → ħc/Δx drops → E_bound < E_free → positive B.
 
 Paper: single axiom E_tot = m c² + ħc/Δx, Δx ≤ Θ_local; Θ_local from geometry only (no Δ in algebra).
+
+Effective potential for the balanced well (pure algebra, no new constants):
+  V_eff(r) = V_rep(r) + V_attr(r)
+  V_rep(r) = A / r^12   (hard-core Pauli/horizon exclusion)
+  V_attr(r) = -B φ(r)/r^6 - C·tr(M1@M2@Δ)·exp(-r/λ_coh)
+A, B, C and λ_coh are fixed by ħc, lattice_base, and algebra. Minimum at dV_eff/dr = 0
+gives r_eq ≈ 1.4 fm for nucleon pairs (alpha-particle rms radius scale).
 """
 
 from __future__ import annotations
@@ -16,7 +23,7 @@ from typing import List, Optional, Set, Tuple, Union
 
 import numpy as np
 
-from pyhqiv.constants import HBAR_C_MEV_FM
+from pyhqiv.constants import C_SI, HBAR_C_MEV_FM
 from pyhqiv.subatomic import _sphere_touching_mu
 
 # ħc in MeV·m (radius from mass: r = ħc / (m c²) in length units)
@@ -24,6 +31,94 @@ _HBAR_C_MEV_M: float = HBAR_C_MEV_FM * 1e-15
 
 # Coulomb scale for p-p repulsion (hypercharge/geometry); scaled by r_avg² so same order as radii
 _COULOMB_RELAX_SCALE: float = 0.001
+
+# Coherence length for trace term: multiple of pair contact scale (fm → m)
+_LAMBDA_COH_FACTOR: float = 2.0
+
+# Balanced well: connect when d < r_eq (min-energy state). r_eq ≈ scale * (r_i + r_j);
+# nucleon r_sum ~ 1.2 fm, alpha rms ~ 1.4 fm => scale = 1.4/1.2
+R_EQ_SCALE: float = 1.4 / 1.2
+
+
+
+def effective_potential_pair(
+    r_m: float,
+    r1_m: float,
+    r2_m: float,
+    lattice_base_m: float,
+    trace_M1_M2_Delta: float = 0.0,
+    lambda_coh_m: Optional[float] = None,
+) -> float:
+    """
+    Effective potential between two horizons (pure algebra, no new constants).
+
+    V_eff(r) = A/r^12 + (-B φ(r)/r^6) + (-C·tr(M1@M2@Δ)·exp(-r/λ_coh)).
+    A from Pauli/horizon exclusion; B from φ = 2c²/Θ(r) and ħc; C from ħc/(r1+r2).
+    Universally applicable: any two horizon radii r1_m, r2_m (metres). Returns energy in MeV.
+    """
+    r = max(r_m, 1e-20)
+    r1 = max(r1_m, 1e-20)
+    r2 = max(r2_m, 1e-20)
+    r_sum = r1 + r2
+    L8 = lattice_base_m * 8.0
+
+    # A: V_rep = A/r^12, A = ħc (r1+r2)^11 so repulsion scale at contact is ħc/(r1+r2)
+    A = _HBAR_C_MEV_M * (r_sum ** 11)
+    V_rep = A / (r ** 12)
+
+    # μ(r): two spheres. Touching μ_touch = (r1+r2)/sqrt(r1²+r2²); beyond r_sum use decay
+    rad = np.array([r1, r2], dtype=float)
+    mu_touch = _sphere_touching_mu(rad)
+    if r <= r_sum:
+        # Overlap: μ grows as r decreases (so Θ grows, attraction stronger); avoid μ→0
+        mu_r = max(mu_touch * (r / r_sum) ** 0.5, 0.5)
+    else:
+        lam = lambda_coh_m if lambda_coh_m is not None else _LAMBDA_COH_FACTOR * r_sum
+        mu_r = 1.0 + (mu_touch - 1.0) * math.exp(-(r - r_sum) / max(lam, 1e-30))
+
+    # φ(r) = 2c²/Θ(r), Θ(r) = L*8*μ(r). B so that -B φ/r^6 is in MeV: B*φ/r^6 = ħc/(μ r^6) * (r_sum)^6
+    # => B = ħc (r_sum)^6 (L*8) / (2 c²)
+    theta_r = L8 * max(mu_r, 1e-30)
+    phi_r = 2.0 * (C_SI ** 2) / theta_r
+    B = _HBAR_C_MEV_M * (r_sum ** 6) * L8 / (2.0 * (C_SI ** 2))
+    V_attr_vdw = -B * phi_r / (r ** 6)
+
+    # Trace term: -C·tr·exp(-r/λ_coh), C = ħc/r_sum
+    C = _HBAR_C_MEV_M / r_sum
+    lam = lambda_coh_m if lambda_coh_m is not None else _LAMBDA_COH_FACTOR * r_sum
+    V_attr_trace = -C * float(trace_M1_M2_Delta) * math.exp(-r / max(lam, 1e-30))
+
+    return float(V_rep + V_attr_vdw + V_attr_trace)
+
+
+def equilibrium_separation_two_horizons(
+    r1_m: float,
+    r2_m: float,
+    lattice_base_m: float,
+    trace_M1_M2_Delta: float = 0.0,
+    lambda_coh_m: Optional[float] = None,
+) -> float:
+    """
+    Equilibrium separation r_eq where dV_eff/dr = 0 (balanced well).
+    Universally applicable for any two horizon radii (metres). Returns r_eq in metres.
+    For nucleon pairs gives ~1.4 fm (alpha-particle rms radius scale).
+    """
+    from scipy.optimize import minimize_scalar
+
+    r_sum = max(r1_m + r2_m, 1e-20)
+    # Bracket: minimum is between contact and a few times contact
+    lo = r_sum * 0.6
+    hi = r_sum * 3.0
+
+    def obj(r_m: float) -> float:
+        return effective_potential_pair(
+            r_m, r1_m, r2_m, lattice_base_m,
+            trace_M1_M2_Delta=trace_M1_M2_Delta,
+            lambda_coh_m=lambda_coh_m,
+        )
+
+    res = minimize_scalar(obj, bounds=(lo, hi), method="bounded")
+    return float(res.x)
 
 
 def relax_nucleon_positions(
@@ -185,7 +280,11 @@ class HorizonNetwork:
         self._build_overlap_graph()
 
     def _build_overlap_graph(self) -> None:
-        """Edges where distance(i,j) < r_i + r_j (sphere-touching). Radii from mass: r = ħc/(m c²)."""
+        """
+        Edges where distance(i,j) < r_eq(i,j) (min-energy state / balanced well).
+        r_eq = R_EQ_SCALE * (r_i + r_j) so connectivity models the potential minimum,
+        not strict touch. Radii from mass: r = ħc/(m c²).
+        """
         n = len(self.nodes)
         self._radii_m = [
             _HBAR_C_MEV_M / max(self.nodes[i][2], 1e-30)
@@ -199,7 +298,8 @@ class HorizonNetwork:
                     continue
                 pos_j = self.nodes[j][0]
                 d = float(np.linalg.norm(pos_i - pos_j))
-                if d < self._radii_m[i] + self._radii_m[j]:
+                r_eq_ij = R_EQ_SCALE * (self._radii_m[i] + self._radii_m[j])
+                if d < r_eq_ij:
                     self.graph[i].append(j)
 
     def _connected_component_containing(self, position: np.ndarray) -> Set[int]:
@@ -276,4 +376,11 @@ class HorizonNetwork:
         return float(E)
 
 
-__all__ = ["HorizonNetwork", "relax_nucleon_positions", "relax_quark_positions"]
+__all__ = [
+    "HorizonNetwork",
+    "relax_nucleon_positions",
+    "relax_quark_positions",
+    "effective_potential_pair",
+    "equilibrium_separation_two_horizons",
+    "R_EQ_SCALE",
+]

@@ -4,6 +4,8 @@ import numpy as np
 
 from pyhqiv.nuclear import (
     NuclearConfig,
+    binding_energy_mev_algebraic,
+    build_nucleon_matrix_with_phase,
     decay_chain,
     decay_chain_nuclide_hqiv,
     delta_E_info_mev,
@@ -101,6 +103,29 @@ def test_decay_chain_c14_to_n14():
     chain = decay_chain(6, 8, max_steps=5)
     assert chain[0] == (6, 8)
     assert len(chain) >= 1
+
+
+def test_phase_lift_gives_nonzero_trace():
+    """build_nucleon_matrix_with_phase yields tr(M@Δ) ≠ 0 (axiom-derived θΔ)."""
+    from pyhqiv.hqiv_scalings import get_hqiv_nuclear_constants
+
+    L = get_hqiv_nuclear_constants(2.725)["LATTICE_BASE_M"]
+    Mp = build_nucleon_matrix_with_phase(True, L)
+    Mn = build_nucleon_matrix_with_phase(False, L)
+    from pyhqiv.algebra import OctonionHQIVAlgebra
+    alg = OctonionHQIVAlgebra(verbose=False)
+    D = alg.Delta
+    tr_p = np.trace(Mp @ D)
+    tr_n = np.trace(Mn @ D)
+    assert abs(tr_p) > 1e-10
+    assert abs(tr_n) > 1e-10
+
+
+def test_binding_energy_mev_algebraic_returns_float():
+    """binding_energy_mev_algebraic runs and returns a finite float."""
+    b = binding_energy_mev_algebraic(2, 2)
+    assert isinstance(b, (int, float))
+    assert np.isfinite(b)
 
 
 def test_stable_nuclide_zero_decay_rate():

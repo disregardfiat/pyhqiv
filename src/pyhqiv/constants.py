@@ -51,6 +51,8 @@ H0_KM_S_MPC_PAPER: Final[float] = (
 # --- SI (for fields / FDTD) ---
 C_SI: Final[float] = 2.99792458e8  # m/s
 E_PL_SI: Final[float] = 1.956e9  # Planck energy in J
+J_TO_MEV: Final[float] = 1.0 / 1.602176634e-13  # MeV per J (CODATA)
+E_PL_MEV: Final[float] = E_PL_SI * J_TO_MEV  # Planck energy in MeV (~1.22e22)
 HBAR_SI: Final[float] = 1.054571817e-34  # J·s
 K_B_SI: Final[float] = 1.380649e-23  # J/K
 # Planck length (m); √(ℏG/c³). For 0 < x < θ horizon-distance ratio in lattice.
