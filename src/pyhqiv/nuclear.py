@@ -44,6 +44,7 @@ from pyhqiv.horizon_network import (
     equilibrium_separation_two_horizons,
     relax_nucleon_positions,
 )
+from pyhqiv.subatomic import quark_nodes_for_nucleon
 
 # Element symbol → (P, N_default) for naming and Nuclide parsing only
 _ELEMENT_PN: dict = {
@@ -292,6 +293,24 @@ def _quark_level_bound_thetas(
     return theta_bound
 
 
+def expand_to_quarks(
+    nucleon_nodes: List[Tuple[np.ndarray, np.ndarray, float]],
+    is_proton: List[bool],
+    algebra=None,
+) -> List[Tuple[np.ndarray, np.ndarray, float]]:
+    """
+    Expand each nucleon node to 3 quark nodes (position, 8×8, mass_mev).
+
+    For A ≤ 2 (deuteron or lighter), HorizonNetwork on the 6-node graph gives
+    cleaner geometry and exact decay threshold (Lucas prototypes).
+    """
+    out: List[Tuple[np.ndarray, np.ndarray, float]] = []
+    for i, (pos, _, _) in enumerate(nucleon_nodes):
+        is_p = is_proton[i] if i < len(is_proton) else True
+        out.extend(quark_nodes_for_nucleon(is_p, pos, algebra=algebra))
+    return out
+
+
 def _binding_energy_via_network(
     P: int,
     N: int,
@@ -334,15 +353,26 @@ def _binding_energy_via_network(
     r_p = hbar_c_mev_m / M_PROTON_MEV
     r_n = hbar_c_mev_m / M_NEUTRON_MEV
     radii_m = np.array([r_p] * P + [r_n] * N)
-    is_proton = [True] * P + [False] * N
-    positions = minimize_nucleon_configuration(radii_m, is_proton, lattice_base_m, algebra)
+    is_proton_list = [True] * P + [False] * N
+    positions = minimize_nucleon_configuration(radii_m, is_proton_list, lattice_base_m, algebra)
     nodes = (
         [(positions[i], M_p, M_PROTON_MEV) for i in range(P)]
         + [(positions[P + j], M_n, M_NEUTRON_MEV) for j in range(N)]
     )
-    net_bound = HorizonNetwork(nodes, lattice_base_m, algebra=algebra)
-    E_bound = net_bound.total_energy()
-    theta_bound = net_bound.effective_theta_array()
+    if A <= 2:
+        # 6-quark mode: uud + udd feel the network together (exact decay threshold)
+        quark_nodes = expand_to_quarks(nodes, is_proton_list, algebra=algebra)
+        net_bound = HorizonNetwork(quark_nodes, lattice_base_m, algebra=algebra)
+        E_bound = net_bound.total_energy()
+        theta_per_quark = net_bound.effective_theta_array()
+        theta_bound = np.array([
+            (theta_per_quark[3 * n] * theta_per_quark[3 * n + 1] * theta_per_quark[3 * n + 2]) ** (1.0 / 3.0)
+            for n in range(A)
+        ])
+    else:
+        net_bound = HorizonNetwork(nodes, lattice_base_m, algebra=algebra)
+        E_bound = net_bound.total_energy()
+        theta_bound = net_bound.effective_theta_array()
     return (float(E_free - E_bound), theta_bound)
 
 

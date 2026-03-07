@@ -23,7 +23,8 @@ from typing import List, Optional, Set, Tuple, Union
 
 import numpy as np
 
-from pyhqiv.constants import C_SI, HBAR_C_MEV_FM
+from pyhqiv.constants import C_SI, GAMMA, HBAR_C_MEV_FM, M_TRANS
+from pyhqiv.lattice import DiscreteNullLattice
 from pyhqiv.subatomic import _sphere_touching_mu
 
 # ħc in MeV·m (radius from mass: r = ħc / (m c²) in length units)
@@ -38,6 +39,22 @@ _LAMBDA_COH_FACTOR: float = 2.0
 # Balanced well: connect when d < r_eq (min-energy state). r_eq ≈ scale * (r_i + r_j);
 # nucleon r_sum ~ 1.2 fm, alpha rms ~ 1.4 fm => scale = 1.4/1.2
 R_EQ_SCALE: float = 1.4 / 1.2
+
+
+def mean_field_mu(density_fm3: float, r_n: float = 1.2e-15) -> float:
+    """
+    Analytic μ in the mean-field limit (N → ∞): sqrt(1 + avg_neighbors).
+
+    For real neutron stars (10^57 nucleons), use this instead of the exact graph.
+    avg_neighbors = (4/3) π (2 r_n)³ × density; r_n in m, density_fm3 in fm⁻³.
+    Plug into effective_theta_local for EOS / TOV (fluid.py, orbit.py).
+    """
+    r_n_m = float(r_n)
+    # density_fm3 is per fm³; 1 fm³ = 1e-45 m³ so n_per_m3 = density_fm3 * 1e45
+    n_per_m3 = density_fm3 * 1e45
+    volume_per_neighbor = (4.0 / 3.0) * np.pi * (2.0 * r_n_m) ** 3
+    avg_neighbors = volume_per_neighbor * n_per_m3
+    return float(np.sqrt(1.0 + max(avg_neighbors, 0.0)))
 
 
 
@@ -367,13 +384,27 @@ class HorizonNetwork:
             return np.array([])
         return np.array([self.effective_theta_for_index(i) for i in range(len(self.nodes))], dtype=float)
 
+    def _network_binding_correction_mev(self, E_net_mev: float) -> float:
+        """
+        Lattice scale fix from axiom only: correction = E_net × (1/(m_eff+1)) × (N/m_trans).
+
+        m_eff from total system energy; m_trans from DiscreteNullLattice. No free constants.
+        Subtracted from E_net so bound state energy drops (binding increases).
+        """
+        m_trans = getattr(self, "_lattice_m_trans", M_TRANS)
+        m_eff = max(1, int(E_net_mev / 1000.0))
+        N = len(self.nodes)
+        return E_net_mev * (1.0 / (m_eff + 1.0)) * (N / m_trans)
+
     def total_energy(self) -> float:
-        """Paper axiom: E = Σ (mass_mev + ħc/Δx), Δx = Θ_local."""
+        """Paper axiom: E = Σ (mass_mev + ħc/Δx), Δx = Θ_local, minus lattice δE binding correction."""
         E = 0.0
         for i, (pos, _, mass_mev) in enumerate(self.nodes):
             theta = self.effective_theta_local(pos)
             E += mass_mev + _HBAR_C_MEV_M / max(theta, 1e-30)
-        return float(E)
+        E_net = float(E)
+        correction = self._network_binding_correction_mev(E_net)
+        return E_net - correction
 
 
 __all__ = [
@@ -382,5 +413,6 @@ __all__ = [
     "relax_quark_positions",
     "effective_potential_pair",
     "equilibrium_separation_two_horizons",
+    "mean_field_mu",
     "R_EQ_SCALE",
 ]

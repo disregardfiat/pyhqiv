@@ -22,7 +22,7 @@ See docs/binding_energy_walkthrough.md (§6.1 full matrix, color vs Coulomb).
 
 from __future__ import annotations
 
-from typing import List, Tuple
+from typing import List, Tuple  # Tuple for quark_nodes_for_nucleon
 
 import numpy as np
 
@@ -348,6 +348,41 @@ def quark_binding_angles(flavor_content: str) -> np.ndarray:
     return _quark_binding_angles(flavor_content)
 
 
+def quark_coulomb_energy_mev(flavor_content: str) -> float:
+    """
+    Electrostatic energy (MeV) of the equilibrium 3-quark configuration.
+
+    E_Coul = (α ℏc) Σ_{i<j} Q_i Q_j / d_ij. Public helper for network/quark-level binding.
+    """
+    return _quark_coulomb_energy_mev(flavor_content)
+
+
+def quark_nodes_for_nucleon(
+    is_proton: bool,
+    center_position: np.ndarray,
+    algebra=None,
+) -> List[Tuple[np.ndarray, np.ndarray, float]]:
+    """
+    Three quark nodes (position, 8×8 state_matrix, mass_mev) for one nucleon.
+
+    Used by expand_to_quarks: build HorizonNetwork on 3A quark nodes for A nucleons.
+    Positions from relax_quark_positions (charge-driven geometry) shifted to center.
+    """
+    from pyhqiv.horizon_network import relax_quark_positions
+
+    flavor = "uud" if is_proton else "udd"
+    radii = _quark_radii_for_flavor(flavor)
+    charges = _quark_charges(flavor)
+    rel_pos = relax_quark_positions(radii, charges)
+    mats = quark_state_matrices_for_nucleon(is_proton, algebra=algebra)
+    center = np.asarray(center_position, dtype=float).reshape(3)
+    masses = (M_U_MEV_QCD, M_U_MEV_QCD, M_D_MEV_QCD) if is_proton else (M_U_MEV_QCD, M_D_MEV_QCD, M_D_MEV_QCD)
+    return [
+        (center + rel_pos[i], mats[i], masses[i])
+        for i in range(3)
+    ]
+
+
 __all__ = [
     "CONSTITUENTS_PROTON",
     "CONSTITUENTS_NEUTRON",
@@ -366,4 +401,6 @@ __all__ = [
     "make_neutron_from_quark_states",
     "quark_state_matrix",
     "quark_state_matrices_for_nucleon",
+    "quark_coulomb_energy_mev",
+    "quark_nodes_for_nucleon",
 ]
