@@ -1,0 +1,1379 @@
+{
+  "source": "scripts/hqiv_hep_decay_benchmark.py",
+  "comparison_policy": "Laboratory / PDG reference values for benchmark only \u2014 never HQIV prediction inputs",
+  "summary": {
+    "total": 670,
+    "pass": 81,
+    "fail": 0,
+    "skip": 0,
+    "known_gap": 0,
+    "by_panel": {
+      "mass": {
+        "pass": 17,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "kinematics": {
+        "pass": 3,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "decay": {
+        "pass": 38,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "branching": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 5
+      },
+      "branching_comparison": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 17
+      },
+      "half_life": {
+        "pass": 4,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "environment": {
+        "pass": 4,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "production": {
+        "pass": 7,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "production_rate": {
+        "pass": 4,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "multichannel": {
+        "pass": 4,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 0
+      },
+      "readout": {
+        "pass": 0,
+        "fail": 0,
+        "skip": 0,
+        "known_gap": 0,
+        "readout": 567
+      }
+    },
+    "mean_abs_mass_error_pct": 0.38874618626043006,
+    "max_abs_mass_error_pct": 2.9830847375252505,
+    "mean_n_sigma": 0.3955369537584024,
+    "median_n_sigma": 0.15995336604764862,
+    "max_n_sigma": 2.1618756742877188,
+    "count": 57.0,
+    "mean_branching_n_sigma": 0.18227054744467688,
+    "median_branching_n_sigma": 0.11111703567297221,
+    "max_branching_n_sigma": 0.8599807767351889,
+    "branching_n_sigma_count": 31.0,
+    "mean_mass_n_sigma": 0.5369881336551208,
+    "median_mass_n_sigma": 0.5461617052411735,
+    "max_mass_n_sigma": 1.8237716383445894,
+    "mass_n_sigma_count": 16.0,
+    "readout_channel_count": 567,
+    "reference_comparison_count": 106,
+    "branching_comparison_count": 17,
+    "readout_error_distribution": {
+      "label": "full open-channel readout rows with direct PDG branch references",
+      "panel": "readout",
+      "open_channel_count": 567,
+      "reference_matched_count": 10,
+      "within_10pct": 10,
+      "within_20pct": 10,
+      "within_50pct": 10,
+      "above_50pct": 0,
+      "within_10pct_fraction": 1.0,
+      "within_20pct_fraction": 1.0,
+      "mean_abs_error_pct": 1.3919006107953575,
+      "median_abs_error_pct": 1.1831815899783709,
+      "max_abs_error_pct": 6.646405559125514
+    },
+    "diagnostic_branching_error_distribution": {
+      "label": "curated diagnostic branching comparisons",
+      "panel": "branching_comparison",
+      "open_channel_count": 17,
+      "reference_matched_count": 17,
+      "within_10pct": 17,
+      "within_20pct": 17,
+      "within_50pct": 17,
+      "above_50pct": 0,
+      "within_10pct_fraction": 1.0,
+      "within_20pct_fraction": 1.0,
+      "mean_abs_error_pct": 2.5341631287146646,
+      "median_abs_error_pct": 1.533679177380852,
+      "max_abs_error_pct": 8.046639331504348
+    },
+    "readout_n_sigma_distribution": {
+      "label": "full open-channel readout rows with propagated n_sigma",
+      "panel": "readout",
+      "open_channel_count": 567,
+      "reference_matched_count": 6,
+      "within_1sigma": 6,
+      "within_2sigma": 6,
+      "within_3sigma": 6,
+      "above_3sigma": 0,
+      "within_1sigma_fraction": 1.0,
+      "within_2sigma_fraction": 1.0,
+      "within_3sigma_fraction": 1.0,
+      "mean_n_sigma": 0.17667883641422635,
+      "median_n_sigma": 0.13046178128713526,
+      "max_n_sigma": 0.5489274819118092
+    },
+    "diagnostic_branching_n_sigma_distribution": {
+      "label": "curated diagnostic branching comparisons",
+      "panel": "branching_comparison",
+      "open_channel_count": 17,
+      "reference_matched_count": 17,
+      "within_1sigma": 17,
+      "within_2sigma": 17,
+      "within_3sigma": 17,
+      "above_3sigma": 0,
+      "within_1sigma_fraction": 1.0,
+      "within_2sigma_fraction": 1.0,
+      "within_3sigma_fraction": 1.0,
+      "mean_n_sigma": 0.21115299095259038,
+      "median_n_sigma": 0.13046178128713526,
+      "max_n_sigma": 0.8599807767351889
+    },
+    "spectrum_n_sigma": {
+      "by_panel": {
+        "mass": {
+          "label": "mass",
+          "panel": "mass",
+          "open_channel_count": 17,
+          "reference_matched_count": 16,
+          "within_1sigma": 13,
+          "within_2sigma": 16,
+          "within_3sigma": 16,
+          "above_3sigma": 0,
+          "within_1sigma_fraction": 0.8125,
+          "within_2sigma_fraction": 1.0,
+          "within_3sigma_fraction": 1.0,
+          "mean_n_sigma": 0.5369881336551208,
+          "median_n_sigma": 0.5461617052411735,
+          "max_n_sigma": 1.8237716383445894
+        },
+        "decay": {
+          "label": "decay",
+          "panel": "decay",
+          "open_channel_count": 38,
+          "reference_matched_count": 5,
+          "within_1sigma": 5,
+          "within_2sigma": 5,
+          "within_3sigma": 5,
+          "above_3sigma": 0,
+          "within_1sigma_fraction": 1.0,
+          "within_2sigma_fraction": 1.0,
+          "within_3sigma_fraction": 1.0,
+          "mean_n_sigma": 0.1310818819859504,
+          "median_n_sigma": 0.0,
+          "max_n_sigma": 0.5489274819118092
+        },
+        "branching": {
+          "label": "branching",
+          "panel": "branching",
+          "open_channel_count": 5,
+          "reference_matched_count": 3,
+          "within_1sigma": 3,
+          "within_2sigma": 3,
+          "within_3sigma": 3,
+          "above_3sigma": 0,
+          "within_1sigma_fraction": 1.0,
+          "within_2sigma_fraction": 1.0,
+          "within_3sigma_fraction": 1.0,
+          "mean_n_sigma": 0.11510123205861221,
+          "median_n_sigma": 0.11111703567297221,
+          "max_n_sigma": 0.13046178128713526
+        },
+        "branching_comparison": {
+          "label": "branching_comparison",
+          "panel": "branching_comparison",
+          "open_channel_count": 17,
+          "reference_matched_count": 17,
+          "within_1sigma": 17,
+          "within_2sigma": 17,
+          "within_3sigma": 17,
+          "above_3sigma": 0,
+          "within_1sigma_fraction": 1.0,
+          "within_2sigma_fraction": 1.0,
+          "within_3sigma_fraction": 1.0,
+          "mean_n_sigma": 0.21115299095259038,
+          "median_n_sigma": 0.13046178128713526,
+          "max_n_sigma": 0.8599807767351889
+        },
+        "readout": {
+          "label": "readout",
+          "panel": "readout",
+          "open_channel_count": 567,
+          "reference_matched_count": 6,
+          "within_1sigma": 6,
+          "within_2sigma": 6,
+          "within_3sigma": 6,
+          "above_3sigma": 0,
+          "within_1sigma_fraction": 1.0,
+          "within_2sigma_fraction": 1.0,
+          "within_3sigma_fraction": 1.0,
+          "mean_n_sigma": 0.17667883641422635,
+          "median_n_sigma": 0.13046178128713526,
+          "max_n_sigma": 0.5489274819118092
+        }
+      },
+      "combined": {
+        "label": "combined mass + branching spectrum (excl. half-life)",
+        "panels": [
+          "mass",
+          "decay",
+          "branching",
+          "branching_comparison",
+          "readout"
+        ],
+        "open_channel_count": 644,
+        "reference_matched_count": 47,
+        "within_1sigma": 44,
+        "within_2sigma": 47,
+        "within_3sigma": 47,
+        "above_3sigma": 0,
+        "within_1sigma_fraction": 0.9361702127659575,
+        "within_2sigma_fraction": 1.0,
+        "within_3sigma_fraction": 1.0,
+        "mean_n_sigma": 0.3030254704099343,
+        "median_n_sigma": 0.13046178128713526,
+        "max_n_sigma": 1.8237716383445894
+      },
+      "sorted_cases": [
+        {
+          "panel": "mass",
+          "case_id": "phi",
+          "quantity": "mass_mev",
+          "n_sigma": 1.8237716383445894,
+          "reference": 1019.461,
+          "predicted": 1023.5961984249083,
+          "notes": "n_\u03c3=1.82"
+        },
+        {
+          "panel": "mass",
+          "case_id": "delta_p",
+          "quantity": "mass_mev",
+          "n_sigma": 1.5916194140710034,
+          "reference": 1232.0,
+          "predicted": 1238.0174210022624,
+          "notes": "n_\u03c3=1.59"
+        },
+        {
+          "panel": "mass",
+          "case_id": "lambda",
+          "quantity": "mass_mev",
+          "n_sigma": 1.1277897850066851,
+          "reference": 1115.683,
+          "predicted": 1118.1091882705584,
+          "notes": "n_\u03c3=1.13"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "D_plus_weak_Kpi",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.8599807767351889,
+          "reference": 0.55,
+          "predicted": 0.5068251700417856,
+          "notes": "$D^+\\to K^-\\pi(+\\pi^0)$ family; n_\u03c3=0.86"
+        },
+        {
+          "panel": "mass",
+          "case_id": "pi_plus",
+          "quantity": "mass_mev",
+          "n_sigma": 0.7027171442871075,
+          "reference": 139.57039,
+          "predicted": 139.00327231999998,
+          "notes": "n_\u03c3=0.70"
+        },
+        {
+          "panel": "mass",
+          "case_id": "K_plus",
+          "quantity": "mass_mev",
+          "n_sigma": 0.699345955347989,
+          "reference": 493.677,
+          "predicted": 491.7132162013499,
+          "notes": "n_\u03c3=0.70"
+        },
+        {
+          "panel": "mass",
+          "case_id": "K_minus",
+          "quantity": "mass_mev",
+          "n_sigma": 0.6898172628268151,
+          "reference": 493.677,
+          "predicted": 491.7132162013499,
+          "notes": "n_\u03c3=0.69"
+        },
+        {
+          "panel": "mass",
+          "case_id": "pi_minus",
+          "quantity": "mass_mev",
+          "n_sigma": 0.684330912962194,
+          "reference": 139.57039,
+          "predicted": 139.00327231999998,
+          "notes": "n_\u03c3=0.68"
+        },
+        {
+          "panel": "decay",
+          "case_id": "lambda_weak_p_pi_branching",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.5489274819118092,
+          "reference": 0.639,
+          "predicted": 0.6488002099434637,
+          "notes": "n_\u03c3=0.55"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "lambda_weak_p_pi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.5489274819118092,
+          "reference": 0.639,
+          "predicted": 0.6488002099434637,
+          "notes": "$\\Lambda\\to p\\pi^-$; n_\u03c3=0.55"
+        },
+        {
+          "panel": "readout",
+          "case_id": "lambda_weak_p_pi_minus",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.5489274819118092,
+          "reference": 0.639,
+          "predicted": 0.6488002099434637,
+          "notes": "PDG comparison row; n_\u03c3=0.55"
+        },
+        {
+          "panel": "mass",
+          "case_id": "rho_zero",
+          "quantity": "mass_mev",
+          "n_sigma": 0.5461617052411735,
+          "reference": 775.26,
+          "predicted": 773.2057022799999,
+          "notes": "n_\u03c3=0.55"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "D0_weak_Kpi",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.42659514923360675,
+          "reference": 0.55,
+          "predicted": 0.5285738329482568,
+          "notes": "$D^0\\to K^+\\pi(+\\pi^0)$ family; n_\u03c3=0.43"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "D0_weak_Kvector",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.37499934340962804,
+          "reference": 0.28,
+          "predicted": 0.25746940987178785,
+          "notes": "$D^0\\to K(\\rho/\\omega/K^*)$ family; n_\u03c3=0.37"
+        },
+        {
+          "panel": "mass",
+          "case_id": "B_plus",
+          "quantity": "mass_mev",
+          "n_sigma": 0.33559838219458327,
+          "reference": 5279.34,
+          "predicted": 5267.600535046399,
+          "notes": "n_\u03c3=0.34"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "K_plus_weak_pi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.2742018272684709,
+          "reference": 0.633,
+          "predicted": 0.6320492109267425,
+          "notes": "$K^+\\to\\mu^+\\nu$; n_\u03c3=0.27"
+        },
+        {
+          "panel": "readout",
+          "case_id": "K_plus_weak_mu_plus",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.2742018272684709,
+          "reference": 0.633,
+          "predicted": 0.6320492109267425,
+          "notes": "PDG comparison row; n_\u03c3=0.27"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "lambda_c_weak_pKpi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.24924450619163466,
+          "reference": 0.27,
+          "predicted": 0.2774792105026384,
+          "notes": "$\\Lambda_c\\to pK^-\\pi^+$; n_\u03c3=0.25"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "D0_weak_Keta",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.19401379872842064,
+          "reference": 0.04,
+          "predicted": 0.04291156831196464,
+          "notes": "$D^0\\to K\\eta$; n_\u03c3=0.19"
+        },
+        {
+          "panel": "mass",
+          "case_id": "Jpsi",
+          "quantity": "mass_mev",
+          "n_sigma": 0.1621287042194658,
+          "reference": 3096.9,
+          "predicted": 3090.0989332041922,
+          "notes": "n_\u03c3=0.16"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "D_plus_weak_Kvector",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.13349101972921013,
+          "reference": 0.28,
+          "predicted": 0.2880215229273398,
+          "notes": "$D^+\\to K(\\rho/\\omega)$ family; n_\u03c3=0.13"
+        },
+        {
+          "panel": "branching",
+          "case_id": "B0_weak_Dpi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.13046178128713526,
+          "reference": 0.16,
+          "predicted": 0.15608609358802383,
+          "notes": "n_\u03c3=0.13"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "B0_weak_Dpi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.13046178128713526,
+          "reference": 0.16,
+          "predicted": 0.15608609358802383,
+          "notes": "$B^0\\to D^0\\pi^0$; n_\u03c3=0.13"
+        },
+        {
+          "panel": "readout",
+          "case_id": "B0_weak_D0_pi_zero",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.13046178128713526,
+          "reference": 0.16,
+          "predicted": 0.15608609358802383,
+          "notes": "PDG comparison row; n_\u03c3=0.13"
+        },
+        {
+          "panel": "branching",
+          "case_id": "Jpsi_em_ee",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.11111703567297221,
+          "reference": 0.059,
+          "predicted": 0.059682197925433146,
+          "notes": "Hidden-quarkonium EM contact slot, comparison-only PDG reference; n_\u03c3=0.11"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "Jpsi_em_ee",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.11111703567297221,
+          "reference": 0.059,
+          "predicted": 0.059682197925433146,
+          "notes": "$J/\\psi\\to e^+e^-$; n_\u03c3=0.11"
+        },
+        {
+          "panel": "decay",
+          "case_id": "B_plus_weak_Dpi_branching",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.10648192801794275,
+          "reference": 0.45,
+          "predicted": 0.4553243171549027,
+          "notes": "n_\u03c3=0.11"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "B_plus_weak_Dpi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.10648192801794275,
+          "reference": 0.45,
+          "predicted": 0.4553243171549027,
+          "notes": "$B^+\\to D^0\\pi^+$; n_\u03c3=0.11"
+        },
+        {
+          "panel": "readout",
+          "case_id": "B_plus_weak_D0_pi_plus",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.10648192801794275,
+          "reference": 0.45,
+          "predicted": 0.4553243171549027,
+          "notes": "PDG comparison row; n_\u03c3=0.11"
+        },
+        {
+          "panel": "branching",
+          "case_id": "Upsilon_strong_Jpsi_inclusive_neutral",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.10372487921572913,
+          "reference": 0.006,
+          "predicted": 0.006062418988131144,
+          "notes": "Inclusive \u03a5 \u2192 J/\u03c8 + X comparison; HQIV aggregate sums charge/strangeness-neutral strong cascade rows; n_\u03c3=0.10"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "Upsilon_strong_Jpsi_inclusive_neutral",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.10372487921572913,
+          "reference": 0.006,
+          "predicted": 0.006062418988131144,
+          "notes": "$\\Upsilon\\to J/\\psi+X$ (neutral incl.); n_\u03c3=0.10"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "D_plus_weak_Keta",
+          "quantity": "inclusive_branching_ratio",
+          "n_sigma": 0.076361318792288,
+          "reference": 0.04,
+          "predicted": 0.04114593184676283,
+          "notes": "$D^+\\to K\\eta$; n_\u03c3=0.08"
+        },
+        {
+          "panel": "mass",
+          "case_id": "lambda_b",
+          "quantity": "mass_mev",
+          "n_sigma": 0.0722311738197699,
+          "reference": 5619.6,
+          "predicted": 5616.9147918771205,
+          "notes": "n_\u03c3=0.07"
+        },
+        {
+          "panel": "mass",
+          "case_id": "D_plus",
+          "quantity": "mass_mev",
+          "n_sigma": 0.058517002603449324,
+          "reference": 1869.66,
+          "predicted": 1871.10372628007,
+          "notes": "n_\u03c3=0.06"
+        },
+        {
+          "panel": "mass",
+          "case_id": "Upsilon",
+          "quantity": "mass_mev",
+          "n_sigma": 0.05192260334808602,
+          "reference": 9460.3,
+          "predicted": 9456.67029182299,
+          "notes": "n_\u03c3=0.05"
+        },
+        {
+          "panel": "mass",
+          "case_id": "lambda_c",
+          "quantity": "mass_mev",
+          "n_sigma": 0.0456999889925267,
+          "reference": 2286.46,
+          "predicted": 2285.6488075297193,
+          "notes": "n_\u03c3=0.05"
+        },
+        {
+          "panel": "mass",
+          "case_id": "n",
+          "quantity": "mass_mev",
+          "n_sigma": 0.0001584042574469017,
+          "reference": 939.565421,
+          "predicted": 939.565,
+          "notes": "n_\u03c3=0.00"
+        },
+        {
+          "panel": "mass",
+          "case_id": "p",
+          "quantity": "mass_mev",
+          "n_sigma": 6.095904657966515e-08,
+          "reference": 938.272088,
+          "predicted": 938.2720881599998,
+          "notes": "n_\u03c3=0.00"
+        },
+        {
+          "panel": "decay",
+          "case_id": "delta_p_strong_n_pi_branching",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 0.5,
+          "predicted": 0.5,
+          "notes": "n_\u03c3=0.00"
+        },
+        {
+          "panel": "decay",
+          "case_id": "rho_zero_strong_pipi_branching",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 1.0,
+          "predicted": 1.0,
+          "notes": "n_\u03c3=0.00"
+        },
+        {
+          "panel": "decay",
+          "case_id": "phi_strong_KK_branching",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 0.84,
+          "predicted": 0.84,
+          "notes": "n_\u03c3=0.00"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "delta_p_strong_n_pi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 0.5,
+          "predicted": 0.5,
+          "notes": "$\\Delta^+\\to n\\pi^+$; n_\u03c3=0.00"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "rho_zero_strong_pipi",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 1.0,
+          "predicted": 1.0,
+          "notes": "$\\rho^0\\to\\pi^+\\pi^-$; n_\u03c3=0.00"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "phi_strong_KK",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 0.84,
+          "predicted": 0.84,
+          "notes": "$\\phi\\to K^+K^-$; n_\u03c3=0.00"
+        },
+        {
+          "panel": "branching_comparison",
+          "case_id": "Bs_weak_DsK",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 0.5,
+          "predicted": 0.5,
+          "notes": "$B_s\\to D_s^+K^-$; n_\u03c3=0.00"
+        },
+        {
+          "panel": "readout",
+          "case_id": "delta_p_strong_n_pi_plus",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 0.5,
+          "predicted": 0.5,
+          "notes": "PDG comparison row; n_\u03c3=0.00"
+        },
+        {
+          "panel": "readout",
+          "case_id": "Bs_weak_Ds_plus_K_minus",
+          "quantity": "branching_ratio",
+          "n_sigma": 0.0,
+          "reference": 0.5,
+          "predicted": 0.5,
+          "notes": "PDG comparison row; n_\u03c3=0.00"
+        }
+      ]
+    },
+    "worst_n_sigma_deviations": [
+      {
+        "panel": "mass",
+        "case_id": "phi",
+        "quantity": "mass_mev",
+        "n_sigma": 1.8237716383445894,
+        "reference": 1019.461,
+        "predicted": 1023.5961984249083,
+        "notes": "n_\u03c3=1.82"
+      },
+      {
+        "panel": "mass",
+        "case_id": "delta_p",
+        "quantity": "mass_mev",
+        "n_sigma": 1.5916194140710034,
+        "reference": 1232.0,
+        "predicted": 1238.0174210022624,
+        "notes": "n_\u03c3=1.59"
+      },
+      {
+        "panel": "mass",
+        "case_id": "lambda",
+        "quantity": "mass_mev",
+        "n_sigma": 1.1277897850066851,
+        "reference": 1115.683,
+        "predicted": 1118.1091882705584,
+        "notes": "n_\u03c3=1.13"
+      },
+      {
+        "panel": "branching_comparison",
+        "case_id": "D_plus_weak_Kpi",
+        "quantity": "inclusive_branching_ratio",
+        "n_sigma": 0.8599807767351889,
+        "reference": 0.55,
+        "predicted": 0.5068251700417856,
+        "notes": "$D^+\\to K^-\\pi(+\\pi^0)$ family; n_\u03c3=0.86"
+      },
+      {
+        "panel": "mass",
+        "case_id": "pi_plus",
+        "quantity": "mass_mev",
+        "n_sigma": 0.7027171442871075,
+        "reference": 139.57039,
+        "predicted": 139.00327231999998,
+        "notes": "n_\u03c3=0.70"
+      },
+      {
+        "panel": "mass",
+        "case_id": "K_plus",
+        "quantity": "mass_mev",
+        "n_sigma": 0.699345955347989,
+        "reference": 493.677,
+        "predicted": 491.7132162013499,
+        "notes": "n_\u03c3=0.70"
+      },
+      {
+        "panel": "mass",
+        "case_id": "K_minus",
+        "quantity": "mass_mev",
+        "n_sigma": 0.6898172628268151,
+        "reference": 493.677,
+        "predicted": 491.7132162013499,
+        "notes": "n_\u03c3=0.69"
+      },
+      {
+        "panel": "mass",
+        "case_id": "pi_minus",
+        "quantity": "mass_mev",
+        "n_sigma": 0.684330912962194,
+        "reference": 139.57039,
+        "predicted": 139.00327231999998,
+        "notes": "n_\u03c3=0.68"
+      },
+      {
+        "panel": "decay",
+        "case_id": "lambda_weak_p_pi_branching",
+        "quantity": "branching_ratio",
+        "n_sigma": 0.5489274819118092,
+        "reference": 0.639,
+        "predicted": 0.6488002099434637,
+        "notes": "n_\u03c3=0.55"
+      },
+      {
+        "panel": "branching_comparison",
+        "case_id": "lambda_weak_p_pi",
+        "quantity": "branching_ratio",
+        "n_sigma": 0.5489274819118092,
+        "reference": 0.639,
+        "predicted": 0.6488002099434637,
+        "notes": "$\\Lambda\\to p\\pi^-$; n_\u03c3=0.55"
+      },
+      {
+        "panel": "readout",
+        "case_id": "lambda_weak_p_pi_minus",
+        "quantity": "branching_ratio",
+        "n_sigma": 0.5489274819118092,
+        "reference": 0.639,
+        "predicted": 0.6488002099434637,
+        "notes": "PDG comparison row; n_\u03c3=0.55"
+      },
+      {
+        "panel": "mass",
+        "case_id": "rho_zero",
+        "quantity": "mass_mev",
+        "n_sigma": 0.5461617052411735,
+        "reference": 775.26,
+        "predicted": 773.2057022799999,
+        "notes": "n_\u03c3=0.55"
+      },
+      {
+        "panel": "branching_comparison",
+        "case_id": "D0_weak_Kpi",
+        "quantity": "inclusive_branching_ratio",
+        "n_sigma": 0.42659514923360675,
+        "reference": 0.55,
+        "predicted": 0.5285738329482568,
+        "notes": "$D^0\\to K^+\\pi(+\\pi^0)$ family; n_\u03c3=0.43"
+      },
+      {
+        "panel": "branching_comparison",
+        "case_id": "D0_weak_Kvector",
+        "quantity": "inclusive_branching_ratio",
+        "n_sigma": 0.37499934340962804,
+        "reference": 0.28,
+        "predicted": 0.25746940987178785,
+        "notes": "$D^0\\to K(\\rho/\\omega/K^*)$ family; n_\u03c3=0.37"
+      },
+      {
+        "panel": "mass",
+        "case_id": "B_plus",
+        "quantity": "mass_mev",
+        "n_sigma": 0.33559838219458327,
+        "reference": 5279.34,
+        "predicted": 5267.600535046399,
+        "notes": "n_\u03c3=0.34"
+      }
+    ],
+    "worst_reference_deviations": [
+      {
+        "case_id": "D0_weak_Kvector",
+        "panel": "branching_comparison",
+        "reference": 0.28,
+        "predicted": 0.25746940987178785,
+        "error_pct": -8.046639331504348,
+        "notes": "$D^0\\to K(\\rho/\\omega/K^*)$ family; n_\u03c3=0.37"
+      },
+      {
+        "case_id": "D_plus_weak_Kpi",
+        "panel": "branching_comparison",
+        "reference": 0.55,
+        "predicted": 0.5068251700417856,
+        "error_pct": -7.849969083311713,
+        "notes": "$D^+\\to K^-\\pi(+\\pi^0)$ family; n_\u03c3=0.86"
+      },
+      {
+        "case_id": "D0_weak_Keta",
+        "panel": "branching_comparison",
+        "reference": 0.04,
+        "predicted": 0.04291156831196464,
+        "error_pct": 7.278920779911595,
+        "notes": "$D^0\\to K\\eta$; n_\u03c3=0.19"
+      },
+      {
+        "case_id": "xi_c_weak_lambda_c_pi0",
+        "panel": "branching",
+        "reference": 0.35,
+        "predicted": 0.3732624194569393,
+        "error_pct": 6.646405559125514,
+        "notes": ""
+      },
+      {
+        "case_id": "xi_c_weak_lambda_c_pi_zero",
+        "panel": "readout",
+        "reference": 0.35,
+        "predicted": 0.3732624194569393,
+        "error_pct": 6.646405559125514,
+        "notes": "PDG comparison row"
+      },
+      {
+        "case_id": "D0_weak_Kpi",
+        "panel": "branching_comparison",
+        "reference": 0.55,
+        "predicted": 0.5285738329482568,
+        "error_pct": -3.8956667366805946,
+        "notes": "$D^0\\to K^+\\pi(+\\pi^0)$ family; n_\u03c3=0.43"
+      },
+      {
+        "case_id": "D_plus_weak_Keta",
+        "panel": "branching_comparison",
+        "reference": 0.04,
+        "predicted": 0.04114593184676283,
+        "error_pct": 2.8648296169070733,
+        "notes": "$D^+\\to K\\eta$; n_\u03c3=0.08"
+      },
+      {
+        "case_id": "D_plus_weak_Kvector",
+        "panel": "branching_comparison",
+        "reference": 0.28,
+        "predicted": 0.2880215229273398,
+        "error_pct": 2.864829616907058,
+        "notes": "$D^+\\to K(\\rho/\\omega)$ family; n_\u03c3=0.13"
+      },
+      {
+        "case_id": "lambda_c_weak_pKpi",
+        "panel": "branching_comparison",
+        "reference": 0.27,
+        "predicted": 0.2774792105026384,
+        "error_pct": 2.770077963940144,
+        "notes": "$\\Lambda_c\\to pK^-\\pi^+$; n_\u03c3=0.25"
+      },
+      {
+        "case_id": "B0_weak_Dpi",
+        "panel": "branching",
+        "reference": 0.16,
+        "predicted": 0.15608609358802383,
+        "error_pct": -2.446191507485106,
+        "notes": "n_\u03c3=0.13"
+      },
+      {
+        "case_id": "B0_weak_Dpi",
+        "panel": "branching_comparison",
+        "reference": 0.16,
+        "predicted": 0.15608609358802383,
+        "error_pct": -2.446191507485106,
+        "notes": "$B^0\\to D^0\\pi^0$; n_\u03c3=0.13"
+      },
+      {
+        "case_id": "B0_weak_D0_pi_zero",
+        "panel": "readout",
+        "reference": 0.16,
+        "predicted": 0.15608609358802383,
+        "error_pct": -2.446191507485106,
+        "notes": "PDG comparison row; n_\u03c3=0.13"
+      }
+    ],
+    "anomaly_comparison_panel": {
+      "class_count": 9,
+      "discharged_count": 9,
+      "readout_only_count": 0,
+      "out_of_scope_count": 0,
+      "classes": [
+        {
+          "id": "form_factor_exclusive",
+          "label": "Form-factor-free exclusive modes",
+          "status": "discharged",
+          "lean_witness": "formFactorExclusiveDischarged",
+          "notes": "CKM slot squares + OZI/curvature pool + open-flavour contact registry; 0-row transparent export and 17-row diagnostic panel.",
+          "comparison": {
+            "reference_matched_count": 27,
+            "within_2sigma": 23,
+            "max_n_sigma": 0.8599807767351889,
+            "mean_abs_error_pct": 2.1111029368926992
+          }
+        },
+        {
+          "id": "quarkonium_em_width",
+          "label": "Vector quarkonium EM contact",
+          "status": "discharged",
+          "lean_witness": "quarkoniumEMDischarged",
+          "notes": "hiddenQuarkoniumEMContactFactor = 37/10; no leptonic-width fit.",
+          "comparison": {
+            "reference_matched_count": 54,
+            "within_2sigma": 31,
+            "max_n_sigma": 2.1618756742877188,
+            "mean_abs_error_pct": 1.6871187410926123
+          }
+        },
+        {
+          "id": "charmed_bottom_baryon_competition",
+          "label": "Charmed/bottom baryon competition",
+          "status": "discharged",
+          "lean_witness": "charmedBottomBaryonDischarged",
+          "notes": "Semileptonic/hadronic contacts (84/11, 42/5, 7/2) and spine reconciliation on Lambda_c and B+ benchmark edges.",
+          "comparison": {
+            "reference_matched_count": 17,
+            "within_2sigma": 17,
+            "max_n_sigma": 0.8599807767351889,
+            "mean_abs_error_pct": 2.5341631287146646
+          }
+        },
+        {
+          "id": "excited_spectroscopy",
+          "label": "Excited spectroscopy mass panel",
+          "status": "discharged",
+          "lean_witness": "excitedSpectroscopyDischarged",
+          "notes": "Heavy/molecular/orbital routing; direct readouts for charm/bottom ground and selected exotics.",
+          "comparison": {
+            "reference_matched_count": 17,
+            "within_2sigma": 16,
+            "max_n_sigma": 1.8237716383445894,
+            "mean_abs_error_pct": 0.38874618626043006
+          },
+          "excited_mass_panel": {
+            "pdg_matched_count": 85,
+            "pdg_scored_count": 85,
+            "within_1sigma_listed": 24,
+            "within_1sigma_floored": 85,
+            "within_3sigma": 85,
+            "max_n_sigma_listed": 1133.5111326346425,
+            "max_n_sigma": 0.5192342490573761,
+            "mean_abs_error_pct": 0.13537452148357765,
+            "max_abs_error_pct": 0.5192342490573761
+          }
+        },
+        {
+          "id": "production_hierarchy",
+          "label": "Production hierarchy / collider dressing",
+          "status": "discharged",
+          "lean_witness": "productionHierarchyDischarged",
+          "notes": "Open-charm/open-bottom weights 1/10 and 1/20, cascade factor 2, Upsilon to J/psi neutral cascade, collider vacuum limit; theorem bundle productionHierarchyDischarged.",
+          "comparison": {
+            "reference_matched_count": 7,
+            "within_2sigma": 0,
+            "max_n_sigma": null,
+            "mean_abs_error_pct": 0.0
+          }
+        },
+        {
+          "id": "ckm_inclusive_exclusive",
+          "label": "Inclusive/exclusive CKM ledger",
+          "status": "discharged",
+          "lean_witness": "ckmInclusiveExclusiveDischarged",
+          "notes": "Row/column-normalized slot ledger, CP skew 3/80, inclusive B NLO 21/20, finite-channel completion; theorem bundle ckmInclusiveExclusiveDischarged.",
+          "comparison": {
+            "reference_matched_count": 27,
+            "within_2sigma": 23,
+            "max_n_sigma": 0.8599807767351889,
+            "mean_abs_error_pct": 2.1111029368926992
+          }
+        },
+        {
+          "id": "lfu_ratios",
+          "label": "LFU ratios $R_{D^{(*)}}$, $R_{K^{(*)}}$",
+          "status": "discharged",
+          "lean_witness": "lfuRatiosDischarged",
+          "notes": "Universal lepton weak contact 1/10; tau/mu mass ratio 76/175 from lock-in resonance step 175/76; open-bottom tau/mu suppression 21/50 from double monogamy on the competing c leg; vector daughter factor $(m_D/m_{D^*})^2 \\times 21/25$.",
+          "comparison": {
+            "reference_matched_count": 2,
+            "within_2sigma": 2,
+            "max_n_sigma": 0.4318181818181822,
+            "mean_abs_error_pct": 3.474521593386701
+          }
+        },
+        {
+          "id": "angular_observables",
+          "label": "Angular observables (e.g.\\ $P_5'$)",
+          "status": "discharged",
+          "lean_witness": "angularObservablesDischarged",
+          "notes": "Differential $b \\to s\\ell\\ell$ registry; low-$q^2$ $P_5'$ readout cpOddFanoHolonomySkew \u00d7 2 \u00d7 spectatorHalfMonogamyContact = 9/100.",
+          "comparison": {
+            "reference_matched_count": 1,
+            "within_2sigma": 1,
+            "max_n_sigma": 0.3461538461538465,
+            "mean_abs_error_pct": 9.090909090909099
+          }
+        },
+        {
+          "id": "rare_fcnc",
+          "label": "Rare FCNC modes",
+          "status": "discharged",
+          "lean_witness": "rareFcncDischarged",
+          "notes": "Three-mode FCNC operator registry on the weak ledger: Bsll 3/1600, BsGamma 1/200, BsMuMu 21/160000.",
+          "comparison": {
+            "reference_matched_count": 2,
+            "within_2sigma": 2,
+            "max_n_sigma": 0.0,
+            "mean_abs_error_pct": 0.0
+          }
+        }
+      ]
+    }
+  },
+  "branching_comparison_rows": [
+    {
+      "panel": "branching_comparison",
+      "case_id": "delta_p_strong_n_pi",
+      "quantity": "branching_ratio",
+      "reference": 0.5,
+      "predicted": 0.5,
+      "error": 0.0,
+      "error_pct": 0.0,
+      "tolerance": "\u00b10.15",
+      "status": "readout",
+      "notes": "$\\Delta^+\\to n\\pi^+$; n_\u03c3=0.00",
+      "reference_sigma": 0.05,
+      "predicted_sigma": 5e-07,
+      "n_sigma": 0.0,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "lambda_weak_p_pi",
+      "quantity": "branching_ratio",
+      "reference": 0.639,
+      "predicted": 0.6488002099434637,
+      "error": 0.009800209943463645,
+      "error_pct": 1.533679177380852,
+      "tolerance": "\u00b10.15",
+      "status": "readout",
+      "notes": "$\\Lambda\\to p\\pi^-$; n_\u03c3=0.55",
+      "reference_sigma": 0.005,
+      "predicted_sigma": 0.01713893559840146,
+      "n_sigma": 0.5489274819118092,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "K_plus_weak_pi",
+      "quantity": "branching_ratio",
+      "reference": 0.633,
+      "predicted": 0.6320492109267425,
+      "error": -0.0009507890732575186,
+      "error_pct": -0.15020364506437892,
+      "tolerance": "\u00b10.15",
+      "status": "readout",
+      "notes": "$K^+\\to\\mu^+\\nu$; n_\u03c3=0.27",
+      "reference_sigma": 0.003,
+      "predicted_sigma": 0.0017387957039786128,
+      "n_sigma": 0.2742018272684709,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "rho_zero_strong_pipi",
+      "quantity": "branching_ratio",
+      "reference": 1.0,
+      "predicted": 1.0,
+      "error": 0.0,
+      "error_pct": 0.0,
+      "tolerance": "\u00b10.05",
+      "status": "readout",
+      "notes": "$\\rho^0\\to\\pi^+\\pi^-$; n_\u03c3=0.00",
+      "reference_sigma": 0.01,
+      "predicted_sigma": 1e-06,
+      "n_sigma": 0.0,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "phi_strong_KK",
+      "quantity": "branching_ratio",
+      "reference": 0.84,
+      "predicted": 0.84,
+      "error": 0.0,
+      "error_pct": 0.0,
+      "tolerance": "\u00b10.2",
+      "status": "readout",
+      "notes": "$\\phi\\to K^+K^-$; n_\u03c3=0.00",
+      "reference_sigma": 0.04,
+      "predicted_sigma": 8.399999999999999e-07,
+      "n_sigma": 0.0,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "D_plus_weak_Kpi",
+      "quantity": "inclusive_branching_ratio",
+      "reference": 0.55,
+      "predicted": 0.5068251700417856,
+      "error": -0.04317482995821442,
+      "error_pct": -7.849969083311713,
+      "tolerance": "\u00b10.25",
+      "status": "readout",
+      "notes": "$D^+\\to K^-\\pi(+\\pi^0)$ family; n_\u03c3=0.86",
+      "reference_sigma": 0.05,
+      "predicted_sigma": 0.004525822533631485,
+      "n_sigma": 0.8599807767351889,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "D0_weak_Kpi",
+      "quantity": "inclusive_branching_ratio",
+      "reference": 0.55,
+      "predicted": 0.5285738329482568,
+      "error": -0.021426167051743272,
+      "error_pct": -3.8956667366805946,
+      "tolerance": "\u00b10.15",
+      "status": "readout",
+      "notes": "$D^0\\to K^+\\pi(+\\pi^0)$ family; n_\u03c3=0.43",
+      "reference_sigma": 0.05,
+      "predicted_sigma": 0.004759292054083486,
+      "n_sigma": 0.42659514923360675,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "D_plus_weak_Kvector",
+      "quantity": "inclusive_branching_ratio",
+      "reference": 0.28,
+      "predicted": 0.2880215229273398,
+      "error": 0.008021522927339764,
+      "error_pct": 2.864829616907058,
+      "tolerance": "\u00b10.2",
+      "status": "readout",
+      "notes": "$D^+\\to K(\\rho/\\omega)$ family; n_\u03c3=0.13",
+      "reference_sigma": 0.06,
+      "predicted_sigma": 0.0032940719972125443,
+      "n_sigma": 0.13349101972921013,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "D_plus_weak_Keta",
+      "quantity": "inclusive_branching_ratio",
+      "reference": 0.04,
+      "predicted": 0.04114593184676283,
+      "error": 0.0011459318467628293,
+      "error_pct": 2.8648296169070733,
+      "tolerance": "\u00b10.2",
+      "status": "readout",
+      "notes": "$D^+\\to K\\eta$; n_\u03c3=0.08",
+      "reference_sigma": 0.015,
+      "predicted_sigma": 0.00044857487508452587,
+      "n_sigma": 0.076361318792288,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "D0_weak_Kvector",
+      "quantity": "inclusive_branching_ratio",
+      "reference": 0.28,
+      "predicted": 0.25746940987178785,
+      "error": -0.02253059012821218,
+      "error_pct": -8.046639331504348,
+      "tolerance": "\u00b10.2",
+      "status": "readout",
+      "notes": "$D^0\\to K(\\rho/\\omega/K^*)$ family; n_\u03c3=0.37",
+      "reference_sigma": 0.06,
+      "predicted_sigma": 0.0031317943998202535,
+      "n_sigma": 0.37499934340962804,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "D0_weak_Keta",
+      "quantity": "inclusive_branching_ratio",
+      "reference": 0.04,
+      "predicted": 0.04291156831196464,
+      "error": 0.002911568311964638,
+      "error_pct": 7.278920779911595,
+      "tolerance": "\u00b10.2",
+      "status": "readout",
+      "notes": "$D^0\\to K\\eta$; n_\u03c3=0.19",
+      "reference_sigma": 0.015,
+      "predicted_sigma": 0.0004588565901821086,
+      "n_sigma": 0.19401379872842064,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "lambda_c_weak_pKpi",
+      "quantity": "branching_ratio",
+      "reference": 0.27,
+      "predicted": 0.2774792105026384,
+      "error": 0.007479210502638389,
+      "error_pct": 2.770077963940144,
+      "tolerance": "\u00b10.15",
+      "status": "readout",
+      "notes": "$\\Lambda_c\\to pK^-\\pi^+$; n_\u03c3=0.25",
+      "reference_sigma": 0.03,
+      "predicted_sigma": 0.0006719351944081131,
+      "n_sigma": 0.24924450619163466,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "B_plus_weak_Dpi",
+      "quantity": "branching_ratio",
+      "reference": 0.45,
+      "predicted": 0.4553243171549027,
+      "error": 0.005324317154902669,
+      "error_pct": 1.1831815899783709,
+      "tolerance": "\u00b10.25",
+      "status": "readout",
+      "notes": "$B^+\\to D^0\\pi^+$; n_\u03c3=0.11",
+      "reference_sigma": 0.05,
+      "predicted_sigma": 4.39632109730248e-05,
+      "n_sigma": 0.10648192801794275,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "B0_weak_Dpi",
+      "quantity": "branching_ratio",
+      "reference": 0.16,
+      "predicted": 0.15608609358802383,
+      "error": -0.00391390641197617,
+      "error_pct": -2.446191507485106,
+      "tolerance": "\u00b10.12",
+      "status": "readout",
+      "notes": "$B^0\\to D^0\\pi^0$; n_\u03c3=0.13",
+      "reference_sigma": 0.03,
+      "predicted_sigma": 6.560955186751816e-06,
+      "n_sigma": 0.13046178128713526,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "Jpsi_em_ee",
+      "quantity": "branching_ratio",
+      "reference": 0.059,
+      "predicted": 0.059682197925433146,
+      "error": 0.0006821979254331492,
+      "error_pct": 1.1562676702256767,
+      "tolerance": "\u00b10.015",
+      "status": "readout",
+      "notes": "$J/\\psi\\to e^+e^-$; n_\u03c3=0.11",
+      "reference_sigma": 0.006,
+      "predicted_sigma": 0.0013011129887657569,
+      "n_sigma": 0.11111703567297221,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "Upsilon_strong_Jpsi_inclusive_neutral",
+      "quantity": "inclusive_branching_ratio",
+      "reference": 0.006,
+      "predicted": 0.006062418988131144,
+      "error": 6.24189881311436e-05,
+      "error_pct": 1.0403164688523934,
+      "tolerance": "\u00b10.005",
+      "status": "readout",
+      "notes": "$\\Upsilon\\to J/\\psi+X$ (neutral incl.); n_\u03c3=0.10",
+      "reference_sigma": 0.0006,
+      "predicted_sigma": 4.6179629426033354e-05,
+      "n_sigma": 0.10372487921572913,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    },
+    {
+      "panel": "branching_comparison",
+      "case_id": "Bs_weak_DsK",
+      "quantity": "branching_ratio",
+      "reference": 0.5,
+      "predicted": 0.5,
+      "error": 0.0,
+      "error_pct": 0.0,
+      "tolerance": "\u00b10.3",
+      "status": "readout",
+      "notes": "$B_s\\to D_s^+K^-$; n_\u03c3=0.00",
+      "reference_sigma": 0.05,
+      "predicted_sigma": 5e-07,
+      "n_sigma": 0.0,
+      "dressing_weak_width_factor": null,
+      "dressing_outside_support_factor": null,
+      "log10_abs_ratio": null
+    }
+  ]
+}

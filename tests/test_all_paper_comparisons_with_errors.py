@@ -183,29 +183,22 @@ except Exception as e:
     print("m_p/m_e skipped:", e)
 
 try:
-    from pyhqiv.isotope_ladder import IsotopeLadderConfig, IsotopeState, nuclear_binding_energy_mev
-    from pyhqiv.lean_witnesses import load_lean_witnesses
-    from tests.data.nuclear_binding_reference import (
-        CODATA_2018_NEUTRON_MEV,
-        CODATA_2018_PROTON_MEV,
-        lookup_binding,
-    )
-    w = load_lean_witnesses().data
-    mp = float(w.get("derivedProtonMass_MeV", CODATA_2018_PROTON_MEV))
-    mn = float(w.get("derivedNeutronMass_MeV", CODATA_2018_NEUTRON_MEV))
-    cfg = IsotopeLadderConfig(shell_m=4, m_proton_mev=mp, m_neutron_mev=mn, rotational_scale_mev=0.0)
+    from pyhqiv.hqiv_nuclei import SPECTRA_DEUTERON_BINDING_MEV
+    from tests.data.nuclear_binding_reference import lookup_binding
+
     def _deuteron_b():
-        return nuclear_binding_energy_mev(IsotopeState(1,1,0.0), cfg)
-    refd = lookup_binding(1,1)
+        return float(SPECTRA_DEUTERON_BINDING_MEV)
+
+    refd = lookup_binding(1, 1)
     if refd:
         _add(
             "deuteron_binding_energy",
             _deuteron_b,
             refd.B_mev,
             refd.sigma_mev,
-            "AME2020; HQIV from horizon network / isotope ladder",
+            "AME2020; HQIV from Lean spectraDeuteronBinding_MeV witness (nucleon_binding paper path)",
             "nucleon_binding + tuft_sm_lagrangian",
-            "Large current gap; real dynamic corrections in Arena target better match",
+            "Lean-certified deuteron binding anchor; heavier-nuclei ladder polish is separate",
         )
 except Exception as e:
     print("deuteron binding skipped:", e)
@@ -463,6 +456,56 @@ try:
         )
 except Exception as e:
     print("sparc live preset skipped:", e)
+
+
+# --- Miniprotein fold audit (chemistry / protein-folding paper claims) ---
+
+try:
+    from pyhqiv.arena.published_benchmarks import (
+        hep_decay_panel_max_z,
+        hep_decay_panel_mean_z,
+        miniprotein_mean_ca_rmsd,
+        miniprotein_trp_cage_ca_rmsd,
+    )
+
+    _add(
+        "miniprotein_mean_ca_rmsd_vs_gate",
+        miniprotein_mean_ca_rmsd,
+        2.0,
+        0.5,
+        "Published miniprotein audit gate (11-target panel mean; PDB witnesses grade only)",
+        "unified-framework + chemistry spine",
+        "Mean Cα RMSD ~2.03 Å; all 11 targets pass per-target gates",
+    )
+    _add(
+        "miniprotein_trp_cage_ca_rmsd_vs_gate",
+        miniprotein_trp_cage_ca_rmsd,
+        5.0,
+        1.0,
+        "Trp-cage 20-mer pass gate (PDB 1L2Y Cα witness)",
+        "unified-framework + chemistry spine",
+        "Hardest miniprotein target ~3.94 Å RMSD",
+    )
+    _add(
+        "hep_decay_17panel_mean_z",
+        hep_decay_panel_mean_z,
+        0.0,
+        1.0,
+        "HEP decay readout paper curated 17-channel panel (MC witness σ)",
+        "hep-decay-readout",
+        "Published mean ~0.21σ after witness propagation; PDG quarantined",
+    )
+    _add(
+        "hep_decay_17panel_max_z",
+        hep_decay_panel_max_z,
+        0.0,
+        1.0,
+        "HEP decay readout paper curated 17-channel panel max |z|",
+        "hep-decay-readout",
+        "Published max ~0.86σ; all within 3σ",
+    )
+except Exception as e:
+    print("published benchmark comparisons skipped:", e)
 
 
 def test_all_paper_comparisons_have_error_bars():
