@@ -228,27 +228,27 @@ def phase_diagram_audit() -> dict[str, Any]:
         try:
             if str(root) not in sys.path:
                 sys.path.insert(0, str(root))
+            import hqiv_thermodynamic_phase_from_tp as tptp  # type: ignore
             from hqiv_lab.phase_diagram import (  # type: ignore
+                WATER_HOH_ANGLE_OBSERVATIONS,
+                WATER_LLPT_OBSERVATIONS,
                 end_members_for_molecule,
                 hoh_angle_witness_row,
                 low_density_free_energy_minimum,
                 low_density_liquid_fraction,
                 material_scales_for_spec,
                 phase_diagram_point,
+                widom_proxy_peak_at_pressure,
                 widom_second_order_window_center_k,
                 widom_second_order_window_weight,
-                widom_proxy_peak_at_pressure,
-                WATER_HOH_ANGLE_OBSERVATIONS,
-                WATER_LLPT_OBSERVATIONS,
             )
             from hqiv_lab.protein_solvent_phase import (  # type: ignore
+                PROTEIN_FOLDING_TEMPERATURE_K,
                 aqueous_mixture_curvature_at_interface,
                 bulk_low_density_fraction,
                 local_low_density_fraction_at_interface,
-                PROTEIN_FOLDING_TEMPERATURE_K,
             )
             from hqiv_lab.spec import resolve_spec  # type: ignore
-            import hqiv_thermodynamic_phase_from_tp as tptp  # type: ignore
 
             low, high = end_members_for_molecule("H2O")
             mat = material_scales_for_spec(resolve_spec("H2O"), bulk=True)

@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import unittest
 
-from pyhqiv.chemistry_extent import build_chemistry_extent_domain_summary
 from pyhqiv.arena import metrics as arena_metrics
 from pyhqiv.arena import published_benchmarks as pb
+from pyhqiv.chemistry_extent import build_chemistry_extent_domain_summary
 
 
 class ChemistryExtentArenaTests(unittest.TestCase):

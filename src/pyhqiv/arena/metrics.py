@@ -982,7 +982,9 @@ def _chemistry_spectroscopy_geometry_reliable_fraction() -> float:
 
 
 def _chemistry_spectroscopy_concentration_bracket_hit_rate() -> float:
-    from pyhqiv.arena.published_benchmarks import chemistry_spectroscopy_concentration_bracket_hit_rate
+    from pyhqiv.arena.published_benchmarks import (
+        chemistry_spectroscopy_concentration_bracket_hit_rate,
+    )
 
     return chemistry_spectroscopy_concentration_bracket_hit_rate()
 

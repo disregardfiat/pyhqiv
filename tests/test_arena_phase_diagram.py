@@ -55,8 +55,8 @@ def test_arena_registry_includes_phase_diagram_metrics():
 def test_free_energy_widom_and_nucleation_witnesses():
     from pyhqiv.arena.published_benchmarks import (
         phase_diagram_audit,
-        water_nucleation_defect_ldl_excess,
         water_h2o_bond_angle_residual_deg,
+        water_nucleation_defect_ldl_excess,
         water_widom_gamma2_window_alignment_K,
         water_widom_peak_temperature_residual_K,
     )
