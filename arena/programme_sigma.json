@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T21:51:24Z",
+  "generated_at": "2026-07-09T22:34:21Z",
   "pyhqiv_version": "0.4.1.dev1+unknown.gabc2030da.d20260707",
   "wikipedia": {
     "title": "List of unsolved problems in physics",
@@ -8,8 +8,8 @@
     "license_note": "Problem titles and grouping follow the English Wikipedia list; HQIV status text is programme commentary, not Wikipedia content."
   },
   "sigma_snapshot": {
-    "overall_score": 643.3336,
-    "sigma_weighted": 0.66617236,
+    "overall_score": 546.21,
+    "sigma_weighted": 0.83079759,
     "num_protected_regressions": 0,
     "alignment_cores": [
       {
@@ -456,19 +456,19 @@
       },
       {
         "name": "chemistry_spectroscopy_geometry_reliable_fraction",
-        "value": 0.8181818181818182,
+        "value": 0.9090909090909091,
         "reference": 1.0,
-        "rel_err": 0.18181818181818177,
+        "rel_err": 0.09090909090909094,
         "unit": "fraction",
         "protected": false,
-        "desc": "Fraction of spectroscopy panel rows with geometry_reliable=True (ionic/period-3 routes quarantined until promoted).",
+        "desc": "Fraction of spectroscopy panel rows with geometry_reliable=True (NaCl gas-phase hold-out; promoted Cl2 period-3 route is scored).",
         "mainstream_note": "Headline accuracy is reported only on covalent nested-WF bonds clearing the 0.70 \u00c5 floor."
       },
       {
         "name": "chemistry_spectroscopy_reliable_omega_e_err_pct",
-        "value": 5.5979058213876245,
+        "value": 13.699028899258556,
         "reference": 0.0,
-        "rel_err": 5.5979058213876245,
+        "rel_err": 13.699028899258556,
         "unit": "pct",
         "protected": false,
         "desc": "Mean |\u0394\u03c9_e|% on geometry-reliable diatomics (lightcone_chemistry_extent molecular spectroscopy panel).",
@@ -476,9 +476,9 @@
       },
       {
         "name": "chemistry_spectroscopy_reliable_r_e_err_pct",
-        "value": 5.066624341201491,
+        "value": 5.0373479401712595,
         "reference": 0.0,
-        "rel_err": 5.066624341201491,
+        "rel_err": 5.0373479401712595,
         "unit": "pct",
         "protected": false,
         "desc": "Mean |\u0394r_e|% on geometry-reliable diatomics (nested-WF / OutsideContactGeometry routes).",

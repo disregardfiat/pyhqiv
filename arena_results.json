@@ -54,8 +54,8 @@
     "hierarchy_tuning_exponent": 0.0,
     "lapse_factor_ref_point": 0.0,
     "miniprotein_fold_pass_fraction": 0.0,
-    "miniprotein_mean_ca_rmsd": 0.215777871713966,
-    "miniprotein_trp_cage_ca_rmsd": -0.0852344718523339,
+    "miniprotein_mean_ca_rmsd": 0.0,
+    "miniprotein_trp_cage_ca_rmsd": 0.0,
     "omega_k_at_horizon_self": 0.0,
     "omega_k_partial_at_reference": 0.0,
     "omega_k_present_now": 0.0,
@@ -567,36 +567,36 @@
       "weight": 1.2
     },
     {
-      "abs_err": 0.18181818181818177,
-      "desc": "Fraction of spectroscopy panel rows with geometry_reliable=True (ionic/period-3 routes quarantined until promoted).",
+      "abs_err": 0.09090909090909094,
+      "desc": "Fraction of spectroscopy panel rows with geometry_reliable=True (NaCl gas-phase hold-out; promoted Cl2 period-3 route is scored).",
       "name": "chemistry_spectroscopy_geometry_reliable_fraction",
       "protected": false,
       "reference": 1.0,
-      "rel_err": 0.18181818181818177,
+      "rel_err": 0.09090909090909094,
       "unit": "fraction",
-      "value": 0.8181818181818182,
+      "value": 0.9090909090909091,
       "weight": 1.0
     },
     {
-      "abs_err": 5.5979058213876245,
+      "abs_err": 13.699028899258556,
       "desc": "Mean |\u0394\u03c9_e|% on geometry-reliable diatomics (lightcone_chemistry_extent molecular spectroscopy panel).",
       "name": "chemistry_spectroscopy_reliable_omega_e_err_pct",
       "protected": false,
       "reference": 0.0,
-      "rel_err": 5.5979058213876245,
+      "rel_err": 13.699028899258556,
       "unit": "pct",
-      "value": 5.5979058213876245,
+      "value": 13.699028899258556,
       "weight": 2.0
     },
     {
-      "abs_err": 5.066624341201491,
+      "abs_err": 5.0373479401712595,
       "desc": "Mean |\u0394r_e|% on geometry-reliable diatomics (nested-WF / OutsideContactGeometry routes).",
       "name": "chemistry_spectroscopy_reliable_r_e_err_pct",
       "protected": false,
       "reference": 0.0,
-      "rel_err": 5.066624341201491,
+      "rel_err": 5.0373479401712595,
       "unit": "pct",
-      "value": 5.066624341201491,
+      "value": 5.0373479401712595,
       "weight": 1.5
     },
     {
@@ -944,7 +944,7 @@
   "num_metrics": 78,
   "num_protected": 7,
   "num_regressed_protected": 0,
-  "overall_score": 643.3336,
+  "overall_score": 546.21,
   "pyhqiv_version": "0.4.1.dev1+unknown.gabc2030da.d20260707",
   "raw": {
     "deltas": {
@@ -1002,8 +1002,8 @@
       "hierarchy_tuning_exponent": 0.0,
       "lapse_factor_ref_point": 0.0,
       "miniprotein_fold_pass_fraction": 0.0,
-      "miniprotein_mean_ca_rmsd": 0.215777871713966,
-      "miniprotein_trp_cage_ca_rmsd": -0.0852344718523339,
+      "miniprotein_mean_ca_rmsd": 0.0,
+      "miniprotein_trp_cage_ca_rmsd": 0.0,
       "omega_k_at_horizon_self": 0.0,
       "omega_k_partial_at_reference": 0.0,
       "omega_k_present_now": 0.0,
@@ -1513,36 +1513,36 @@
         "weight": 1.2
       },
       {
-        "abs_err": 0.18181818181818177,
-        "desc": "Fraction of spectroscopy panel rows with geometry_reliable=True (ionic/period-3 routes quarantined until promoted).",
+        "abs_err": 0.09090909090909094,
+        "desc": "Fraction of spectroscopy panel rows with geometry_reliable=True (NaCl gas-phase hold-out; promoted Cl2 period-3 route is scored).",
         "name": "chemistry_spectroscopy_geometry_reliable_fraction",
         "protected": false,
         "reference": 1.0,
-        "rel_err": 0.18181818181818177,
+        "rel_err": 0.09090909090909094,
         "unit": "fraction",
-        "value": 0.8181818181818182,
+        "value": 0.9090909090909091,
         "weight": 1.0
       },
       {
-        "abs_err": 5.5979058213876245,
+        "abs_err": 13.699028899258556,
         "desc": "Mean |\u0394\u03c9_e|% on geometry-reliable diatomics (lightcone_chemistry_extent molecular spectroscopy panel).",
         "name": "chemistry_spectroscopy_reliable_omega_e_err_pct",
         "protected": false,
         "reference": 0.0,
-        "rel_err": 5.5979058213876245,
+        "rel_err": 13.699028899258556,
         "unit": "pct",
-        "value": 5.5979058213876245,
+        "value": 13.699028899258556,
         "weight": 2.0
       },
       {
-        "abs_err": 5.066624341201491,
+        "abs_err": 5.0373479401712595,
         "desc": "Mean |\u0394r_e|% on geometry-reliable diatomics (nested-WF / OutsideContactGeometry routes).",
         "name": "chemistry_spectroscopy_reliable_r_e_err_pct",
         "protected": false,
         "reference": 0.0,
-        "rel_err": 5.066624341201491,
+        "rel_err": 5.0373479401712595,
         "unit": "pct",
-        "value": 5.066624341201491,
+        "value": 5.0373479401712595,
         "weight": 1.5
       },
       {
@@ -1887,11 +1887,11 @@
         "weight": 1.2
       }
     ],
-    "sigma_avg": 0.665953660634611,
-    "sigma_weighted": 0.6661723617449199
+    "sigma_avg": 0.76827337327476,
+    "sigma_weighted": 0.8307975919015532
   },
-  "sigma_avg": 0.66595366,
-  "sigma_weighted": 0.66617236,
-  "timestamp": "2026-07-09T21:51:23.905740+00:00",
+  "sigma_avg": 0.76827337,
+  "sigma_weighted": 0.83079759,
+  "timestamp": "2026-07-09T22:34:21.009459+00:00",
   "witnesses_source": "/home/jr/Repos/pyhqiv/src/pyhqiv/witnesses.json"
 }

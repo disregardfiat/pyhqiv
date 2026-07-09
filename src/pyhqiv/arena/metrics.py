@@ -1050,7 +1050,7 @@ register_metric(
         weight=1.0,
         unit="fraction",
         tolerance=0.0,
-        desc="Fraction of spectroscopy panel rows with geometry_reliable=True (ionic/period-3 routes quarantined until promoted).",
+        desc="Fraction of spectroscopy panel rows with geometry_reliable=True (NaCl gas-phase hold-out; promoted Cl2 period-3 route is scored).",
         mainstream_note="Headline accuracy is reported only on covalent nested-WF bonds clearing the 0.70 Å floor.",
     )
 )
