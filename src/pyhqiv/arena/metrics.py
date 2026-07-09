@@ -717,3 +717,773 @@ register_metric(
         mainstream_note="Mainstream: dark-matter halos fitted per galaxy (NFW etc., many free params); HQIV horizon-modified inertia, no new particle.",
     )
 )
+
+# --- Generalized phase diagrams (H₂O LLPT / two-liquid branch) ---
+
+
+def _water_h2o_melt_T_residual_K() -> float:
+    from pyhqiv.arena.published_benchmarks import water_h2o_melt_temperature_K
+
+    return abs(water_h2o_melt_temperature_K() - 273.15)
+
+
+def _thermo_allotrope_phase_residual() -> float:
+    """Alias for ice Ih melt residual from geometry-derived T_sl (Arena programme hook)."""
+    return _water_h2o_melt_T_residual_K()
+
+
+def _water_phase_diagram_structural_pass_rate() -> float:
+    from pyhqiv.arena.published_benchmarks import water_phase_diagram_structural_pass_rate
+
+    return water_phase_diagram_structural_pass_rate()
+
+
+def _water_metastable_liquid_at_llcp() -> float:
+    from pyhqiv.arena.published_benchmarks import water_metastable_liquid_at_llcp
+
+    return water_metastable_liquid_at_llcp()
+
+
+def _water_llcp_observation_distance() -> float:
+    from pyhqiv.arena.published_benchmarks import water_llcp_observation_distance
+
+    return water_llcp_observation_distance()
+
+
+def _water_widom_peak_temperature_residual_K() -> float:
+    from pyhqiv.arena.published_benchmarks import water_widom_peak_temperature_residual_K
+
+    return water_widom_peak_temperature_residual_K()
+
+
+def _water_widom_free_energy_peak_residual_K() -> float:
+    from pyhqiv.arena.published_benchmarks import water_widom_peak_temperature_residual_K
+
+    return water_widom_peak_temperature_residual_K()
+
+
+def _water_widom_gamma2_window_alignment_K() -> float:
+    from pyhqiv.arena.published_benchmarks import water_widom_gamma2_window_alignment_K
+
+    return water_widom_gamma2_window_alignment_K()
+
+
+def _water_nucleation_defect_ldl_excess() -> float:
+    from pyhqiv.arena.published_benchmarks import water_nucleation_defect_ldl_excess
+
+    return water_nucleation_defect_ldl_excess()
+
+
+def _water_hoh_angle_taxonomy_open_gap_deg() -> float:
+    from pyhqiv.arena.published_benchmarks import water_hoh_angle_taxonomy_open_gap_deg
+
+    return water_hoh_angle_taxonomy_open_gap_deg()
+
+
+def _water_h2o_bond_angle_residual_deg() -> float:
+    from pyhqiv.arena.published_benchmarks import water_h2o_bond_angle_residual_deg
+
+    return water_h2o_bond_angle_residual_deg()
+
+
+def _protein_hydrophobic_interface_ldl_excess() -> float:
+    from pyhqiv.arena.published_benchmarks import protein_hydrophobic_interface_ldl_excess
+
+    return protein_hydrophobic_interface_ldl_excess()
+
+
+register_metric(
+    Metric(
+        name="thermo_allotrope_phase_residual",
+        compute=_thermo_allotrope_phase_residual,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.0,
+        unit="K",
+        tolerance=0.1,
+        desc="|T_sl(H₂O ice Ih) − 273.15 K| from HQIV geometry melt ladder (allotrope phase residual).",
+        mainstream_note="Mainstream: empirical melting curves; HQIV derives T_sl from tetrahedral H-bond network + cohesive scales.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_h2o_melt_T_residual_K",
+        compute=_water_h2o_melt_T_residual_K,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.5,
+        unit="K",
+        tolerance=0.05,
+        desc="Bulk H₂O solid→liquid transition temperature residual vs 273.15 K (PhaseGeometryDensity + thermodynamic phase engine).",
+        mainstream_note="Mainstream: NIST melting point; HQIV from ice Ih unit cell + shell-opening melt (no fitted potential).",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_phase_diagram_structural_pass_rate",
+        compute=_water_phase_diagram_structural_pass_rate,
+        reference=lambda: 1.0,
+        protected=False,
+        weight=2.0,
+        unit="fraction",
+        tolerance=0.0,
+        desc="Structural pass rate on H₂O phase-diagram anchors: cytosol liquid, ice below melt, LLCP-regime metastable liquid, T_melt window.",
+        mainstream_note="Mainstream: MD potentials (MB-pol, TIP4P) map LLPT; HQIV first-principles (T,P) engine with comparison quarantine.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_metastable_liquid_at_llcp",
+        compute=_water_metastable_liquid_at_llcp,
+        reference=lambda: 1.0,
+        protected=False,
+        weight=1.5,
+        unit="fraction",
+        tolerance=0.0,
+        desc="HQIV classifies Sciortino LLCP coordinates (~198 K, ~1250 atm) as metastable_liquid (two-liquid branch witness).",
+        mainstream_note="Sciortino et al. Nat. Phys. 2025 (MB-pol) — comparison only, not an input.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_llcp_observation_distance",
+        compute=_water_llcp_observation_distance,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.0,
+        unit="norm",
+        tolerance=0.05,
+        desc="Normalized (T,P) distance from HQIV LLCP-regime anchor to Sciortino observation (comparison grading; lower is better).",
+        mainstream_note="Literature LLCP ~198 K / 1250 atm grades HQIV readouts; coordinates never enter derivation.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_widom_peak_temperature_residual_K",
+        compute=_water_widom_peak_temperature_residual_K,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.2,
+        unit="K",
+        tolerance=15.0,
+        desc="|T_peak(κ proxy from free-energy susceptibility + γ² supercooled window) − Kim et al. compressibility max ~229 K| at 1 atm.",
+        mainstream_note="Kim et al. Science 2020 compressibility anomaly — comparison only; HQIV peak from T_melt·(1−γ²), not fitted to Kim.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_widom_free_energy_peak_residual_K",
+        compute=_water_widom_free_energy_peak_residual_K,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.2,
+        unit="K",
+        tolerance=5.0,
+        desc="Alias metric: Widom peak residual after replacing Boltzmann f_LDL with a two-branch free-energy minimizer.",
+        mainstream_note="Comparison-only Kim peak; HQIV derives the anomaly branch from latent barrier f(1−f), free-energy curvature, and γ² melt window.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_widom_gamma2_window_alignment_K",
+        compute=_water_widom_gamma2_window_alignment_K,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.0,
+        unit="K",
+        tolerance=2.0,
+        desc="Internal residual |T_peak − T_melt·(1−γ²)| for the second-order supercooled Widom window.",
+        mainstream_note="No external input: γ=2/5 and T_melt from HQIV phase geometry determine the center.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_nucleation_defect_ldl_excess",
+        compute=_water_nucleation_defect_ldl_excess,
+        reference=lambda: 0.05,
+        protected=False,
+        weight=1.0,
+        unit="fraction",
+        tolerance=0.02,
+        desc="Positive f_LDL response to local δB / coordination defect at a fixed supercooled water state.",
+        mainstream_note="Nucleation is modeled as local curvature excess δB; no MD nucleation table enters.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_hoh_angle_taxonomy_open_gap_deg",
+        compute=_water_hoh_angle_taxonomy_open_gap_deg,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=0.5,
+        unit="deg",
+        tolerance=0.1,
+        desc="Comparison residual |θ_dyn(H₂O) − 104.478°| after separating θ_tet=109.47° as the LDL network angle.",
+        mainstream_note="104.478° (NIST CCCBDB / Hoy & Bunker 1979) remains comparison-only; HQIV θ_dyn uses torque-tree screening n_lp/(n_domains+n_bonds), not the tabulated angle.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="water_h2o_bond_angle_residual_deg",
+        compute=_water_h2o_bond_angle_residual_deg,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.0,
+        unit="deg",
+        tolerance=0.1,
+        desc="H–O–H dynamic-centre angle residual vs gas-phase comparison after HQIV torque-tree lone-pair screening.",
+        mainstream_note="104.478° (Hoy & Bunker 1979 / NIST CCCBDB) remains comparison-only; the derived angle comes from VSEPR balance plus strong-channel torque denominator.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="protein_hydrophobic_interface_ldl_excess",
+        compute=_protein_hydrophobic_interface_ldl_excess,
+        reference=lambda: 0.24,
+        protected=False,
+        weight=1.5,
+        unit="fraction",
+        tolerance=0.02,
+        desc="f_LDL excess at hydrophobic protein–solvent interface vs bulk (200 K supercooled witness).",
+        mainstream_note="HQIV interface dress γ·α toward LDL; no fitted hydrophobic potential.",
+    )
+)
+
+# --- Light-cone chemistry extent paper (spectroscopy / condensed / crystal) ---
+
+
+def _chemistry_spectroscopy_reliable_omega_e_err_pct() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_spectroscopy_reliable_omega_e_err_pct
+
+    return chemistry_spectroscopy_reliable_omega_e_err_pct()
+
+
+def _chemistry_spectroscopy_reliable_r_e_err_pct() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_spectroscopy_reliable_r_e_err_pct
+
+    return chemistry_spectroscopy_reliable_r_e_err_pct()
+
+
+def _chemistry_spectroscopy_geometry_reliable_fraction() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_spectroscopy_geometry_reliable_fraction
+
+    return chemistry_spectroscopy_geometry_reliable_fraction()
+
+
+def _chemistry_spectroscopy_concentration_bracket_hit_rate() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_spectroscopy_concentration_bracket_hit_rate
+
+    return chemistry_spectroscopy_concentration_bracket_hit_rate()
+
+
+def _chemistry_condensed_phase_mean_n_err_pct() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_condensed_phase_mean_n_err_pct
+
+    return chemistry_condensed_phase_mean_n_err_pct()
+
+
+def _chemistry_condensed_phase_mean_T_sl_err_pct() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_condensed_phase_mean_T_sl_err_pct
+
+    return chemistry_condensed_phase_mean_T_sl_err_pct()
+
+
+def _chemistry_crystal_contact_panel_pass_rate() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_crystal_contact_panel_pass_rate
+
+    return chemistry_crystal_contact_panel_pass_rate()
+
+
+def _chemistry_crystal_fracture_panel_pass_rate() -> float:
+    from pyhqiv.arena.published_benchmarks import chemistry_crystal_fracture_panel_pass_rate
+
+    return chemistry_crystal_fracture_panel_pass_rate()
+
+
+register_metric(
+    Metric(
+        name="chemistry_spectroscopy_reliable_omega_e_err_pct",
+        compute=_chemistry_spectroscopy_reliable_omega_e_err_pct,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=2.0,
+        unit="pct",
+        tolerance=1.0,
+        desc="Mean |Δω_e|% on geometry-reliable diatomics (lightcone_chemistry_extent molecular spectroscopy panel).",
+        mainstream_note="NIST/CRC/HITRAN ω_e grade readouts only; HQIV Morse + VB resonance + coupled relaxation never fits comparison residuals.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="chemistry_spectroscopy_reliable_r_e_err_pct",
+        compute=_chemistry_spectroscopy_reliable_r_e_err_pct,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.5,
+        unit="pct",
+        tolerance=1.0,
+        desc="Mean |Δr_e|% on geometry-reliable diatomics (nested-WF / OutsideContactGeometry routes).",
+        mainstream_note="Gas-phase spectroscopic r_e quarantine; solid-lattice contacts are a separate crystal panel.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="chemistry_spectroscopy_geometry_reliable_fraction",
+        compute=_chemistry_spectroscopy_geometry_reliable_fraction,
+        reference=lambda: 1.0,
+        protected=False,
+        weight=1.0,
+        unit="fraction",
+        tolerance=0.0,
+        desc="Fraction of spectroscopy panel rows with geometry_reliable=True (ionic/period-3 routes quarantined until promoted).",
+        mainstream_note="Headline accuracy is reported only on covalent nested-WF bonds clearing the 0.70 Å floor.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="chemistry_spectroscopy_concentration_bracket_hit_rate",
+        compute=_chemistry_spectroscopy_concentration_bracket_hit_rate,
+        reference=lambda: 1.0,
+        protected=False,
+        weight=1.2,
+        unit="fraction",
+        tolerance=0.05,
+        desc="Fraction of derived [diffuse, concentrated] ω_e brackets that contain the NIST reference.",
+        mainstream_note="Missing physics is an in-bracket concentration flow — not a free offset outside the bracket.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="chemistry_condensed_phase_mean_n_err_pct",
+        compute=_chemistry_condensed_phase_mean_n_err_pct,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.5,
+        unit="pct",
+        tolerance=1.0,
+        desc="Mean refractive-index |Δn|% vs NIST/CRC on condensed-phase audit species.",
+        mainstream_note="Optical local-field / linear-chain coupled relaxation grades against handbooks; no refractive-index fit.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="chemistry_condensed_phase_mean_T_sl_err_pct",
+        compute=_chemistry_condensed_phase_mean_T_sl_err_pct,
+        reference=lambda: 0.0,
+        protected=False,
+        weight=1.5,
+        unit="pct",
+        tolerance=1.0,
+        desc="Mean melt-temperature |ΔT_sl|% vs NIST on condensed-phase audit species.",
+        mainstream_note="T_sl from PhaseGeometryDensity + cohesive ladder; handbook melt points are comparison-only.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="chemistry_crystal_contact_panel_pass_rate",
+        compute=_chemistry_crystal_contact_panel_pass_rate,
+        reference=lambda: 1.0,
+        protected=False,
+        weight=1.2,
+        unit="fraction",
+        tolerance=0.0,
+        desc="Structural pass rate for NaCl/Cu/Si/Ge crystal-contact witnesses (solid_lattice regime).",
+        mainstream_note="Lattice nn contacts derived upstream of spectroscopy; NIST/CRC distances grade only.",
+    )
+)
+
+register_metric(
+    Metric(
+        name="chemistry_crystal_fracture_panel_pass_rate",
+        compute=_chemistry_crystal_fracture_panel_pass_rate,
+        reference=lambda: 1.0,
+        protected=False,
+        weight=1.0,
+        unit="fraction",
+        tolerance=0.0,
+        desc="Ethics + structural completeness of Griffith-scale fracture witnesses (no tabulated K_IC / moduli).",
+        mainstream_note="Fracture-scale candidates from contact binding only; handbook toughness remains quarantined.",
+    )
+)
+
+
+def _published_metric_getter(name: str) -> Callable[[], float]:
+    def compute() -> float:
+        from pyhqiv.arena import published_benchmarks as pb
+
+        return float(getattr(pb, name)())
+
+    return compute
+
+
+def _register_chemistry_domain_metric(
+    *,
+    name: str,
+    getter: str,
+    reference: float,
+    weight: float,
+    unit: str,
+    desc: str,
+    mainstream_note: str,
+    tolerance: float = 0.0,
+) -> None:
+    register_metric(
+        Metric(
+            name=name,
+            compute=_published_metric_getter(getter),
+            reference=lambda ref=reference: ref,
+            protected=False,
+            weight=weight,
+            unit=unit,
+            tolerance=tolerance,
+            desc=desc,
+            mainstream_note=mainstream_note,
+        )
+    )
+
+
+_register_chemistry_domain_metric(
+    name="chemistry_public_spectral_r_e_geom_mean_err_pct",
+    getter="chemistry_public_spectral_r_e_geom_mean_err_pct",
+    reference=0.0,
+    weight=1.2,
+    unit="pct",
+    tolerance=0.5,
+    desc="Public DFT-replacement spectral-scale panel: geometric-mean |Δr_e|% on the paper diatomic panel.",
+    mainstream_note="NIST/CRC bond lengths grade readouts only; HQIV spectral-scale anchor supplies the geometry without DFT optimization.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_public_spectral_D_e_geom_mean_err_pct",
+    getter="chemistry_public_spectral_D_e_geom_mean_err_pct",
+    reference=0.0,
+    weight=1.2,
+    unit="pct",
+    tolerance=0.5,
+    desc="Public DFT-replacement spectral-scale panel: geometric-mean |ΔD_e|% on the paper diatomic panel.",
+    mainstream_note="Dissociation energies are comparison quarantine; HQIV uses the light-cone spectral scale plus bond-network readout.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_public_spectral_B_e_geom_mean_err_pct",
+    getter="chemistry_public_spectral_B_e_geom_mean_err_pct",
+    reference=0.0,
+    weight=1.0,
+    unit="pct",
+    tolerance=0.5,
+    desc="Public DFT-replacement spectral-scale panel: geometric-mean |ΔB_e|% on the paper diatomic panel.",
+    mainstream_note="Rotational constants grade the derived bond length / reduced-mass readout; they are not geometry inputs.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_carbon_density_mean_err_pct",
+    getter="chemistry_carbon_density_mean_err_pct",
+    reference=0.0,
+    weight=1.0,
+    unit="pct",
+    tolerance=0.5,
+    desc="Carbon network packing panel: mean |Δdensity|% for graphene areal density and diamond bulk density.",
+    mainstream_note="Graphene/diamond densities grade curvature-network packing; no DFT lattice relaxation is used.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_carbon_bond_mean_err_pct",
+    getter="chemistry_carbon_bond_mean_err_pct",
+    reference=0.0,
+    weight=1.0,
+    unit="pct",
+    tolerance=0.25,
+    desc="Carbon network packing panel: mean |Δbond length|% for graphene and diamond.",
+    mainstream_note="CRC/NIST carbon bond lengths grade the network-packing readout only.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_molecule_suite_core_binding_err_pct",
+    getter="chemistry_molecule_suite_core_binding_err_pct",
+    reference=0.0,
+    weight=1.3,
+    unit="pct",
+    tolerance=1.0,
+    desc="Molecule-suite domain replacement: core-panel mean |binding-energy error|%.",
+    mainstream_note="W4/GMTKN-style energies grade the derived bond-state network; no functional/basis-set fit enters the readout.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_molecule_suite_combined_binding_err_pct",
+    getter="chemistry_molecule_suite_combined_binding_err_pct",
+    reference=0.0,
+    weight=1.2,
+    unit="pct",
+    tolerance=1.0,
+    desc="Molecule-suite domain replacement: combined core+expanded mean |binding-energy error|%.",
+    mainstream_note="Broader molecular energetics are scored as Arena residuals against quarantined references.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_molecule_suite_open_shell_binding_err_pct",
+    getter="chemistry_molecule_suite_open_shell_binding_err_pct",
+    reference=0.0,
+    weight=1.1,
+    unit="pct",
+    tolerance=1.0,
+    desc="Molecule-suite domain replacement: open-shell mean |binding-energy error|%.",
+    mainstream_note="Open-shell handling is read from the same bond-state ledger, not from an exchange-correlation functional.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_molecule_suite_within15_fraction",
+    getter="chemistry_molecule_suite_within15_fraction",
+    reference=1.0,
+    weight=0.8,
+    unit="fraction",
+    desc="Molecule-suite structural coverage: fraction of combined core+expanded molecules within 15%.",
+    mainstream_note="Coverage metric complements residual metrics so broad panels are rewarded, not only cherry-picked molecules.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_constraint_condensed_resid_norm",
+    getter="chemistry_constraint_condensed_resid_norm",
+    reference=0.0,
+    weight=0.8,
+    unit="norm",
+    tolerance=0.05,
+    desc="Log-linear constraint audit: condensed-sector residual norm after HQIV channel solve.",
+    mainstream_note="Diagnoses bulk density / optical split and outside-curvature participation; no coefficient is promoted as a fit.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_constraint_binding_resid_norm",
+    getter="chemistry_constraint_binding_resid_norm",
+    reference=0.0,
+    weight=0.8,
+    unit="norm",
+    tolerance=0.02,
+    desc="Log-linear constraint audit: binding-sector residual norm after HQIV channel solve.",
+    mainstream_note="Binding residuals identify second-order channels while preserving the first-principles ledger.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_inverse_gmtkn_resid_norm",
+    getter="chemistry_inverse_gmtkn_resid_norm",
+    reference=0.0,
+    weight=0.8,
+    unit="norm",
+    tolerance=0.02,
+    desc="Inverse-channel solve: 3-slot GMTKN activation residual norm.",
+    mainstream_note="GMTKN/W4 comparisons grade activation/path barriers only; path slots are not DFT-calibrated.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_inverse_outside_gas_participation_abs",
+    getter="chemistry_inverse_outside_gas_participation_abs",
+    reference=0.0,
+    weight=0.7,
+    unit="fraction",
+    tolerance=0.01,
+    desc="Inverse-channel solve: absolute outside-curvature gas participation inferred from the reduced channel ledger.",
+    mainstream_note="Gas outside-curvature participation remains a diagnostic channel, not a fitted gas-phase offset.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_nested_wf_within15_fraction",
+    getter="chemistry_nested_wf_within15_fraction",
+    reference=1.0,
+    weight=0.7,
+    unit="fraction",
+    desc="Nested-WF geometry coverage: fraction of geometry witnesses within 15%.",
+    mainstream_note="Nested wavefront geometry is the direct replacement route for geometry optimization panels.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_quantum_lih_primary_err_pct",
+    getter="chemistry_quantum_lih_primary_err_pct",
+    reference=0.0,
+    weight=1.0,
+    unit="pct",
+    tolerance=0.5,
+    desc="Quantum-chem LiH dynamic Compton participation primary binding error%.",
+    mainstream_note="LiH binding uses Compton shell participation + curvature feedback; the laboratory binding grades only the final readout.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_quantum_lih_imprint_theorem_fraction",
+    getter="chemistry_quantum_lih_imprint_theorem_fraction",
+    reference=1.0,
+    weight=0.8,
+    unit="fraction",
+    desc="Quantum-chem LiH bridge: fraction of imprint phase theorem witnesses discharged.",
+    mainstream_note="Formal bridge coverage protects Lean/Python chemistry alignment while residual metrics target numerical polish.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_contact_network_rule_coverage_fraction",
+    getter="chemistry_contact_network_rule_coverage_fraction",
+    reference=1.0,
+    weight=0.8,
+    unit="fraction",
+    desc="Curvature contact-network rule/contact coverage across the paper network panel.",
+    mainstream_note="Contact-network rules replace force-field topology tables with derived contact kinds and phase slots.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_allotrope_phase_cooling_coverage_fraction",
+    getter="chemistry_allotrope_phase_cooling_coverage_fraction",
+    reference=1.0,
+    weight=0.8,
+    unit="fraction",
+    desc="Allotrope phase-cooling coverage: transition and spectroscopy-profile coverage across six molecules.",
+    mainstream_note="Cooling/phase profiles are generated from HQIV phase ladders; comparison observations remain quarantined.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_residual_spectroscopy_reliable_fraction",
+    getter="chemistry_residual_spectroscopy_reliable_fraction",
+    reference=1.0,
+    weight=0.7,
+    unit="fraction",
+    desc="Residual-correlation audit: geometry-reliable spectroscopy fraction used for second-order target selection.",
+    mainstream_note="Residual correlations select formal target slots; they are not fitted corrections.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_residual_spectroscopy_max_abs_correlation",
+    getter="chemistry_residual_spectroscopy_max_abs_correlation",
+    reference=1.0,
+    weight=0.5,
+    unit="abs_r",
+    tolerance=0.05,
+    desc="Residual-correlation audit: strongest spectroscopy residual correlation against derived HQIV features.",
+    mainstream_note="High |r| marks an Arena target for theorem promotion, not a regression fit.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_residual_condensed_max_abs_correlation",
+    getter="chemistry_residual_condensed_max_abs_correlation",
+    reference=1.0,
+    weight=0.5,
+    unit="abs_r",
+    tolerance=0.05,
+    desc="Residual-correlation audit: strongest condensed residual correlation against derived HQIV features.",
+    mainstream_note="Small-N condensed correlations are target selectors; comparison values remain quarantined.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_residual_flow_target_count",
+    getter="chemistry_residual_flow_target_count",
+    reference=8.0,
+    weight=0.4,
+    unit="count",
+    desc="Residual-correlation audit: count of in-bracket concentration-flow target rows.",
+    mainstream_note="Counts formal promotion opportunities for concentration-flow terms without applying a fitted correction.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_generator_spectral_gap_err_pct",
+    getter="chemistry_generator_spectral_gap_err_pct",
+    reference=0.0,
+    weight=1.0,
+    unit="pct",
+    tolerance=0.5,
+    desc="Generator-dependent coupling audit: spectral-gap variant mean |binding error|%.",
+    mainstream_note="Preferred-axis spectral gap is a finite polarity-spectrum projector, not a molecule-type case split.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_generator_spectral_gap_improvement_pct",
+    getter="chemistry_generator_spectral_gap_improvement_pct",
+    reference=1.0,
+    weight=0.8,
+    unit="pct",
+    tolerance=0.1,
+    desc="Generator-dependent coupling audit: spectral-gap mean-error improvement over the abelian baseline.",
+    mainstream_note="Rewards a derived generator-dependent improvement that preserves the same bond-network ledger.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_generator_recommendation_improved",
+    getter="chemistry_generator_recommendation_improved",
+    reference=1.0,
+    weight=0.5,
+    unit="fraction",
+    desc="Generator-dependent coupling audit: recommendation marks the spectral-gap promotion as improved.",
+    mainstream_note="Structural recommendation is generated by the audit from derived variants only.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_system_matrix_best_is_base_fraction",
+    getter="chemistry_system_matrix_best_is_base_fraction",
+    reference=1.0,
+    weight=0.5,
+    unit="fraction",
+    desc="System-matrix functor audit: confirms current continuous SO(8) matrix functor is a no-op guard on E_bind_from_network.",
+    mainstream_note="A no-op finding is useful: it prevents promoting an over-correcting matrix dress as a fake score improvement.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_system_matrix_so8_blend_err_pct",
+    getter="chemistry_system_matrix_so8_blend_err_pct",
+    reference=0.0,
+    weight=0.6,
+    unit="pct",
+    tolerance=1.0,
+    desc="System-matrix functor audit: SO(8)-blend relative variant mean |binding error|%.",
+    mainstream_note="Matrix functors are tested as candidate dresses, not silently folded into the production binding readout.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_second_order_outside_geff_err_pct",
+    getter="chemistry_second_order_outside_geff_err_pct",
+    reference=0.0,
+    weight=0.7,
+    unit="pct",
+    tolerance=1.0,
+    desc="Second-order effect audit: outside-geff toggle mean |binding error|%.",
+    mainstream_note="Derived second-order toggles are scored before promotion, avoiding fitted post-hoc corrections.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_second_order_promote_outside_geff_fraction",
+    getter="chemistry_second_order_promote_outside_geff_fraction",
+    reference=1.0,
+    weight=0.5,
+    unit="fraction",
+    desc="Second-order effect audit: outside-geff is the promoted candidate in the proof-boundary audit.",
+    mainstream_note="Promotion flag documents the formal candidate while residual metrics quantify its current numerical state.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_crystal_ethics_pass_fraction",
+    getter="chemistry_crystal_ethics_pass_fraction",
+    reference=1.0,
+    weight=0.8,
+    unit="fraction",
+    desc="Crystal ethics audit: full policy pass for referenceM=4, no PDG/external mass tables, and comparison quarantine.",
+    mainstream_note="Ethics gates protect the chemistry Arena from smuggling handbook constants into derivations.",
+)
+
+_register_chemistry_domain_metric(
+    name="chemistry_crystal_ethics_lean_pass_fraction",
+    getter="chemistry_crystal_ethics_lean_pass_fraction",
+    reference=1.0,
+    weight=0.8,
+    unit="fraction",
+    desc="Crystal ethics audit: fraction of Lean chemistry modules with no sorry/admit/axiom hits.",
+    mainstream_note="Lean proof coverage is scored separately from numerical comparison residuals.",
+)

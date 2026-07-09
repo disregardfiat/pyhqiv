@@ -1,0 +1,350 @@
+{
+  "source": "scripts/hqiv_condensed_phase_audit.py",
+  "comparison_policy": "NIST/CRC values used for benchmark only, not HQIV fit",
+  "expected_contact_xi_molecular_default": 3.6666666666666665,
+  "xi_routing": "per crystal_kind via hqiv_lab.crystal_geometry.expected_contact_xi_for_crystal",
+  "species": [
+    {
+      "molecule": "H2O",
+      "motif_label": "tetrahedral / Ih",
+      "allotrope": "Ih",
+      "crystal_kind": "molecular",
+      "expected_contact_xi": 3.6666666666666665,
+      "witness_temperature_K": 273.15,
+      "gmtkn55_compton_triplet": [
+        4,
+        3,
+        1
+      ],
+      "contact_xi": 3.6666666666666665,
+      "intermolecular_contacts": 4,
+      "monomer_motif": "tetrahedral_hbond",
+      "geometry": {
+        "density_g_cm3": 1.0134441053549463,
+        "curvature_density_fraction": 0.7916666666666666,
+        "phase_curvature_density_fraction": 0.8819637726950252,
+        "kappa6_feedback": 1.0147683185969043,
+        "T_sl_at_pressure_K": 272.7117912030581,
+        "refractive_index_solid": 1.3054337264394031,
+        "neighbor_lapse_overlap_factor": 0.95,
+        "halogen_strong_hbond_leg_factor": 1.0,
+        "linear_chain_zigzag_lattice_open_factor": 1.0
+      },
+      "material_response": {
+        "refractive_index": 1.3054337264394031,
+        "refractive_index_one_way": 1.3054337264394031,
+        "optical_coupling_level": "feed_forward",
+        "missing_optical_coupled_relaxation_flag": 0,
+        "thermal_conductivity_W_mK": 1.3005399065203695,
+        "thermal_conductivity_one_way_W_mK": 1.3129140414303175,
+        "phonon_cage_fraction": 0.00942493911975184,
+        "network_propagated_curvature_density_fraction": 0.8394046812779262,
+        "molar_heat_capacity_J_per_mol_K": 118.59983012395719,
+        "optical_phase_eta": 1.0,
+        "optical_geff": 1.0,
+        "B_hom": 0.9905750608802482
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 0.917,
+        "refractive_index": 1.31,
+        "melt_K": 273.15
+      },
+      "benchmark": {
+        "density_error_pct": 10.517350638489235,
+        "refractive_index_error_pct": 0.34857050080892454,
+        "T_sl_error_pct": 0.16042789564044113,
+        "contact_xi_trace_consistent": true
+      }
+    },
+    {
+      "molecule": "CH4",
+      "motif_label": "apolar / solid_I",
+      "allotrope": "solid_I",
+      "crystal_kind": "molecular",
+      "expected_contact_xi": 3.6666666666666665,
+      "witness_temperature_K": 90.0,
+      "gmtkn55_compton_triplet": [
+        4,
+        3,
+        1
+      ],
+      "contact_xi": 3.6666666666666665,
+      "intermolecular_contacts": 4,
+      "monomer_motif": "apolar_close_pack",
+      "geometry": {
+        "density_g_cm3": 0.7032204227179959,
+        "curvature_density_fraction": 0.9,
+        "phase_curvature_density_fraction": 0.9405779866167785,
+        "kappa6_feedback": 1.0146756282950329,
+        "T_sl_at_pressure_K": 90.89562711385939,
+        "refractive_index_solid": 1.1152352611962526,
+        "neighbor_lapse_overlap_factor": 1.0,
+        "halogen_strong_hbond_leg_factor": 1.0,
+        "linear_chain_zigzag_lattice_open_factor": 1.0
+      },
+      "material_response": {
+        "refractive_index": 1.1152352611962526,
+        "refractive_index_one_way": 1.1152352611962526,
+        "optical_coupling_level": "feed_forward",
+        "missing_optical_coupled_relaxation_flag": 0,
+        "thermal_conductivity_W_mK": 2.654710244858023,
+        "thermal_conductivity_one_way_W_mK": 2.6834626553095315,
+        "phonon_cage_fraction": 0.010714667630875696,
+        "network_propagated_curvature_density_fraction": 0.9214284797685899,
+        "molar_heat_capacity_J_per_mol_K": 197.40902195208932,
+        "optical_phase_eta": 1.0,
+        "optical_geff": 1.0,
+        "B_hom": 0.9892853323691243
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 0.523,
+        "refractive_index": 1.1,
+        "melt_K": 90.7
+      },
+      "benchmark": {
+        "density_error_pct": 34.458971839004946,
+        "refractive_index_error_pct": 1.385023745113865,
+        "T_sl_error_pct": 0.21568590282181663,
+        "contact_xi_trace_consistent": true
+      }
+    },
+    {
+      "molecule": "NH3",
+      "motif_label": "pyramidal / fcc",
+      "allotrope": "solid",
+      "crystal_kind": "molecular",
+      "expected_contact_xi": 3.6666666666666665,
+      "witness_temperature_K": 195.8,
+      "gmtkn55_compton_triplet": [
+        4,
+        3,
+        1
+      ],
+      "contact_xi": 3.6666666666666665,
+      "intermolecular_contacts": 4,
+      "monomer_motif": "pyramidal_hbond",
+      "geometry": {
+        "density_g_cm3": 0.8782143098597665,
+        "curvature_density_fraction": 0.9090909090909091,
+        "phase_curvature_density_fraction": 0.9742055097017819,
+        "kappa6_feedback": 1.0146224510013804,
+        "T_sl_at_pressure_K": 194.2792206036562,
+        "refractive_index_solid": 1.1860346693068822,
+        "neighbor_lapse_overlap_factor": 1.0,
+        "halogen_strong_hbond_leg_factor": 1.0,
+        "linear_chain_zigzag_lattice_open_factor": 1.0
+      },
+      "material_response": {
+        "refractive_index": 1.1860346693068822,
+        "refractive_index_one_way": 1.1860346693068822,
+        "optical_coupling_level": "feed_forward",
+        "missing_optical_coupled_relaxation_flag": 0,
+        "thermal_conductivity_W_mK": 1.7515822092671034,
+        "thermal_conductivity_one_way_W_mK": 1.7707468189882036,
+        "phonon_cage_fraction": 0.010822896596844211,
+        "network_propagated_curvature_density_fraction": 0.9283115957258483,
+        "molar_heat_capacity_J_per_mol_K": 157.90994014038992,
+        "optical_phase_eta": 1.0,
+        "optical_geff": 1.0,
+        "B_hom": 0.9891771034031558
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 0.817,
+        "refractive_index": 1.32,
+        "melt_K": 195.8
+      },
+      "benchmark": {
+        "density_error_pct": 7.492571586262731,
+        "refractive_index_error_pct": 10.148888688872566,
+        "T_sl_error_pct": 0.7767004067128764,
+        "contact_xi_trace_consistent": true
+      }
+    },
+    {
+      "molecule": "HF",
+      "motif_label": "linear chain / Z=4",
+      "allotrope": "chain",
+      "crystal_kind": "molecular",
+      "expected_contact_xi": 3.6666666666666665,
+      "witness_temperature_K": 189.6,
+      "gmtkn55_compton_triplet": [
+        4,
+        3,
+        1
+      ],
+      "contact_xi": 3.6666666666666665,
+      "intermolecular_contacts": 2,
+      "monomer_motif": "linear_chain",
+      "geometry": {
+        "density_g_cm3": 1.2014004382965726,
+        "curvature_density_fraction": 0.9677419354838709,
+        "phase_curvature_density_fraction": 1.0,
+        "kappa6_feedback": 1.0145816605696336,
+        "T_sl_at_pressure_K": 189.1135609462753,
+        "refractive_index_solid": 1.3609312666781561,
+        "neighbor_lapse_overlap_factor": 1.0,
+        "halogen_strong_hbond_leg_factor": 0.9777777777777777,
+        "linear_chain_zigzag_lattice_open_factor": 1.0333333333333334
+      },
+      "material_response": {
+        "refractive_index": 1.2636163239541438,
+        "refractive_index_one_way": 1.3609312666781561,
+        "optical_coupling_level": "coupled_relaxed",
+        "missing_optical_coupled_relaxation_flag": 1,
+        "thermal_conductivity_W_mK": 0.8188447310650616,
+        "thermal_conductivity_one_way_W_mK": 0.8283887201027689,
+        "phonon_cage_fraction": 0.011521147990188996,
+        "network_propagated_curvature_density_fraction": 0.9727187954500965,
+        "molar_heat_capacity_J_per_mol_K": 78.89923645315778,
+        "optical_phase_eta": 1.0,
+        "optical_geff": 1.0,
+        "B_hom": 0.988478852009811
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 1.15,
+        "refractive_index": 1.2,
+        "melt_K": 189.6
+      },
+      "benchmark": {
+        "density_error_pct": 4.469603330136757,
+        "refractive_index_error_pct": 5.301360329511988,
+        "T_sl_error_pct": 0.2565606823442483,
+        "contact_xi_trace_consistent": true
+      }
+    },
+    {
+      "molecule": "NaCl",
+      "motif_label": "ionic rocksalt / B1",
+      "allotrope": "B1",
+      "crystal_kind": "ionic",
+      "comparison_regime": "solid_lattice",
+      "expected_contact_xi": 4.333333333333333,
+      "witness_temperature_K": 1074.0,
+      "contact_xi": 4.333333333333333,
+      "geometry": {
+        "density_g_cm3": 2.135101665564785,
+        "nearest_neighbor_angstrom": 2.8220013650376075,
+        "lattice_parameter_angstrom": 5.644002730075215,
+        "T_sl_at_pressure_K": 1226.0361764617153,
+        "curvature_density_fraction": 0.7894769481028381
+      },
+      "material_response": {
+        "refractive_index": 1.6172150801252798
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 2.17,
+        "refractive_index": 1.544,
+        "melt_K": 1074.0
+      },
+      "benchmark": {
+        "density_error_pct": 1.608218176738006,
+        "refractive_index_error_pct": 4.741909334538845,
+        "T_sl_error_pct": 14.156068571854311,
+        "contact_xi_trace_consistent": true
+      }
+    },
+    {
+      "molecule": "Cu",
+      "motif_label": "metallic fcc / CN=12",
+      "allotrope": "fcc",
+      "crystal_kind": "metallic",
+      "comparison_regime": "solid_lattice",
+      "expected_contact_xi": 7.0,
+      "witness_temperature_K": 1357.77,
+      "contact_xi": 7.0,
+      "geometry": {
+        "density_g_cm3": 7.409920388684352,
+        "nearest_neighbor_angstrom": 2.7099021609557084,
+        "lattice_parameter_angstrom": 3.832380388727721,
+        "T_sl_at_pressure_K": 1357.77,
+        "mass_reliable": true
+      },
+      "material_response": {
+        "refractive_index": 0.0
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 8.96,
+        "refractive_index": 0.0,
+        "melt_K": 1357.77
+      },
+      "benchmark": {
+        "density_error_pct": 17.29999566200501,
+        "refractive_index_error_pct": 0.0,
+        "T_sl_error_pct": 0.0,
+        "contact_xi_trace_consistent": true
+      }
+    },
+    {
+      "molecule": "Si",
+      "motif_label": "covalent diamond-cubic / k=4",
+      "allotrope": "diamond",
+      "crystal_kind": "covalent_network",
+      "comparison_regime": "solid_lattice",
+      "expected_contact_xi": 6.0,
+      "witness_temperature_K": 1687.0,
+      "contact_xi": 6.0,
+      "geometry": {
+        "density_g_cm3": 2.76993823239258,
+        "bond_length_angstrom": 2.2679023324414285,
+        "lattice_parameter_angstrom": 5.237496088523356,
+        "T_sl_at_pressure_K": 1687.0,
+        "allotrope_bond_order": 1.0,
+        "length_reliable": false,
+        "mass_reliable": true
+      },
+      "material_response": {
+        "refractive_index": 3.42
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 2.33,
+        "refractive_index": 3.42,
+        "melt_K": 1687.0
+      },
+      "benchmark": {
+        "density_error_pct": 18.881469201398282,
+        "refractive_index_error_pct": 0.0,
+        "T_sl_error_pct": 0.0,
+        "contact_xi_trace_consistent": true
+      }
+    },
+    {
+      "molecule": "Ge",
+      "motif_label": "covalent diamond-cubic / k=4",
+      "allotrope": "diamond",
+      "crystal_kind": "covalent_network",
+      "comparison_regime": "solid_lattice",
+      "expected_contact_xi": 7.0,
+      "witness_temperature_K": 1211.0,
+      "contact_xi": 7.0,
+      "geometry": {
+        "density_g_cm3": 4.179414949058469,
+        "bond_length_angstrom": 2.6458860545149996,
+        "lattice_parameter_angstrom": 6.110412103277247,
+        "T_sl_at_pressure_K": 1211.0,
+        "allotrope_bond_order": 0.0,
+        "length_reliable": false,
+        "mass_reliable": true
+      },
+      "material_response": {
+        "refractive_index": 4.0
+      },
+      "nist_reference": {
+        "solid_density_g_cm3": 5.32,
+        "refractive_index": 4.0,
+        "melt_K": 1211.0
+      },
+      "benchmark": {
+        "density_error_pct": 21.43956862672052,
+        "refractive_index_error_pct": 0.0,
+        "T_sl_error_pct": 0.0,
+        "contact_xi_trace_consistent": true
+      }
+    }
+  ],
+  "summary": {
+    "mean_density_error_pct_vs_nist": 14.520968632594435,
+    "mean_refractive_index_error_pct_vs_nist": 2.7407190748557735,
+    "mean_T_sl_error_pct_vs_nist": 1.9456804324217116,
+    "all_contact_xi_traces_consistent": true
+  }
+}

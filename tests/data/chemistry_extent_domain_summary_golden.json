@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "source": "lightcone_chemistry_extent paper witness payloads",
+  "comparison_policy": "External chemistry data grade readouts only; no DFT/table fit inputs.",
+  "chemistry_panel_accuracy": {
+    "spectral_geometric_mean_error_pct": {
+      "r_e": 0.8345656589535899,
+      "D_e": 1.4234060558880879,
+      "B_e": 1.6014760313853849
+    },
+    "spectral_reliable_fraction": 1.0,
+    "carbon_density_mean_abs_error_pct": 1.049024437016152,
+    "carbon_bond_mean_abs_error_pct": 0.22622034887264425,
+    "carbon_count": 2
+  },
+  "molecule_suite": {
+    "core_mean_abs_binding_error_pct": 2.5295881819873496,
+    "combined_mean_abs_binding_error_pct": 3.2828493573309627,
+    "open_shell_mean_abs_binding_error_pct": 2.128674737507891,
+    "combined_within_15pct_fraction": 1.0,
+    "total_molecules": 19
+  },
+  "constraint_system": {
+    "n_equations": 49,
+    "slot_count": 20,
+    "condensed_resid_norm": 0.1782083792134966,
+    "binding_resid_norm": 0.039694613479917526,
+    "spectroscopy_rank_fraction": 1.0
+  },
+  "inverse_channel_solve": {
+    "gmtkn_resid_norm": 0.0381582479544391,
+    "outside_curvature_gas_abs_participation": 0.00985584112420999,
+    "spectroscopy_resid_norm": 0.3818221512854997
+  },
+  "nested_wf_geometry": {
+    "mean_abs_error_pct": 11.623833138435975,
+    "within_15pct_fraction": 0.8064516129032258,
+    "within_5pct_fraction": 0.3548387096774194,
+    "count": 31
+  },
+  "quantum_chem_witnesses": {
+    "h2_trace_match_fraction": 1.0,
+    "lih_imprint_theorem_fraction": 1.0,
+    "lih_dynamic_primary_error_pct": 0.8150558722634238,
+    "dynamic_chart_mean_abs_error_pct": 8.678502542693748,
+    "dynamic_chart_within_15pct_fraction": 0.8333333333333334
+  },
+  "contact_network_rules": {
+    "contact_kind_count": 7,
+    "derived_phase_count": 5,
+    "network_count": 21,
+    "network_with_rules_fraction": 1.0,
+    "network_with_contacts_fraction": 1.0
+  },
+  "allotrope_phase_cooling": {
+    "molecule_count": 6,
+    "species_count": 6,
+    "transition_coverage_fraction": 1.0,
+    "profile_coverage_fraction": 1.0
+  },
+  "residual_correlation_audit": {
+    "condensed_n": 4,
+    "spectroscopy_n": 11,
+    "spectroscopy_reliable_fraction": 0.8181818181818182,
+    "condensed_max_abs_correlation": 0.9115869956344493,
+    "spectroscopy_max_abs_correlation": 0.9749599310915544,
+    "in_bracket_flow_target_count": 8,
+    "coupled_relaxation_improvement_count": 4
+  },
+  "generator_dependent_coupling": {
+    "abelian_mean_abs_error_pct": 2.5295881819873496,
+    "spectral_gap_mean_abs_error_pct": 1.5996323511413877,
+    "spectral_gap_improvement_pct": 0.9299558308459619,
+    "spectral_gap_within5_fraction": 1.0,
+    "recommendation_improved": 1.0
+  },
+  "system_matrix_functor": {
+    "base_mean_abs_error_pct": 2.5295881819873496,
+    "so8_blend_mean_abs_error_pct": 2.5451562623233746,
+    "contact_relative_mean_abs_error_pct": 5.109945484393625,
+    "best_is_base_fraction": 1.0,
+    "row_count": 6
+  },
+  "second_order_effect": {
+    "base_mean_abs_error_pct": 2.528882603434188,
+    "outside_geff_mean_abs_error_pct": 3.8229049219078366,
+    "outside_geff_within5_fraction": 0.5,
+    "promote_outside_geff_fraction": 1.0
+  },
+  "crystal_ethics": {
+    "passes_fraction": 1.0,
+    "lean_module_pass_fraction": 1.0,
+    "az_policy_pass_fraction": 1.0,
+    "regime_match_fraction": 1.0
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "anchor_points": {
+    "cytosol_310K_1atm": {
+      "T_melt_K": 272.7117912030581,
+      "derived_phase": "liquid",
+      "f_low_density": 0.0,
+      "label": "cytosol_310K_1atm",
+      "liquid_subphase": "high_density",
+      "notes": "T_melt \u2264 T \u2264 T_boil and P \u2265 P_vap; condensed liquid coordination",
+      "pressure_Pa": 101325.0,
+      "pressure_atm": 1.0,
+      "rho_curv": 1.0,
+      "temperature_K": 310.15
+    },
+    "ice_271K_1atm": {
+      "T_melt_K": 272.7117912030581,
+      "derived_phase": "solid",
+      "f_low_density": null,
+      "label": "ice_271K_1atm",
+      "liquid_subphase": null,
+      "notes": "T < T_melt and P \u2265 P_solidify; full coordination + periodic weight",
+      "pressure_Pa": 101325.0,
+      "pressure_atm": 1.0,
+      "rho_curv": 0.7916666666666666,
+      "temperature_K": 271.0
+    },
+    "llcp_198K_1250atm": {
+      "T_melt_K": 272.7117912030581,
+      "derived_phase": "metastable_liquid",
+      "f_low_density": 2.89727502824809e-09,
+      "label": "llcp_198K_1250atm",
+      "liquid_subphase": "high_density",
+      "notes": "T < T_melt, above kinetic floor: metastable liquid (two-liquid branch; LDL/HDL mixture from cohesive ladder)",
+      "pressure_Pa": 126656250.0,
+      "pressure_atm": 1250.0,
+      "rho_curv": 0.999999999396401,
+      "temperature_K": 198.0
+    },
+    "melt_273K_1atm": {
+      "T_melt_K": 272.7117912030581,
+      "derived_phase": "liquid",
+      "f_low_density": 0.0,
+      "label": "melt_273K_1atm",
+      "liquid_subphase": "high_density",
+      "notes": "T_melt \u2264 T \u2264 T_boil and P \u2265 P_vap; condensed liquid coordination",
+      "pressure_Pa": 101325.0,
+      "pressure_atm": 1.0,
+      "rho_curv": 1.0,
+      "temperature_K": 273.15
+    }
+  },
+  "comparison_policy": "external observations grade readouts only",
+  "derivation": "HQIV motif + cohesive ladder (no MD/DFT inputs)",
+  "end_members": {
+    "high_density": {
+      "label": "H2O_HDL",
+      "rho_curv": 1.0
+    },
+    "low_density": {
+      "label": "H2O_LDL",
+      "rho_curv": 0.7916666666666666
+    }
+  },
+  "hoh_angle_witness": {
+    "cytosol_310K_1atm": {
+      "f_low_density": 0.5738301098024224,
+      "theta_dyn_minus_ref_deg": -0.006779365509288482,
+      "theta_dynamic_gas_deg": 104.4712206344907,
+      "theta_dyn_within_comparison_band": true,
+      "theta_gas_reference_deg": 104.478,
+      "theta_gas_reference_unc_deg": 0.01,
+      "theta_gas_reference_range_deg": [104.45, 104.51],
+      "theta_mix_minus_ref_deg": 2.862371183502816,
+      "theta_mixture_deg": 107.34037118350281,
+      "theta_tet_minus_ref_deg": 4.993220634490697,
+      "theta_tetrahedral_deg": 109.47122063449069
+    },
+    "window_center_1atm": {
+      "f_low_density": 0.6027605867580326,
+      "theta_dyn_minus_ref_deg": -0.006779365509288482,
+      "theta_dynamic_gas_deg": 104.4712206344907,
+      "theta_dyn_within_comparison_band": true,
+      "theta_gas_reference_deg": 104.478,
+      "theta_gas_reference_unc_deg": 0.01,
+      "theta_gas_reference_range_deg": [104.45, 104.51],
+      "theta_mix_minus_ref_deg": 3.0070235682808573,
+      "theta_mixture_deg": 107.48502356828085,
+      "theta_tet_minus_ref_deg": 4.993220634490697,
+      "theta_tetrahedral_deg": 109.47122063449069
+    }
+  },
+  "kim_compressibility_peak_T_K": 229.0,
+  "nucleation_defect_witness": {
+    "f_low_density_baseline": 0.6074439302407976,
+    "f_low_density_defect": 0.9628748387003195,
+    "f_low_density_excess": 0.35543090845952197,
+    "local_coordination_excess": 0.25,
+    "pressure_atm": 1.0,
+    "temperature_K": 220.0
+  },
+  "protein_interface": {
+    "fold_310K_rho_neutral": 1.0,
+    "supercooled_200K_f_bulk": 0.0,
+    "supercooled_200K_f_hydrophobic": 0.24,
+    "supercooled_200K_rho_hydrophobic": 0.7916666666666666
+  },
+  "source": "hqiv_lab/phase_diagram.py",
+  "structural_expectations": {
+    "T_melt_K_window": [
+      270.0,
+      276.0
+    ],
+    "cytosol_phase": "liquid",
+    "ice_below_melt_phase": "solid",
+    "llcp_regime_phase": "metastable_liquid"
+  },
+  "water_hoh_angle_observations": [
+    {
+      "bibkey": "hoy1979waterRotBend",
+      "doi": "10.1016/0022-2852(79)90019-5",
+      "label": "equilibrium structure θe (rotovibrational fit)",
+      "phase": "gas",
+      "role": "comparison_only",
+      "sigma_deg": 0.0019,
+      "source": "Hoy & Bunker, J. Mol. Spectrosc. 1979",
+      "structure": "equilibrium",
+      "theta_deg": 104.4776
+    },
+    {
+      "bibkey": "nistCCCBDBwaterH2O",
+      "label": "ground-state effective angle (aggregated)",
+      "note": "Arena median comparison target; cites Hoy & Bunker 1979 among others",
+      "phase": "gas",
+      "primary_comparison": true,
+      "role": "comparison_only",
+      "sigma_deg": 0.01,
+      "source": "NIST CCCBDB (H2O, CAS 7732-18-5)",
+      "structure": "ground_vibrational",
+      "theta_deg": 104.478,
+      "url": "https://cccbdb.nist.gov/expgeom2.asp?casno=7732185&charge=0"
+    }
+  ],
+  "water_llpt_observations": [
+    {
+      "P_atm": 1250.0,
+      "T_K": 198.0,
+      "doi": "10.1038/s41567-024-02761-0",
+      "label": "LLCP (MB-pol)",
+      "role": "comparison_only",
+      "source": "Sciortino et al., Nat. Phys. 2025"
+    },
+    {
+      "T_regime_K": "deeply supercooled",
+      "doi": "10.1038/s41567-026-03301-8",
+      "label": "two-state A\u21ccB (TIP4P/Ice MD)",
+      "role": "comparison_only",
+      "source": "Li et al., Nat. Phys. 2026"
+    },
+    {
+      "bibkey": "kim2020waterLLPT",
+      "doi": "10.1126/science.abb9385",
+      "label": "bulk LLPT experimental claim",
+      "role": "comparison_only",
+      "source": "Kim et al., Science 2020"
+    },
+    {
+      "P_atm": 1.0,
+      "T_K": 229.0,
+      "bibkey": "kim2017waterWidom",
+      "doi": "10.1126/science.aap8269",
+      "label": "compressibility maximum ~229 K at 1 atm",
+      "role": "comparison_only",
+      "source": "Kim et al., Science 2017"
+    }
+  ],
+  "widom_compressibility_proxy": {
+    "compressibility_proxy": 0.018138746847395453,
+    "pressure_Pa": 101325.0,
+    "temperature_K": 228.0
+  },
+  "widom_free_energy": {
+    "gamma2_window": {
+      "T_melt_K": 272.7117912030581,
+      "center_K": 229.0779046105688,
+      "peak_minus_center_K": -1.077904610568794,
+      "weight_at_150K": 0.00010907562007875585,
+      "weight_at_center": 1.0
+    },
+    "minimum_at_gamma2_window": {
+      "f_low_density": 0.6027605867580326,
+      "free_energy_curvature_ev": 0.07275470544770846,
+      "free_energy_ev": -0.01646449555694287,
+      "latent_branch_barrier_ev": 0.005439926827209101
+    }
+  }
+}

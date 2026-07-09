@@ -508,9 +508,342 @@ except Exception as e:
     print("published benchmark comparisons skipped:", e)
 
 
+try:
+    from pyhqiv.arena.published_benchmarks import (
+        water_h2o_melt_temperature_K,
+        water_llcp_observation_distance,
+        water_metastable_liquid_at_llcp,
+    )
+
+    _add(
+        "water_h2o_melt_T_vs_nist",
+        water_h2o_melt_temperature_K,
+        273.15,
+        3.0,
+        "NIST H₂O melting point at 1 atm (comparison grades T_sl from geometry ladder)",
+        "thermodynamics-arrow + PhaseGeometryDensity",
+        "HQIV T_sl from ice Ih unit cell + cohesive scales",
+    )
+    _add(
+        "water_metastable_at_sciortino_llcp",
+        water_metastable_liquid_at_llcp,
+        1.0,
+        1.0,
+        "Sciortino et al. Nat. Phys. 2025 LLCP regime — HQIV structural witness (comparison only)",
+        "PhaseDiagramMixture",
+        "Metastable_liquid at ~198 K / 1250 atm without MB-pol inputs",
+    )
+    _add(
+        "water_llcp_TP_distance_vs_sciortino",
+        water_llcp_observation_distance,
+        0.0,
+        0.15,
+        "Normalized (T,P) distance to Sciortino LLCP (198 K, 1250 atm); lower is better",
+        "PhaseDiagramMixture",
+        "Literature coordinates quarantined; grades HQIV phase-map placement",
+    )
+except Exception as e:
+    print("phase diagram paper comp skipped:", e)
+
+
+# --- Light-cone chemistry extent: DFT-replacement proof/witness panels ---
+
+try:
+    from pyhqiv.arena import published_benchmarks as chem_pb
+
+    CHEM_SOURCE = (
+        "lightcone_chemistry_extent paper witness bundle; NIST/CRC/GMTKN/W4/PDB-style "
+        "values grade readouts only, never derivation inputs"
+    )
+    CHEM_PAPER = "lightcone_chemistry_extent"
+
+    chemistry_comparisons = [
+        (
+            "chem_spectroscopy_reliable_omega_e_mean_error_pct",
+            chem_pb.chemistry_spectroscopy_reliable_omega_e_err_pct,
+            0.0,
+            15.0,
+            "Mean |Δω_e|% on geometry-reliable spectroscopy panel; paper gate",
+        ),
+        (
+            "chem_spectroscopy_reliable_r_e_mean_error_pct",
+            chem_pb.chemistry_spectroscopy_reliable_r_e_err_pct,
+            0.0,
+            10.0,
+            "Mean |Δr_e|% on geometry-reliable spectroscopy panel; paper gate",
+        ),
+        (
+            "chem_spectroscopy_geometry_reliable_fraction",
+            chem_pb.chemistry_spectroscopy_geometry_reliable_fraction,
+            1.0,
+            0.2,
+            "Geometry-reliable coverage fraction for spectroscopy rows",
+        ),
+        (
+            "chem_spectroscopy_concentration_bracket_hit_rate",
+            chem_pb.chemistry_spectroscopy_concentration_bracket_hit_rate,
+            1.0,
+            0.2,
+            "Fraction of concentration brackets containing the NIST omega_e witness",
+        ),
+        (
+            "chem_condensed_refractive_index_mean_error_pct",
+            chem_pb.chemistry_condensed_phase_mean_n_err_pct,
+            0.0,
+            5.0,
+            "Condensed-phase mean |Δn|%; NIST/CRC comparison quarantine",
+        ),
+        (
+            "chem_condensed_melt_temperature_mean_error_pct",
+            chem_pb.chemistry_condensed_phase_mean_T_sl_err_pct,
+            0.0,
+            5.0,
+            "Condensed-phase mean |ΔT_sl|%; NIST/CRC comparison quarantine",
+        ),
+        (
+            "chem_crystal_contact_panel_pass_rate",
+            chem_pb.chemistry_crystal_contact_panel_pass_rate,
+            1.0,
+            0.01,
+            "NaCl/Cu/Si/Ge solid-lattice contact witness structural pass rate",
+        ),
+        (
+            "chem_crystal_fracture_panel_pass_rate",
+            chem_pb.chemistry_crystal_fracture_panel_pass_rate,
+            1.0,
+            0.01,
+            "Fracture-scale witness ethics/structure pass rate",
+        ),
+        (
+            "chem_public_spectral_r_e_geom_mean_error_pct",
+            chem_pb.chemistry_public_spectral_r_e_geom_mean_err_pct,
+            0.0,
+            5.0,
+            "Public accuracy panel geometric-mean |Δr_e|%; NIST/CRC quarantine",
+        ),
+        (
+            "chem_public_spectral_D_e_geom_mean_error_pct",
+            chem_pb.chemistry_public_spectral_D_e_geom_mean_err_pct,
+            0.0,
+            5.0,
+            "Public accuracy panel geometric-mean |ΔD_e|%; NIST/CRC quarantine",
+        ),
+        (
+            "chem_public_spectral_B_e_geom_mean_error_pct",
+            chem_pb.chemistry_public_spectral_B_e_geom_mean_err_pct,
+            0.0,
+            5.0,
+            "Public accuracy panel geometric-mean |ΔB_e|%; NIST/CRC quarantine",
+        ),
+        (
+            "chem_carbon_density_mean_error_pct",
+            chem_pb.chemistry_carbon_density_mean_err_pct,
+            0.0,
+            2.0,
+            "Graphene/diamond carbon packing density mean |error|%",
+        ),
+        (
+            "chem_carbon_bond_mean_error_pct",
+            chem_pb.chemistry_carbon_bond_mean_err_pct,
+            0.0,
+            1.0,
+            "Graphene/diamond carbon bond length mean |error|%",
+        ),
+        (
+            "chem_molecule_suite_core_binding_error_pct",
+            chem_pb.chemistry_molecule_suite_core_binding_err_pct,
+            0.0,
+            5.0,
+            "Core molecule-suite binding-energy mean |error|%; W4/GMTKN quarantine",
+        ),
+        (
+            "chem_molecule_suite_combined_binding_error_pct",
+            chem_pb.chemistry_molecule_suite_combined_binding_err_pct,
+            0.0,
+            5.0,
+            "Core+expanded molecule-suite binding mean |error|%",
+        ),
+        (
+            "chem_molecule_suite_open_shell_binding_error_pct",
+            chem_pb.chemistry_molecule_suite_open_shell_binding_err_pct,
+            0.0,
+            5.0,
+            "Open-shell molecule-suite binding mean |error|%",
+        ),
+        (
+            "chem_molecule_suite_within15_fraction",
+            chem_pb.chemistry_molecule_suite_within15_fraction,
+            1.0,
+            0.05,
+            "Combined molecule suite within-15% coverage fraction",
+        ),
+        (
+            "chem_constraint_condensed_residual_norm",
+            chem_pb.chemistry_constraint_condensed_resid_norm,
+            0.0,
+            0.25,
+            "Log-linear chemistry constraint system condensed residual norm",
+        ),
+        (
+            "chem_constraint_binding_residual_norm",
+            chem_pb.chemistry_constraint_binding_resid_norm,
+            0.0,
+            0.05,
+            "Log-linear chemistry constraint system binding residual norm",
+        ),
+        (
+            "chem_inverse_gmtkn_residual_norm",
+            chem_pb.chemistry_inverse_gmtkn_resid_norm,
+            0.0,
+            0.05,
+            "Inverse-channel GMTKN three-slot residual norm",
+        ),
+        (
+            "chem_inverse_outside_gas_participation_abs",
+            chem_pb.chemistry_inverse_outside_gas_participation_abs,
+            0.0,
+            0.02,
+            "Reduced channel solve outside-curvature gas participation magnitude",
+        ),
+        (
+            "chem_nested_wf_geometry_within15_fraction",
+            chem_pb.chemistry_nested_wf_within15_fraction,
+            1.0,
+            0.2,
+            "Nested wavefront geometry rows within 15%",
+        ),
+        (
+            "chem_quantum_lih_primary_binding_error_pct",
+            chem_pb.chemistry_quantum_lih_primary_err_pct,
+            0.0,
+            2.0,
+            "LiH dynamic Compton participation primary binding error%",
+        ),
+        (
+            "chem_quantum_lih_imprint_theorem_fraction",
+            chem_pb.chemistry_quantum_lih_imprint_theorem_fraction,
+            1.0,
+            0.01,
+            "LiH Compton bridge imprint theorem coverage fraction",
+        ),
+        (
+            "chem_contact_network_rule_coverage_fraction",
+            chem_pb.chemistry_contact_network_rule_coverage_fraction,
+            1.0,
+            0.01,
+            "Curvature contact-network rules/contact coverage fraction",
+        ),
+        (
+            "chem_allotrope_phase_cooling_coverage_fraction",
+            chem_pb.chemistry_allotrope_phase_cooling_coverage_fraction,
+            1.0,
+            0.01,
+            "Allotrope cooling transition/profile coverage fraction",
+        ),
+        (
+            "chem_residual_spectroscopy_reliable_fraction",
+            chem_pb.chemistry_residual_spectroscopy_reliable_fraction,
+            1.0,
+            0.2,
+            "Residual-correlation audit spectroscopy reliable fraction",
+        ),
+        (
+            "chem_residual_spectroscopy_max_abs_correlation",
+            chem_pb.chemistry_residual_spectroscopy_max_abs_correlation,
+            1.0,
+            0.2,
+            "Strongest spectroscopy residual correlation against derived HQIV target slots",
+        ),
+        (
+            "chem_residual_condensed_max_abs_correlation",
+            chem_pb.chemistry_residual_condensed_max_abs_correlation,
+            1.0,
+            0.2,
+            "Strongest condensed residual correlation against derived HQIV target slots",
+        ),
+        (
+            "chem_residual_flow_target_count",
+            chem_pb.chemistry_residual_flow_target_count,
+            8.0,
+            1.0,
+            "Count of in-bracket concentration-flow target rows",
+        ),
+        (
+            "chem_generator_spectral_gap_error_pct",
+            chem_pb.chemistry_generator_spectral_gap_err_pct,
+            0.0,
+            3.0,
+            "Generator-dependent spectral-gap coupling mean |binding error|%",
+        ),
+        (
+            "chem_generator_spectral_gap_improvement_pct",
+            chem_pb.chemistry_generator_spectral_gap_improvement_pct,
+            1.0,
+            0.2,
+            "Spectral-gap improvement over abelian baseline in mean error pct",
+        ),
+        (
+            "chem_generator_recommendation_improved",
+            chem_pb.chemistry_generator_recommendation_improved,
+            1.0,
+            0.01,
+            "Generator-dependent audit recommendation improved flag",
+        ),
+        (
+            "chem_system_matrix_best_is_base_fraction",
+            chem_pb.chemistry_system_matrix_best_is_base_fraction,
+            1.0,
+            0.01,
+            "System-matrix audit confirms base is best current production readout",
+        ),
+        (
+            "chem_system_matrix_so8_blend_error_pct",
+            chem_pb.chemistry_system_matrix_so8_blend_err_pct,
+            0.0,
+            5.0,
+            "System-matrix SO(8)-blend candidate mean |binding error|%",
+        ),
+        (
+            "chem_second_order_outside_geff_error_pct",
+            chem_pb.chemistry_second_order_outside_geff_err_pct,
+            0.0,
+            5.0,
+            "Second-order outside-geff toggle mean |binding error|%",
+        ),
+        (
+            "chem_second_order_promote_outside_geff_fraction",
+            chem_pb.chemistry_second_order_promote_outside_geff_fraction,
+            1.0,
+            0.01,
+            "Second-order audit promotes outside-geff candidate flag",
+        ),
+        (
+            "chem_crystal_ethics_pass_fraction",
+            chem_pb.chemistry_crystal_ethics_pass_fraction,
+            1.0,
+            0.01,
+            "Crystal ethics full policy pass fraction",
+        ),
+        (
+            "chem_crystal_ethics_lean_pass_fraction",
+            chem_pb.chemistry_crystal_ethics_lean_pass_fraction,
+            1.0,
+            0.01,
+            "Crystal Lean module no-sorry/admit/axiom pass fraction",
+        ),
+    ]
+
+    for cid, getter, central, err, notes in chemistry_comparisons:
+        _add(cid, getter, central, err, CHEM_SOURCE, CHEM_PAPER, notes)
+except Exception as e:
+    print("lightcone chemistry extent comparisons skipped:", e)
+
+
 def test_all_paper_comparisons_have_error_bars():
     """The core assertion: for every entry we have a (hqiv, central, err>0, source)."""
-    assert len(COMPARISONS) > 5, "Need to expand coverage for all papers"
+    chemistry_ids = [cid for cid, *_ in COMPARISONS if cid.startswith("chem_")]
+    assert len(COMPARISONS) >= 70, "Need broad paper-comparison coverage in live stats"
+    assert len(chemistry_ids) >= 35, "lightcone_chemistry_extent must stay test-covered"
     for cid, getter, central, err, source, paper, notes in COMPARISONS:
         assert err > 0 or "exact" in source.lower() or "theorem" in notes.lower(), f"{cid} must have positive err or be exact theorem"
         assert source, f"{cid} missing source"

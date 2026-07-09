@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T18:53:58Z",
+  "generated_at": "2026-07-09T21:51:24Z",
   "pyhqiv_version": "0.4.1.dev1+unknown.gabc2030da.d20260707",
   "wikipedia": {
     "title": "List of unsolved problems in physics",
@@ -8,8 +8,8 @@
     "license_note": "Problem titles and grouping follow the English Wikipedia list; HQIV status text is programme commentary, not Wikipedia content."
   },
   "sigma_snapshot": {
-    "overall_score": 886.0607,
-    "sigma_weighted": 0.12859086,
+    "overall_score": 643.3336,
+    "sigma_weighted": 0.66617236,
     "num_protected_regressions": 0,
     "alignment_cores": [
       {
@@ -115,6 +115,396 @@
         "mainstream_note": "Mainstream (\u039bCDM): fitted parameter (\u03a9_b h^2) from BBN light-element abundances + CMB damping tail (depends on baryon density + several other cosmological parameters + initial conditions). HQIV: derived ~6.19782 from axioms + discrete dynamics (no fit)."
       },
       {
+        "name": "chemistry_allotrope_phase_cooling_coverage_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Allotrope phase-cooling coverage: transition and spectroscopy-profile coverage across six molecules.",
+        "mainstream_note": "Cooling/phase profiles are generated from HQIV phase ladders; comparison observations remain quarantined."
+      },
+      {
+        "name": "chemistry_carbon_bond_mean_err_pct",
+        "value": 0.22622034887264425,
+        "reference": 0.0,
+        "rel_err": 0.22622034887264425,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Carbon network packing panel: mean |\u0394bond length|% for graphene and diamond.",
+        "mainstream_note": "CRC/NIST carbon bond lengths grade the network-packing readout only."
+      },
+      {
+        "name": "chemistry_carbon_density_mean_err_pct",
+        "value": 1.049024437016152,
+        "reference": 0.0,
+        "rel_err": 1.049024437016152,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Carbon network packing panel: mean |\u0394density|% for graphene areal density and diamond bulk density.",
+        "mainstream_note": "Graphene/diamond densities grade curvature-network packing; no DFT lattice relaxation is used."
+      },
+      {
+        "name": "chemistry_condensed_phase_mean_T_sl_err_pct",
+        "value": 1.9456804324217116,
+        "reference": 0.0,
+        "rel_err": 1.9456804324217116,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Mean melt-temperature |\u0394T_sl|% vs NIST on condensed-phase audit species.",
+        "mainstream_note": "T_sl from PhaseGeometryDensity + cohesive ladder; handbook melt points are comparison-only."
+      },
+      {
+        "name": "chemistry_condensed_phase_mean_n_err_pct",
+        "value": 2.7407190748557735,
+        "reference": 0.0,
+        "rel_err": 2.7407190748557735,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Mean refractive-index |\u0394n|% vs NIST/CRC on condensed-phase audit species.",
+        "mainstream_note": "Optical local-field / linear-chain coupled relaxation grades against handbooks; no refractive-index fit."
+      },
+      {
+        "name": "chemistry_constraint_binding_resid_norm",
+        "value": 0.039694613479917526,
+        "reference": 0.0,
+        "rel_err": 0.039694613479917526,
+        "unit": "norm",
+        "protected": false,
+        "desc": "Log-linear constraint audit: binding-sector residual norm after HQIV channel solve.",
+        "mainstream_note": "Binding residuals identify second-order channels while preserving the first-principles ledger."
+      },
+      {
+        "name": "chemistry_constraint_condensed_resid_norm",
+        "value": 0.1782083792134966,
+        "reference": 0.0,
+        "rel_err": 0.1782083792134966,
+        "unit": "norm",
+        "protected": false,
+        "desc": "Log-linear constraint audit: condensed-sector residual norm after HQIV channel solve.",
+        "mainstream_note": "Diagnoses bulk density / optical split and outside-curvature participation; no coefficient is promoted as a fit."
+      },
+      {
+        "name": "chemistry_contact_network_rule_coverage_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Curvature contact-network rule/contact coverage across the paper network panel.",
+        "mainstream_note": "Contact-network rules replace force-field topology tables with derived contact kinds and phase slots."
+      },
+      {
+        "name": "chemistry_crystal_contact_panel_pass_rate",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Structural pass rate for NaCl/Cu/Si/Ge crystal-contact witnesses (solid_lattice regime).",
+        "mainstream_note": "Lattice nn contacts derived upstream of spectroscopy; NIST/CRC distances grade only."
+      },
+      {
+        "name": "chemistry_crystal_ethics_lean_pass_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Crystal ethics audit: fraction of Lean chemistry modules with no sorry/admit/axiom hits.",
+        "mainstream_note": "Lean proof coverage is scored separately from numerical comparison residuals."
+      },
+      {
+        "name": "chemistry_crystal_ethics_pass_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Crystal ethics audit: full policy pass for referenceM=4, no PDG/external mass tables, and comparison quarantine.",
+        "mainstream_note": "Ethics gates protect the chemistry Arena from smuggling handbook constants into derivations."
+      },
+      {
+        "name": "chemistry_crystal_fracture_panel_pass_rate",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Ethics + structural completeness of Griffith-scale fracture witnesses (no tabulated K_IC / moduli).",
+        "mainstream_note": "Fracture-scale candidates from contact binding only; handbook toughness remains quarantined."
+      },
+      {
+        "name": "chemistry_generator_recommendation_improved",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Generator-dependent coupling audit: recommendation marks the spectral-gap promotion as improved.",
+        "mainstream_note": "Structural recommendation is generated by the audit from derived variants only."
+      },
+      {
+        "name": "chemistry_generator_spectral_gap_err_pct",
+        "value": 1.5996323511413877,
+        "reference": 0.0,
+        "rel_err": 1.5996323511413877,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Generator-dependent coupling audit: spectral-gap variant mean |binding error|%.",
+        "mainstream_note": "Preferred-axis spectral gap is a finite polarity-spectrum projector, not a molecule-type case split."
+      },
+      {
+        "name": "chemistry_generator_spectral_gap_improvement_pct",
+        "value": 0.9299558308459619,
+        "reference": 1.0,
+        "rel_err": 0.0700441691540381,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Generator-dependent coupling audit: spectral-gap mean-error improvement over the abelian baseline.",
+        "mainstream_note": "Rewards a derived generator-dependent improvement that preserves the same bond-network ledger."
+      },
+      {
+        "name": "chemistry_inverse_gmtkn_resid_norm",
+        "value": 0.0381582479544391,
+        "reference": 0.0,
+        "rel_err": 0.0381582479544391,
+        "unit": "norm",
+        "protected": false,
+        "desc": "Inverse-channel solve: 3-slot GMTKN activation residual norm.",
+        "mainstream_note": "GMTKN/W4 comparisons grade activation/path barriers only; path slots are not DFT-calibrated."
+      },
+      {
+        "name": "chemistry_inverse_outside_gas_participation_abs",
+        "value": 0.00985584112420999,
+        "reference": 0.0,
+        "rel_err": 0.00985584112420999,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Inverse-channel solve: absolute outside-curvature gas participation inferred from the reduced channel ledger.",
+        "mainstream_note": "Gas outside-curvature participation remains a diagnostic channel, not a fitted gas-phase offset."
+      },
+      {
+        "name": "chemistry_molecule_suite_combined_binding_err_pct",
+        "value": 3.2828493573309627,
+        "reference": 0.0,
+        "rel_err": 3.2828493573309627,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Molecule-suite domain replacement: combined core+expanded mean |binding-energy error|%.",
+        "mainstream_note": "Broader molecular energetics are scored as Arena residuals against quarantined references."
+      },
+      {
+        "name": "chemistry_molecule_suite_core_binding_err_pct",
+        "value": 2.5295881819873496,
+        "reference": 0.0,
+        "rel_err": 2.5295881819873496,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Molecule-suite domain replacement: core-panel mean |binding-energy error|%.",
+        "mainstream_note": "W4/GMTKN-style energies grade the derived bond-state network; no functional/basis-set fit enters the readout."
+      },
+      {
+        "name": "chemistry_molecule_suite_open_shell_binding_err_pct",
+        "value": 2.128674737507891,
+        "reference": 0.0,
+        "rel_err": 2.128674737507891,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Molecule-suite domain replacement: open-shell mean |binding-energy error|%.",
+        "mainstream_note": "Open-shell handling is read from the same bond-state ledger, not from an exchange-correlation functional."
+      },
+      {
+        "name": "chemistry_molecule_suite_within15_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Molecule-suite structural coverage: fraction of combined core+expanded molecules within 15%.",
+        "mainstream_note": "Coverage metric complements residual metrics so broad panels are rewarded, not only cherry-picked molecules."
+      },
+      {
+        "name": "chemistry_nested_wf_within15_fraction",
+        "value": 0.8064516129032258,
+        "reference": 1.0,
+        "rel_err": 0.19354838709677424,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Nested-WF geometry coverage: fraction of geometry witnesses within 15%.",
+        "mainstream_note": "Nested wavefront geometry is the direct replacement route for geometry optimization panels."
+      },
+      {
+        "name": "chemistry_public_spectral_B_e_geom_mean_err_pct",
+        "value": 1.6014760313853849,
+        "reference": 0.0,
+        "rel_err": 1.6014760313853849,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Public DFT-replacement spectral-scale panel: geometric-mean |\u0394B_e|% on the paper diatomic panel.",
+        "mainstream_note": "Rotational constants grade the derived bond length / reduced-mass readout; they are not geometry inputs."
+      },
+      {
+        "name": "chemistry_public_spectral_D_e_geom_mean_err_pct",
+        "value": 1.4234060558880879,
+        "reference": 0.0,
+        "rel_err": 1.4234060558880879,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Public DFT-replacement spectral-scale panel: geometric-mean |\u0394D_e|% on the paper diatomic panel.",
+        "mainstream_note": "Dissociation energies are comparison quarantine; HQIV uses the light-cone spectral scale plus bond-network readout."
+      },
+      {
+        "name": "chemistry_public_spectral_r_e_geom_mean_err_pct",
+        "value": 0.8345656589535899,
+        "reference": 0.0,
+        "rel_err": 0.8345656589535899,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Public DFT-replacement spectral-scale panel: geometric-mean |\u0394r_e|% on the paper diatomic panel.",
+        "mainstream_note": "NIST/CRC bond lengths grade readouts only; HQIV spectral-scale anchor supplies the geometry without DFT optimization."
+      },
+      {
+        "name": "chemistry_quantum_lih_imprint_theorem_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Quantum-chem LiH bridge: fraction of imprint phase theorem witnesses discharged.",
+        "mainstream_note": "Formal bridge coverage protects Lean/Python chemistry alignment while residual metrics target numerical polish."
+      },
+      {
+        "name": "chemistry_quantum_lih_primary_err_pct",
+        "value": 0.8150558722634238,
+        "reference": 0.0,
+        "rel_err": 0.8150558722634238,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Quantum-chem LiH dynamic Compton participation primary binding error%.",
+        "mainstream_note": "LiH binding uses Compton shell participation + curvature feedback; the laboratory binding grades only the final readout."
+      },
+      {
+        "name": "chemistry_residual_condensed_max_abs_correlation",
+        "value": 0.9115869956344493,
+        "reference": 1.0,
+        "rel_err": 0.08841300436555066,
+        "unit": "abs_r",
+        "protected": false,
+        "desc": "Residual-correlation audit: strongest condensed residual correlation against derived HQIV features.",
+        "mainstream_note": "Small-N condensed correlations are target selectors; comparison values remain quarantined."
+      },
+      {
+        "name": "chemistry_residual_flow_target_count",
+        "value": 8.0,
+        "reference": 8.0,
+        "rel_err": 0.0,
+        "unit": "count",
+        "protected": false,
+        "desc": "Residual-correlation audit: count of in-bracket concentration-flow target rows.",
+        "mainstream_note": "Counts formal promotion opportunities for concentration-flow terms without applying a fitted correction."
+      },
+      {
+        "name": "chemistry_residual_spectroscopy_max_abs_correlation",
+        "value": 0.9749599310915544,
+        "reference": 1.0,
+        "rel_err": 0.025040068908445567,
+        "unit": "abs_r",
+        "protected": false,
+        "desc": "Residual-correlation audit: strongest spectroscopy residual correlation against derived HQIV features.",
+        "mainstream_note": "High |r| marks an Arena target for theorem promotion, not a regression fit."
+      },
+      {
+        "name": "chemistry_residual_spectroscopy_reliable_fraction",
+        "value": 0.8181818181818182,
+        "reference": 1.0,
+        "rel_err": 0.18181818181818177,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Residual-correlation audit: geometry-reliable spectroscopy fraction used for second-order target selection.",
+        "mainstream_note": "Residual correlations select formal target slots; they are not fitted corrections."
+      },
+      {
+        "name": "chemistry_second_order_outside_geff_err_pct",
+        "value": 3.8229049219078366,
+        "reference": 0.0,
+        "rel_err": 3.8229049219078366,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Second-order effect audit: outside-geff toggle mean |binding error|%.",
+        "mainstream_note": "Derived second-order toggles are scored before promotion, avoiding fitted post-hoc corrections."
+      },
+      {
+        "name": "chemistry_second_order_promote_outside_geff_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Second-order effect audit: outside-geff is the promoted candidate in the proof-boundary audit.",
+        "mainstream_note": "Promotion flag documents the formal candidate while residual metrics quantify its current numerical state."
+      },
+      {
+        "name": "chemistry_spectroscopy_concentration_bracket_hit_rate",
+        "value": 0.8181818181818182,
+        "reference": 1.0,
+        "rel_err": 0.18181818181818177,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Fraction of derived [diffuse, concentrated] \u03c9_e brackets that contain the NIST reference.",
+        "mainstream_note": "Missing physics is an in-bracket concentration flow \u2014 not a free offset outside the bracket."
+      },
+      {
+        "name": "chemistry_spectroscopy_geometry_reliable_fraction",
+        "value": 0.8181818181818182,
+        "reference": 1.0,
+        "rel_err": 0.18181818181818177,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Fraction of spectroscopy panel rows with geometry_reliable=True (ionic/period-3 routes quarantined until promoted).",
+        "mainstream_note": "Headline accuracy is reported only on covalent nested-WF bonds clearing the 0.70 \u00c5 floor."
+      },
+      {
+        "name": "chemistry_spectroscopy_reliable_omega_e_err_pct",
+        "value": 5.5979058213876245,
+        "reference": 0.0,
+        "rel_err": 5.5979058213876245,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Mean |\u0394\u03c9_e|% on geometry-reliable diatomics (lightcone_chemistry_extent molecular spectroscopy panel).",
+        "mainstream_note": "NIST/CRC/HITRAN \u03c9_e grade readouts only; HQIV Morse + VB resonance + coupled relaxation never fits comparison residuals."
+      },
+      {
+        "name": "chemistry_spectroscopy_reliable_r_e_err_pct",
+        "value": 5.066624341201491,
+        "reference": 0.0,
+        "rel_err": 5.066624341201491,
+        "unit": "pct",
+        "protected": false,
+        "desc": "Mean |\u0394r_e|% on geometry-reliable diatomics (nested-WF / OutsideContactGeometry routes).",
+        "mainstream_note": "Gas-phase spectroscopic r_e quarantine; solid-lattice contacts are a separate crystal panel."
+      },
+      {
+        "name": "chemistry_system_matrix_best_is_base_fraction",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "System-matrix functor audit: confirms current continuous SO(8) matrix functor is a no-op guard on E_bind_from_network.",
+        "mainstream_note": "A no-op finding is useful: it prevents promoting an over-correcting matrix dress as a fake score improvement."
+      },
+      {
+        "name": "chemistry_system_matrix_so8_blend_err_pct",
+        "value": 2.5451562623233746,
+        "reference": 0.0,
+        "rel_err": 2.5451562623233746,
+        "unit": "pct",
+        "protected": false,
+        "desc": "System-matrix functor audit: SO(8)-blend relative variant mean |binding error|%.",
+        "mainstream_note": "Matrix functors are tested as candidate dresses, not silently folded into the production binding readout."
+      },
+      {
         "name": "cmb_birefringence_z",
         "value": 0.3936170212765955,
         "reference": 1.0,
@@ -206,9 +596,9 @@
       },
       {
         "name": "miniprotein_mean_ca_rmsd",
-        "value": 2.4621418617860744,
+        "value": 2.0305861183581424,
         "reference": 2.0,
-        "rel_err": 0.2310709308930372,
+        "rel_err": 0.0152930591790712,
         "unit": "angstrom",
         "protected": false,
         "desc": "Mean C\u03b1 RMSD across 11-target miniprotein audit panel (PDB/COD witnesses grade HQIV fold readouts only; 11/11 pass at published gates).",
@@ -216,9 +606,9 @@
       },
       {
         "name": "miniprotein_trp_cage_ca_rmsd",
-        "value": 4.369079045103398,
+        "value": 3.942906685841728,
         "reference": 5.0,
-        "rel_err": 0.1261841909793205,
+        "rel_err": 0.2114186628316544,
         "unit": "angstrom",
         "protected": false,
         "desc": "Trp-cage (20-mer) C\u03b1 RMSD vs PDB witness \u2014 hardest miniprotein target in the published ladder.",
@@ -255,6 +645,16 @@
         "mainstream_note": "Mainstream: per-observable fits / effective theories achieve |z| << 1 on data they were calibrated to (many free params per sector)"
       },
       {
+        "name": "protein_hydrophobic_interface_ldl_excess",
+        "value": 0.24,
+        "reference": 0.24,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "f_LDL excess at hydrophobic protein\u2013solvent interface vs bulk (200 K supercooled witness).",
+        "mainstream_note": "HQIV interface dress \u03b3\u00b7\u03b1 toward LDL; no fitted hydrophobic potential."
+      },
+      {
         "name": "proton_electron_mass_ratio",
         "value": 1836.1526600005734,
         "reference": 1836.15267343,
@@ -263,6 +663,16 @@
         "protected": false,
         "desc": "m_p / m_e from HQIV resonance ladder + nucleon binding (tuft + SM_GR_Unification papers)",
         "mainstream_note": "Mainstream: measured constant (CODATA/PDG fit to many experiments); no first-principles derivation in SM+GR"
+      },
+      {
+        "name": "thermo_allotrope_phase_residual",
+        "value": 0.4382087969418649,
+        "reference": 0.0,
+        "rel_err": 0.4382087969418649,
+        "unit": "K",
+        "protected": false,
+        "desc": "|T_sl(H\u2082O ice Ih) \u2212 273.15 K| from HQIV geometry melt ladder (allotrope phase residual).",
+        "mainstream_note": "Mainstream: empirical melting curves; HQIV derives T_sl from tetrahedral H-bond network + cohesive scales."
       },
       {
         "name": "tuft_hopf_kappa6_correction",
@@ -283,6 +693,106 @@
         "protected": false,
         "desc": "Vacuum energy density from finite sum \u00bd N(m) \u03c9(m) over causal modes 0 to m_now (matches paper kirchhoff_finite_mode script). HQIV gives observed small value naturally.",
         "mainstream_note": "Mainstream QFT+GR (Planck cutoff): predicts \u03c1_vac ~10^{120} \u00d7 observed (vacuum catastrophe); requires 120 orders fine-tuning or new physics (e.g. SUSY to 10^{-3} eV). No first-principles solution."
+      },
+      {
+        "name": "water_h2o_bond_angle_residual_deg",
+        "value": 0.006779365509288482,
+        "reference": 0.0,
+        "rel_err": 0.006779365509288482,
+        "unit": "deg",
+        "protected": false,
+        "desc": "H\u2013O\u2013H dynamic-centre angle residual vs gas-phase comparison after HQIV torque-tree lone-pair screening.",
+        "mainstream_note": "104.478\u00b0 (Hoy & Bunker 1979 / NIST CCCBDB) remains comparison-only; the derived angle comes from VSEPR balance plus strong-channel torque denominator."
+      },
+      {
+        "name": "water_h2o_melt_T_residual_K",
+        "value": 0.4382087969418649,
+        "reference": 0.0,
+        "rel_err": 0.4382087969418649,
+        "unit": "K",
+        "protected": false,
+        "desc": "Bulk H\u2082O solid\u2192liquid transition temperature residual vs 273.15 K (PhaseGeometryDensity + thermodynamic phase engine).",
+        "mainstream_note": "Mainstream: NIST melting point; HQIV from ice Ih unit cell + shell-opening melt (no fitted potential)."
+      },
+      {
+        "name": "water_hoh_angle_taxonomy_open_gap_deg",
+        "value": 0.006779365509288482,
+        "reference": 0.0,
+        "rel_err": 0.006779365509288482,
+        "unit": "deg",
+        "protected": false,
+        "desc": "Comparison residual |\u03b8_dyn(H\u2082O) \u2212 104.478\u00b0| after separating \u03b8_tet=109.47\u00b0 as the LDL network angle.",
+        "mainstream_note": "104.478\u00b0 (NIST CCCBDB / Hoy & Bunker 1979) remains comparison-only; HQIV \u03b8_dyn uses torque-tree screening n_lp/(n_domains+n_bonds), not the tabulated angle."
+      },
+      {
+        "name": "water_llcp_observation_distance",
+        "value": 0.0,
+        "reference": 0.0,
+        "rel_err": 0.0,
+        "unit": "norm",
+        "protected": false,
+        "desc": "Normalized (T,P) distance from HQIV LLCP-regime anchor to Sciortino observation (comparison grading; lower is better).",
+        "mainstream_note": "Literature LLCP ~198 K / 1250 atm grades HQIV readouts; coordinates never enter derivation."
+      },
+      {
+        "name": "water_metastable_liquid_at_llcp",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "HQIV classifies Sciortino LLCP coordinates (~198 K, ~1250 atm) as metastable_liquid (two-liquid branch witness).",
+        "mainstream_note": "Sciortino et al. Nat. Phys. 2025 (MB-pol) \u2014 comparison only, not an input."
+      },
+      {
+        "name": "water_nucleation_defect_ldl_excess",
+        "value": 0.35543090845952197,
+        "reference": 0.05,
+        "rel_err": 6.108618169190439,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Positive f_LDL response to local \u03b4B / coordination defect at a fixed supercooled water state.",
+        "mainstream_note": "Nucleation is modeled as local curvature excess \u03b4B; no MD nucleation table enters."
+      },
+      {
+        "name": "water_phase_diagram_structural_pass_rate",
+        "value": 1.0,
+        "reference": 1.0,
+        "rel_err": 0.0,
+        "unit": "fraction",
+        "protected": false,
+        "desc": "Structural pass rate on H\u2082O phase-diagram anchors: cytosol liquid, ice below melt, LLCP-regime metastable liquid, T_melt window.",
+        "mainstream_note": "Mainstream: MD potentials (MB-pol, TIP4P) map LLPT; HQIV first-principles (T,P) engine with comparison quarantine."
+      },
+      {
+        "name": "water_widom_free_energy_peak_residual_K",
+        "value": 1.0,
+        "reference": 0.0,
+        "rel_err": 1.0,
+        "unit": "K",
+        "protected": false,
+        "desc": "Alias metric: Widom peak residual after replacing Boltzmann f_LDL with a two-branch free-energy minimizer.",
+        "mainstream_note": "Comparison-only Kim peak; HQIV derives the anomaly branch from latent barrier f(1\u2212f), free-energy curvature, and \u03b3\u00b2 melt window."
+      },
+      {
+        "name": "water_widom_gamma2_window_alignment_K",
+        "value": 1.077904610568794,
+        "reference": 0.0,
+        "rel_err": 1.077904610568794,
+        "unit": "K",
+        "protected": false,
+        "desc": "Internal residual |T_peak \u2212 T_melt\u00b7(1\u2212\u03b3\u00b2)| for the second-order supercooled Widom window.",
+        "mainstream_note": "No external input: \u03b3=2/5 and T_melt from HQIV phase geometry determine the center."
+      },
+      {
+        "name": "water_widom_peak_temperature_residual_K",
+        "value": 1.0,
+        "reference": 0.0,
+        "rel_err": 1.0,
+        "unit": "K",
+        "protected": false,
+        "desc": "|T_peak(\u03ba proxy from free-energy susceptibility + \u03b3\u00b2 supercooled window) \u2212 Kim et al. compressibility max ~229 K| at 1 atm.",
+        "mainstream_note": "Kim et al. Science 2020 compressibility anomaly \u2014 comparison only; HQIV peak from T_melt\u00b7(1\u2212\u03b3\u00b2), not fitted to Kim."
       }
     ],
     "note": "Protected metrics are Lean\u2194Python exact witnesses (rel_err = 0). Phenomenology metrics use PDG/Planck/literature error bars; Arena rewards broad reduction of rel_err across many observables ('sigma everywhere'). sigma_weighted mixes large-magnitude witnesses \u2014 use per-metric rel_err for physics gaps."
@@ -613,7 +1123,8 @@
       "hqiv": "Condensed-matter mechanism not part of the horizon lattice spine; thermo/allotrope Arena metrics are separate phenomenology hooks.",
       "papers": [],
       "arena_metrics": [
-        "thermo_allotrope_phase_residual"
+        "thermo_allotrope_phase_residual",
+        "water_h2o_melt_T_residual_K"
       ]
     },
     {
@@ -637,6 +1148,30 @@
       "arena_metrics": []
     },
     {
+      "id": "water-anomalies-llpt",
+      "wikipedia_topic": "Condensed matter physics",
+      "title": "Water anomalies and liquid\u2013liquid critical point",
+      "status": "partial",
+      "hqiv": "Generalized (T,P) phase engine: motif end members (LDL/HDL \u03c1_curv), two-branch free-energy minimizer, latent f(1\u2212f) barrier, \u03b3\u00b2 Widom window, and metastable_liquid branch below T_melt. Sciortino/Kim/Li grade readouts only \u2014 never inputs. Lean: PhaseDiagramMixture.",
+      "papers": [
+        "thermodynamics-arrow",
+        "unified-framework"
+      ],
+      "arena_metrics": [
+        "water_phase_diagram_structural_pass_rate",
+        "water_metastable_liquid_at_llcp",
+        "water_h2o_melt_T_residual_K",
+        "water_llcp_observation_distance",
+        "water_widom_peak_temperature_residual_K",
+        "water_widom_free_energy_peak_residual_K",
+        "water_widom_gamma2_window_alignment_K",
+        "water_nucleation_defect_ldl_excess",
+        "water_hoh_angle_taxonomy_open_gap_deg",
+        "water_h2o_bond_angle_residual_deg",
+        "thermo_allotrope_phase_residual"
+      ]
+    },
+    {
       "id": "protein-folding",
       "wikipedia_topic": "Biophysics",
       "title": "Protein folding (structure prediction)",
@@ -649,7 +1184,8 @@
       "arena_metrics": [
         "miniprotein_mean_ca_rmsd",
         "miniprotein_trp_cage_ca_rmsd",
-        "miniprotein_fold_pass_fraction"
+        "miniprotein_fold_pass_fraction",
+        "protein_hydrophobic_interface_ldl_excess"
       ]
     },
     {

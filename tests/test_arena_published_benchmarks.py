@@ -66,6 +66,8 @@ def test_arena_registry_includes_published_metrics():
         "hep_decay_panel_mean_z",
         "hep_decay_panel_max_z",
         "orbital_flyby_sparc_model_residual",
+        "water_phase_diagram_structural_pass_rate",
+        "water_metastable_liquid_at_llcp",
     ):
         assert name in names
 
